@@ -49,7 +49,7 @@ export default function HomePage() {
           <div className="hidden md:block" />
           <div className="px-4 py-5 md:px-8">
             <p className="text-[12px] font-extrabold tracking-[0.01em]">
-              Socratic Tutor
+              AI_thena
             </p>
           </div>
           <div className="px-4 py-5 md:px-8 md:text-right">

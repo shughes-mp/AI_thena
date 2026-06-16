@@ -1,4 +1,4 @@
-// Shared TypeScript types for the Socratic Tutor application
+// Shared TypeScript types for the AI_thena application
 
 export type SessionPurpose =
   | "pre_class"

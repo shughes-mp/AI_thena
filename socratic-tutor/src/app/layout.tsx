@@ -17,9 +17,9 @@ const serif = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Socratic Tutor",
+  title: "AI_thena",
   description:
-    "A Socratic tutoring tool for instructors. See how learners think at any point in the learning cycle — before, during, or after class.",
+    "An AI teaching, learning, and formative assessment tool for reading-based courses.",
 };
 
 export default function RootLayout({

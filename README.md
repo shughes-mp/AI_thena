@@ -1,90 +1,96 @@
-# Socratic Tutor
+# AI_thena
 
-Socratic Tutor is an AI-powered learning app that helps learners work through course material with guided questions instead of jumping straight to answers.
+AI_thena is an AI teaching, learning, and formative assessment tool for reading-based courses and programs.
 
-The app is built for instructors, adult learners, and professional learners who want a structured way to prepare for class, reflect during class, or apply ideas after class.
+Instructors upload course materials and define learning outcomes. Learners then work through the material in a guided Socratic dialogue. As learners respond, AI_thena analyzes their reasoning and gives instructors evidence about readiness, misconceptions, progress, and next teaching moves.
 
-## What the App Does
+It is not just a chatbot. It is a learning conversation for students, a teaching intelligence layer for instructors, and a formative assessment signal for programs that care about how learners think.
 
-An instructor creates a learning session, uploads one or more readings, defines learning outcomes, optionally adds protected assessment materials, and shares a learner link. Learners join without an account, enter their name, and chat with a Socratic tutor grounded in the uploaded materials.
+## At a Glance
 
-The tutor asks learners to explain their thinking, checks for misconceptions, tracks repeated attempts, and adapts its support as learners move through the session. Afterward, instructors can review learner progress, misconception patterns, AI-generated teaching recommendations, and purpose-aware reports.
+| Function | What AI_thena Does |
+| --- | --- |
+| Teaching | Helps instructors see learner progress, common misunderstandings, readiness patterns, and recommended teaching moves. |
+| Learning | Guides learners through uploaded readings with Socratic questions, confidence checks, and targeted support. |
+| Assessment | Produces formative evidence against instructor-defined learning outcomes, including rubric-style signals and supporting evidence. |
 
-This is not a generic chatbot. It is a reading-grounded tutoring and instructional insight tool.
+## How It Works
 
-## Tutoring Approach
+1. An instructor creates a session.
+2. The instructor chooses the session purpose, defines learning outcomes, and uploads source readings.
+3. The instructor can add key questions, teaching context, and protected assessment materials.
+4. Learners open a shared link, enter their name, and begin a guided chat.
+5. The tutor starts with prior knowledge, then asks one Socratic question at a time.
+6. After each exchange, a separate diagnostic pass analyzes misconceptions, engagement, confidence, and progress.
+7. Instructors review learner progress, misconception patterns, teaching recommendations, learning outcome evidence, and reports.
 
-The tutor is designed to support learning rather than shortcut it.
+AI_thena can support different moments in the learning cycle:
 
-- It starts with prior knowledge before moving into reading content.
-- It asks one guiding question at a time.
-- It distinguishes direct comprehension help from deeper Socratic probing.
-- It tracks attempts and escalates support when a learner is stuck.
-- It probes confidence and can revisit fragile topics later.
-- It logs misconceptions through a separate diagnostic pass after each tutor response.
-- It protects uploaded assessment materials by coaching learners without supplying protected answers.
-- It strips internal tags and diagnostic notes before content is shown to learners or instructors.
+- `Pre-class`: check comprehension and readiness before class.
+- `In-class Prep`: activate retrieval before an activity.
+- `In-class Reflection`: consolidate learning through self-explanation.
+- `After Class`: push toward transfer and application.
 
-The session purpose changes the tutor's cognitive target:
+New sessions currently default to `Pre-class`. Instructors can change the session purpose in the session workspace.
 
-- `Pre-class`: comprehension and corrected understanding.
-- `In-class Prep`: retrieval, activation, and readiness for an upcoming activity.
-- `In-class Reflection`: consolidation and self-explanation.
-- `After Class`: transfer and application to novel contexts.
+## Who It Is For
 
-New sessions currently default to `Pre-class`. Instructors can change the session purpose in the session workspace under `Session Purpose & Outcomes`.
+- Instructors who want better evidence of learner understanding before, during, or after class.
+- Adult, executive, and professional learning programs.
+- Courses where reading, interpretation, reasoning, and application matter.
+- Teams exploring AI-supported tutoring, teaching analytics, and formative assessment.
 
-## Core Features
+## What Learners Experience
 
-- Instructor session creation with shareable learner links and access codes.
-- Four-step setup framing: session target, source materials, key questions, and sharing.
-- Upload support for `.pdf`, `.docx`, `.txt`, and `.md` source and assessment files.
-- Reading-grounded learner chat with streaming responses.
-- Learner onboarding that starts with prior knowledge rather than immediate recall.
-- Purpose-aware tutor behavior across pre-class, in-class, reflection, and after-class uses.
-- Configurable learning outcomes, course context, session goal, tutor stance, exchange limit, and open/close times.
-- Instructor-authored key questions with process levels, expectations, reading anchors, and misconception seeds.
-- AI-generated key-question suggestions derived from uploaded readings.
-- AI-assisted question improvement and prerequisite-map suggestions.
-- Assessment upload for answer-protection behavior.
-- Message limits and phase-based learner progress framing.
-- Learner end-session flow with markdown summary and copy support.
-- Attempt tracking, confidence checks, topic mastery, soft revisit prompts, and checkpoint coverage.
-- Separate post-response diagnostic pipeline for misconception detection, resolution tracking, and engagement flags.
-- Instructor learner-progress view with summary rows, lazy-loaded conversation traces, confidence checks, and topic mastery.
-- Instructor misconception dashboard with clustering, prevalence, resolution rate, median turns to resolution, severity, and override actions.
-- Session analysis view with quick brief, full analysis, learner outcomes, misconception patterns, question difficulty, and recommendations.
-- AI-generated teaching recommendations with 5-minute, 15-minute, and 30-minute active learning moves.
-- Instructor actions for marking recommendations as used or dismissed.
-- AI-generated instructor reports with purpose-aware heatmaps and per-student notes.
-- Formative learning outcome assessments with rubric scores, evidence, process metrics, and AI confidence.
-- PDF export for instructor reports and session analysis.
+Learners do not need an account. They open the session link, enter their name, and chat with a tutor grounded in the instructor's uploaded materials.
 
-## Typical Workflow
+The tutor:
 
-### Instructor Flow
+- begins by asking what the learner already knows or believes;
+- uses the uploaded readings as its source of truth;
+- asks one guiding question at a time;
+- gives direct comprehension help when appropriate;
+- uses deeper Socratic probing for interpretation, application, and conceptual confusion;
+- checks confidence and revisits fragile topics;
+- protects uploaded assessment materials by coaching without supplying protected answers;
+- ends with a learner-facing session summary.
 
-1. Create a session by entering a session name.
-2. In the session workspace, choose or confirm the session purpose and define at least one learning outcome.
-3. Upload one or more source readings.
-4. Add key questions manually or generate suggested questions from the source material.
-5. Optionally upload assessments the tutor should treat as protected.
-6. Optionally add teaching context, a session goal, tutor stance, exchange limit, availability dates, and a prerequisite map.
-7. Save settings and copy the learner link.
-8. Monitor learner progress as students participate.
-9. Review session analysis, common misunderstandings, teaching recommendations, and reports.
-10. Export reports to PDF when needed.
+A session is available to learners only after it has at least one uploaded source reading and at least one learning outcome.
 
-### Learner Flow
+## What Instructors Can Do
 
-1. Open the shared session link.
-2. If the session is not ready, see a `Session Not Ready Yet` message.
-3. Enter a name and begin with no account required.
-4. Share prior knowledge before moving into the reading.
-5. Work through guided questions, confidence checks, and targeted feedback.
-6. End the session and receive a formatted summary.
+Instructors can:
 
-A session is considered ready for learners only after it has at least one uploaded source reading and at least one learning outcome.
+- create sessions with shareable learner links and access codes;
+- upload `.pdf`, `.docx`, `.txt`, and `.md` readings;
+- optionally upload protected assessment materials;
+- define learning outcomes and session goals;
+- choose a session purpose;
+- configure tutor stance, exchange limits, and availability dates;
+- add key questions manually or generate suggestions from readings;
+- monitor learner progress and conversation traces;
+- review common misunderstandings across the class;
+- generate teaching recommendations;
+- review AI-generated reports and export them as PDFs.
+
+## What AI_thena Produces
+
+AI_thena turns learner conversations into instructor-facing evidence:
+
+- learner progress summaries;
+- confidence checks;
+- topic mastery signals;
+- checkpoint coverage;
+- misconception clusters;
+- prevalence and resolution rates;
+- engagement flags;
+- question difficulty signals;
+- 5-minute, 15-minute, and 30-minute teaching recommendations;
+- formative learning outcome assessments;
+- purpose-aware reports and heatmaps;
+- per-student notes and summaries.
+
+These outputs are formative teaching aids. They are designed to help instructors make better decisions, not to replace instructor judgment.
 
 ## Instructor Surfaces
 
@@ -94,7 +100,7 @@ A session is considered ready for learners only after it has at least one upload
 - `Common misunderstandings`: class-level misconception clusters and recommendation generation.
 - `Instructor recommendations`: generated teaching brief/report with heatmaps, next steps, per-student notes, learning outcome review, and PDF export.
 
-## Local Development Setup
+## Local Development
 
 ### Requirements
 
@@ -104,7 +110,9 @@ A session is considered ready for learners only after it has at least one upload
 
 ### Environment Variables
 
-Create a local `.env.local` file. For local development, the app runtime uses `file:./prisma/dev.db`; Prisma CLI commands use `LOCAL_DATABASE_URL`, then `DATABASE_URL`, then the fallback configured in `prisma.config.ts`.
+Create a local `.env.local` file inside the app folder.
+
+For local development, the app runtime uses `file:./prisma/dev.db`. Prisma CLI commands use `LOCAL_DATABASE_URL`, then `DATABASE_URL`, then the fallback configured in `prisma.config.ts`.
 
 ```bash
 ANTHROPIC_API_KEY=your_anthropic_api_key
@@ -127,19 +135,11 @@ ANTHROPIC_MODEL_PRIMARY=claude-sonnet-4-6
 ANTHROPIC_MODEL_FAST=claude-haiku-4-5-20251001
 ```
 
-Environment variable notes:
-
-- `ANTHROPIC_API_KEY` is required for tutoring, diagnostics, recommendations, and reports.
-- `NEXT_PUBLIC_APP_URL` is useful for generated links.
-- `LOCAL_DATABASE_URL` is used by Prisma CLI commands during local schema work.
-- `DATABASE_URL` is a local fallback and can also point to `libsql://` in hosted runtime.
-- `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` are required for Vercel production runtime.
-- `ANTHROPIC_MODEL_PRIMARY` overrides the main tutoring/report model.
-- `ANTHROPIC_MODEL_FAST` overrides faster diagnostic and suggestion features.
-
 Do not commit `.env.local`.
 
 ### Install and Run
+
+From the app folder:
 
 ```bash
 npm install
@@ -149,7 +149,9 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000).
 
-### Verification Commands
+## Verification
+
+Useful checks:
 
 ```bash
 npm run build
@@ -162,12 +164,11 @@ Current status:
 - `npm run build` succeeds.
 - `npx tsc --noEmit` succeeds.
 - `npm run lint` currently reports existing lint issues, including source lint errors and the untracked local `scratch/` helper folder if it is present.
+- There is currently no `npm test` script.
 
-There is currently no `npm test` script. The `tests/model-alias.test.ts` file is a Node test file, but the project does not currently include the `ts-node/register` dependency needed to run it with the obvious command.
+## Database and Deployment
 
-## Database Setup
-
-The app uses two database modes:
+AI_thena uses two database modes:
 
 - Local development: `better-sqlite3` with `prisma/dev.db`.
 - Production: Turso Cloud through Prisma's libsql adapter.
@@ -179,18 +180,6 @@ Important details:
 - Production runtime uses `TURSO_DATABASE_URL` or a `DATABASE_URL` that starts with `libsql://`.
 - Production without a Turso/libsql URL throws a configuration error.
 - The app includes runtime Turso bootstrap SQL for production tables, indexes, and incremental schema upgrades.
-- Prisma's `driverAdapters` preview flag is still present in the schema, though Prisma reports that the feature is now available without specifying it as preview.
-
-## Production Deployment
-
-This project is set up for deployment on Vercel.
-
-Set these environment variables in Vercel:
-
-- `ANTHROPIC_API_KEY`
-- `TURSO_DATABASE_URL`
-- `TURSO_AUTH_TOKEN`
-- `NEXT_PUBLIC_APP_URL`
 
 The production build command is:
 
@@ -198,27 +187,25 @@ The production build command is:
 prisma generate && next build
 ```
 
-### Schema Changes in Production
+For Vercel, configure:
 
-Do not rely on `prisma db push` during the Vercel build for Turso schema creation.
+- `ANTHROPIC_API_KEY`
+- `TURSO_DATABASE_URL`
+- `TURSO_AUTH_TOKEN`
+- `NEXT_PUBLIC_APP_URL`
 
-Recommended workflow:
-
-- Use `npx prisma migrate dev` for local schema work.
-- Let Vercel builds run `prisma generate && next build`.
-- Handle Turso schema rollout as a separate operational step.
-- Keep the runtime Turso bootstrap path as a safety net for production table and column creation.
+Do not rely on `prisma db push` during the Vercel build for Turso schema creation. Use `npx prisma migrate dev` for local schema work and handle Turso schema rollout as a separate operational step.
 
 ## Quick Test Flow
 
 1. Create an instructor session.
-2. In the workspace, choose the session purpose and add at least one learning outcome.
+2. Choose the session purpose and add at least one learning outcome.
 3. Upload a reading.
 4. Add key questions manually or generate suggestions from the reading.
 5. Copy the learner link and open it in another browser window.
 6. Enter a learner name and begin the chat.
 7. Have a short tutoring conversation.
-8. End the learner session and review the generated learner summary.
+8. End the learner session and review the learner summary.
 9. Return to the instructor workspace and open learner progress or session analysis.
 10. Generate or review reports, recommendations, misconception patterns, and PDF exports.
 
@@ -228,14 +215,13 @@ Recommended workflow:
 - PDF extraction works best with text-based PDFs, not scanned-image PDFs.
 - Scanned or image-based PDFs should be converted or replaced with DOCX, TXT, or Markdown.
 - The file parser enforces a 10MB upload limit.
-- The quality of tutoring depends heavily on the quality of uploaded source material and learning outcomes.
+- Tutoring quality depends heavily on the quality of uploaded source material and learning outcomes.
 - Assessment protection reduces answer leakage but should not be treated as a formal exam-security guarantee.
 - AI-generated diagnostics, learning outcome assessments, summaries, and teaching recommendations are formative aids that instructors should review.
 - Misconception detection runs after the tutor response, so dashboard updates may lag slightly behind the learner-visible chat.
 - Recommendation generation falls back to deterministic cards when structured AI output cannot be parsed.
 - Changing the session purpose affects future tutor behavior and future report framing, but it does not retroactively change recorded conversations.
 - Live engagement flags are lightweight heuristics, not definitive judgments about learner effort.
-- Fast-path AI features rely on a currently available Anthropic Haiku model. If you override `ANTHROPIC_MODEL_FAST`, make sure the model is available in your Anthropic account.
 
 ## Tech Stack
 
