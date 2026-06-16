@@ -44,7 +44,7 @@ interface WorkspaceHeaderProps {
 
 function getPurposeLinks(sessionId: string, purpose: string) {
   const monitor = { href: `/instructor/${sessionId}/monitor`, label: "Learner progress" };
-  const analysis = { href: `/instructor/${sessionId}/analysis`, label: "Session analysis" };
+  const analysis = { href: `/instructor/${sessionId}/analysis`, label: "Teaching brief" };
 
   switch (purpose) {
     case "during_class_prep":
@@ -84,7 +84,7 @@ export function WorkspaceHeader({ sessionId, session, isActive, setupStep }: Wor
             {setupStep !== null && (
               <span className="text-xs text-[var(--dim-grey)]">
                 Step {setupStep} of 4 —{" "}
-                {setupStep === 2 ? "Add source materials" : setupStep === 3 ? "Define outcomes" : "Share with learners"}
+                {setupStep === 2 ? "Add source materials" : setupStep === 3 ? "Define evidence goals" : "Share with learners"}
               </span>
             )}
           </div>
@@ -119,7 +119,7 @@ interface StatusBarProps {
  export function StatusBar({ learnerCount, readingsCount, assessmentsCount, checkpointsCount, purposeLabel }: StatusBarProps & { checkpointsCount: number, purposeLabel: string }) {
   return (
     <div className="border border-[var(--rule)] bg-[rgba(17,120,144,0.04)] px-6 py-3 text-sm text-[var(--dim-grey)]">
-      Status: {readingsCount} reading{readingsCount !== 1 ? "s" : ""}, {checkpointsCount} key question{checkpointsCount !== 1 ? "s" : ""}, {assessmentsCount} assignment{assessmentsCount !== 1 ? "s" : ""}. AI tutor set to {purposeLabel}.
+      Session signal: {readingsCount} source material{readingsCount !== 1 ? "s" : ""}, {checkpointsCount} evidence question{checkpointsCount !== 1 ? "s" : ""}, {assessmentsCount} protected assessment{assessmentsCount !== 1 ? "s" : ""}. AI_thena purpose: {purposeLabel}.
     </div>
   );
 }
@@ -225,7 +225,7 @@ export function SessionInsightsCard({
             className={`h-2.5 w-2.5 rounded-full ${hasConcerns ? "bg-[#906f12]" : "bg-[var(--teal)]"}`}
           />
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--dim-grey)]">
-            Real-time monitoring
+            Review signals
           </p>
         </div>
 
@@ -256,7 +256,7 @@ export function SessionInsightsCard({
                   {concernCount}
                 </p>
                 <p className="mt-1 text-xs text-[var(--dim-grey)]">
-                  engagement concern{concernCount !== 1 ? "s" : ""}
+                  possible concern{concernCount !== 1 ? "s" : ""}
                 </p>
               </div>
             )}
@@ -278,8 +278,7 @@ export function SessionInsightsCard({
               <p className="text-sm text-[var(--charcoal)]">
                 {concernCount > 0 && (
                   <span className="font-medium text-[#906f12]">
-                    {concernCount} learner{concernCount !== 1 ? "s" : ""} showing
-                    engagement concerns.{" "}
+                    {concernCount} learner{concernCount !== 1 ? "s" : ""} may need follow-up.{" "}
                   </span>
                 )}
                 {waitingLong > 0 && (
@@ -317,12 +316,12 @@ export function SessionInsightsCard({
   const total = liveStatus.length;
   const participationLabel =
     sessionPurpose === "pre_class"
-      ? "Learner readiness"
-      : "Learning outcome summary";
+      ? "Learner readiness signals"
+      : "Learning outcome evidence";
   const contextLine =
     sessionPurpose === "pre_class"
-      ? "Identify readiness and misconceptions before class began."
-      : "Review how learners translated understanding into application.";
+      ? "Review what learners appear ready to apply and where misconceptions may remain."
+      : "Review evidence of how learners translated understanding into application.";
 
   return (
     <div className="minerva-card overflow-hidden">
@@ -426,7 +425,7 @@ export function ReadingsSection({
       >
         <div>
           <h2 className="font-serif text-[34px] leading-[1] tracking-[-0.03em] text-[var(--charcoal)]">
-            Source Materials
+            Source materials
           </h2>
           {!open && readings.length > 0 && (
             <p className="mt-2 text-sm text-[var(--dim-grey)]">
@@ -434,7 +433,7 @@ export function ReadingsSection({
             </p>
           )}
           {!open && readings.length === 0 && (
-            <p className="mt-2 text-sm text-[#906f12]">No source materials yet — upload to activate the AI Tutor</p>
+            <p className="mt-2 text-sm text-[#906f12]">No source materials yet - upload to ground AI_thena</p>
           )}
         </div>
         <ChevronIcon open={open} />
@@ -443,7 +442,7 @@ export function ReadingsSection({
       {open && (
         <div className="space-y-4 px-6 pb-6 md:px-8 md:pb-8">
           <p className="text-sm text-[var(--dim-grey)]">
-            Ground the AI conversation in your primary materials. PDF, DOCX, TXT, or Markdown. Up to 50MB.
+            AI_thena uses these sources as its evidence base for learner dialogue. PDF, DOCX, TXT, or Markdown. Up to 10MB.
           </p>
           <div
             onDrop={(e) => handlers.onDrop(e, "reading")}
@@ -596,7 +595,7 @@ export function QuestionsSection({
       >
         <div>
           <h2 className="font-serif text-[34px] leading-[1] tracking-[-0.03em] text-[var(--charcoal)]">
-            Key Questions
+            Evidence questions
           </h2>
           {!open && checkpoints.length > 0 && (
             <p className="mt-2 text-sm text-[var(--dim-grey)]">
@@ -604,7 +603,7 @@ export function QuestionsSection({
             </p>
           )}
           {!open && checkpoints.length === 0 && (
-            <p className="mt-2 text-sm text-[#906f12]">No questions yet — add 2–4 to guide the tutor</p>
+            <p className="mt-2 text-sm text-[#906f12]">No questions yet - add 2-4 to guide AI_thena</p>
           )}
         </div>
         <ChevronIcon open={open} />
@@ -628,7 +627,7 @@ export function QuestionsSection({
           </div>
 
           <div className="space-y-3 pt-2">
-            <label className="minerva-label">Choose 1-3 questions that will guide what the AI tutor focuses on. Aim for questions that require interpretation, inference, or synthesis - not merely recall.</label>
+            <label className="minerva-label">Choose 1-3 questions that guide what evidence AI_thena listens for. Aim for interpretation, inference, or synthesis - not recall.</label>
           </div>
 
           {tooMany && (
@@ -876,7 +875,7 @@ export function GoalsSection({
         <div className="flex items-center gap-4">
           <ChevronIcon open={open} />
           <h2 className="text-base font-medium text-[var(--charcoal)] tracking-[-0.01em]">
-            Step 1: Session Purpose & Outcomes
+            Step 1: Learning purpose & outcomes
           </h2>
         </div>
         {session.learningOutcomes && session.learningOutcomes.trim().length > 0 ? (
@@ -893,9 +892,9 @@ export function GoalsSection({
       {open && (
         <div className="border-t border-[var(--rule)] bg-[rgba(34,34,34,0.01)] px-4 py-8 md:px-14 md:py-10 space-y-8">
           <div className="space-y-3">
-            <label className="minerva-label">Session Target</label>
+            <label className="minerva-label">Learning cycle purpose</label>
             <p className="text-xs text-[var(--dim-grey)]">
-              When in the learning cycle will learners use this session? This shapes how the tutor questions and what the teaching brief measures.
+              When in the learning cycle will learners use this session? This shapes how AI_thena questions learners and what the teaching brief treats as evidence.
             </p>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {SESSION_PURPOSE_OPTIONS.map((option) => {
@@ -930,11 +929,10 @@ export function GoalsSection({
 
           <div className="space-y-2">
             <label className="minerva-label" htmlFor="learningOutcomes">
-              Learning outcomes to assess
+              Learning outcomes for formative evidence
             </label>
             <p className="text-xs text-[var(--dim-grey)]">
-              The specific skills or understandings you want to track. The tutor will assess each learner against
-              these and include formative ratings in the teaching brief.
+              The specific skills or understandings you want to track. AI_thena will look for evidence in each learner&apos;s reasoning and include reviewable formative signals in the teaching brief.
             </p>
             <textarea
               id="learningOutcomes"
@@ -951,13 +949,13 @@ export function GoalsSection({
               Opening message for students
             </label>
             <p className="text-xs text-[var(--dim-grey)]">
-              Optional. Shown to students before the tutoring conversation begins. Use it to set the stage or provide context.
+              Optional. Shown to learners before the conversation begins. Use it to set the stage or provide context.
             </p>
             <textarea
               id="sessionDescription"
               value={session.description ?? ""}
               onChange={(e) => updateSession({ description: e.target.value || null })}
-              placeholder="e.g. Explain how the author's definition of X conflicts with Y—the tutor will push you on your reasoning."
+              placeholder="e.g. Explain how the author's definition of X conflicts with Y. AI_thena will push you on your reasoning."
               rows={3}
               className="minerva-input w-full resize-none text-sm"
             />
@@ -1056,7 +1054,7 @@ export function TeachingContextSection({
               Where this session fits in your course
             </label>
             <p className="text-xs text-[var(--dim-grey)]">
-              Optional. Helps the tutor connect to larger course themes and prior sessions.
+              Optional. Helps AI_thena connect the session to larger course themes and prior learning.
             </p>
             <textarea
               id="courseContext"
@@ -1074,8 +1072,7 @@ export function TeachingContextSection({
               Session goal
             </label>
             <p className="text-xs text-[var(--dim-grey)]">
-              The overarching understanding you&apos;re building toward. Shapes how the tutor opens and closes the
-              session.
+              The overarching understanding you&apos;re building toward. Shapes how AI_thena opens, questions, and closes the session.
             </p>
             <textarea
               id="learningGoal"
@@ -1107,11 +1104,11 @@ export function TeachingContextSection({
 
             {showAdvanced && (
               <div className="mt-6 space-y-6">
-                {/* Tutor stance */}
+                {/* Interaction style */}
                 <div className="space-y-2">
-                  <label className="minerva-label">Tutor stance</label>
+                  <label className="minerva-label">Interaction style</label>
                   <p className="text-xs text-[var(--dim-grey)]">
-                    Directed: guides learners through questions with clear authority. Mentor: more collaborative inquiry, suited for experienced or professional learners.
+                    Directed: guides learners through questions with clear authority. Mentor: uses more collaborative inquiry for experienced or professional learners.
                   </p>
                   <div className="flex gap-3">
                     {(["directed", "mentor"] as const).map((stance) => (
@@ -1183,7 +1180,7 @@ export function TeachingContextSection({
                   <div className="space-y-2">
                     <label className="minerva-label">Foundational concept map</label>
                     <p className="text-xs text-[var(--dim-grey)]">
-                      Identify the concepts learners must understand to master this reading. Helps the AI identify the &quot;illusion of competence.&quot;
+                      Identify the concepts learners need in order to reason well with this material. Helps AI_thena notice confidence that is not yet backed by explanation.
                     </p>
                     <div className="flex gap-3">
                       <button
@@ -1277,7 +1274,7 @@ export function AssessmentsSection({
       >
         <div>
           <h2 className="font-serif text-[34px] leading-[1] tracking-[-0.03em] text-[var(--charcoal)]">
-            Assessments
+            Protected assessment materials
           </h2>
           {!open && assessments.length > 0 && (
             <p className="mt-2 text-sm text-[var(--dim-grey)]">
@@ -1285,7 +1282,7 @@ export function AssessmentsSection({
             </p>
           )}
           {!open && assessments.length === 0 && (
-            <p className="mt-2 text-sm text-[var(--dim-grey)]">Optional — protects your assessment answers</p>
+            <p className="mt-2 text-sm text-[var(--dim-grey)]">Optional - keeps answer keys out of learner replies</p>
           )}
         </div>
         <ChevronIcon open={open} />
@@ -1294,8 +1291,7 @@ export function AssessmentsSection({
       {open && (
         <div className="space-y-4 px-6 pb-6 md:px-8 md:pb-8">
           <p className="text-sm text-[var(--dim-grey)]">
-            Upload your assessment or exam questions. The tutor will coach learners without revealing the answers.
-            Optional.
+            Upload assessment or exam prompts that AI_thena should protect. Learners can be coached toward the reasoning without seeing the answers. Optional.
           </p>
 
           {/* Drop zone */}

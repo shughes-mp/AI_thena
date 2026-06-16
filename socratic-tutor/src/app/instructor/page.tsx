@@ -53,12 +53,12 @@ export default function InstructorCreatePage() {
           <div className="px-4 py-12 md:px-8 md:py-16">
             <p className="eyebrow eyebrow-teal">Setup</p>
             <h1 className="section-title mt-5 max-w-[10ch]">
-              Set up your AI Tutor.
+              Set up a learning evidence session.
             </h1>
             <p className="body-copy muted-copy mt-6 max-w-[25rem]">
               Name your session and we&apos;ll take you to the workspace where
-              you can upload readings, set learning goals, and choose when in
-              the learning cycle students will use the tutor.
+              you can upload sources, define outcomes, protect assessment
+              materials, and choose when learners will use AI_thena.
             </p>
             <div className="mt-8">
               <StepIndicator currentStep={1} />
@@ -70,7 +70,7 @@ export default function InstructorCreatePage() {
               <div className="space-y-5">
                 <div>
                   <label htmlFor="session-name" className="minerva-label">
-                    Session Name
+                    Learning session name
                   </label>
                   <input
                     id="session-name"

@@ -19,7 +19,7 @@ function getConversationPhase(exchangeCount: number, maxExchanges: number) {
   if (percentage < 90) {
     return { phase: "Wrapping up", percentage };
   }
-  return { phase: "Final thoughts", percentage };
+  return { phase: "Synthesis", percentage };
 }
 
 interface Message {
@@ -255,7 +255,7 @@ If course context is available, use it naturally in the first three exchanges.`,
                 Your session summary{studentName ? `, ${studentName}` : ""}
               </h1>
               <p className="body-copy muted-copy mt-4 max-w-[36rem]">
-                Save or share this with your instructor before class.
+                Save or share this with your instructor for formative review.
               </p>
 
               <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -367,8 +367,10 @@ If course context is available, use it naturally in the first three exchanges.`,
                       )}
                       <p className="mt-3 max-w-[40rem] text-[14px] leading-7 text-[var(--dim-grey)]">
                         Start by sharing what you already know about the topic.
-                        The tutor will ask questions — not give you answers.
-                        Try to explain your thinking before asking for help.
+                        AI_thena will ask questions, look for evidence in your
+                        reasoning, and stay grounded in the materials your
+                        instructor provided. Try to explain your thinking
+                        before asking for help.
                       </p>
                     </div>
 
@@ -432,7 +434,7 @@ If course context is available, use it naturally in the first three exchanges.`,
                       className="cursor-help text-xs text-[var(--dim-grey)]"
                       title={`${exchangeCount} / ${maxExchanges} exchanges`}
                     >
-                      {exchangeCount} / {maxExchanges}
+                      Session progress
                     </span>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-[rgba(60,55,50,0.12)]">
@@ -456,7 +458,7 @@ If course context is available, use it naturally in the first three exchanges.`,
 
               <div className="mt-3 flex flex-col gap-2 text-[12px] font-medium text-[var(--dim-grey)] md:flex-row md:items-center md:justify-between">
                 <span>
-                  Your tutor is based only on the materials your instructor uploaded.
+                  AI_thena is based on the materials your instructor uploaded.
                 </span>
                 <span>{phaseInfo.phase}</span>
               </div>
@@ -470,7 +472,7 @@ If course context is available, use it naturally in the first three exchanges.`,
                           End this session now?
                         </p>
                         <p className="mt-1 text-[12px] text-[var(--dim-grey)]">
-                          We&apos;ll wrap up the conversation and prepare your session summary.
+                          We&apos;ll wrap up the conversation and prepare a formative session summary.
                         </p>
                       </div>
                       <div className="flex flex-col gap-2 sm:flex-row">

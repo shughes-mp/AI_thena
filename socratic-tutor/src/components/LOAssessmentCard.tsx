@@ -20,11 +20,11 @@ const statusColors: Record<string, string> = {
 
 const statusLabels: Record<string, string> = {
   // New 0-4 Rubric
-  "0_no_submission": "Score: 0 / 4 (No Submission)",
-  "1_beginning": "Score: 1 / 4 (Beginning)",
-  "2_developing": "Score: 2 / 4 (Developing)",
-  "3_proficient": "Score: 3 / 4 (Proficient)",
-  "4_advanced": "Score: 4 / 4 (Advanced)",
+  "0_no_submission": "Evidence level: 0 / 4 (No Submission)",
+  "1_beginning": "Evidence level: 1 / 4 (Beginning)",
+  "2_developing": "Evidence level: 2 / 4 (Developing)",
+  "3_proficient": "Evidence level: 3 / 4 (Proficient)",
+  "4_advanced": "Evidence level: 4 / 4 (Advanced)",
   // Legacy backups
   not_observed: "Not Observed",
   insufficient_evidence: "Insufficient Evidence",
@@ -122,7 +122,7 @@ export function LOAssessmentCard({ assessment }: LOAssessmentCardProps) {
           {processMetrics && (
             <div className="rounded-xl bg-[rgba(34,34,34,0.03)] p-3 text-xs leading-5 text-[var(--dim-grey)]">
               <p className="mb-1 font-medium text-[var(--charcoal)]">
-                Process Metrics
+                Process evidence
               </p>
               {processMetrics.misconceptionCount !== undefined && (
                 <p>

@@ -138,7 +138,7 @@ export default function StudentMonitorPage() {
                   {getSessionPurposeOption(sessionPurpose).shortLabel}
                 </span>
                 <p className="text-[15px] leading-7 text-[var(--dim-grey)]">
-                  See who joined, how far each learner got, and the conversation behind their progress.
+                  See who joined, how far each learner got, and the evidence AI_thena found in their dialogue.
                 </p>
               </div>
             </div>
@@ -165,7 +165,7 @@ export default function StudentMonitorPage() {
                   mode === "live" ? "" : "minerva-button-secondary"
                 }`}
               >
-                Real-time monitoring
+                Live review signals
               </button>
             </div>
           </div>
@@ -200,7 +200,7 @@ export default function StudentMonitorPage() {
                     <div className="minerva-card flex items-center gap-3 p-4">
                       <span className="h-3 w-3 rounded-full bg-[var(--teal)]" />
                       <p className="text-sm text-[var(--charcoal)]">
-                        All learners are on task
+                        No current review signals detected
                       </p>
                     </div>
                   );
@@ -211,8 +211,7 @@ export default function StudentMonitorPage() {
                     <p className="text-sm text-[var(--charcoal)]">
                       {concernCount > 0 && (
                         <span className="font-medium text-[#906f12]">
-                          {concernCount} learner{concernCount !== 1 ? "s" : ""} showing
-                          engagement concerns.{" "}
+                          {concernCount} learner{concernCount !== 1 ? "s" : ""} may need follow-up.{" "}
                         </span>
                       )}
                       {waitingLong > 0 && (
@@ -231,9 +230,9 @@ export default function StudentMonitorPage() {
                 <thead className="border-b border-[var(--rule)] bg-[rgba(34,34,34,0.02)]">
                   <tr>
                     <th className="px-6 py-4">Learner</th>
-                    <th className="px-6 py-4">Action Flags</th>
-                    <th className="px-6 py-4">Rubric projection</th>
-                    <th className="px-6 py-4">Misconceptions</th>
+                    <th className="px-6 py-4">Review signals</th>
+                    <th className="px-6 py-4">Outcome evidence</th>
+                    <th className="px-6 py-4">Misunderstandings</th>
                     <th className="px-6 py-4">Last active</th>
                     <th className="px-6 py-4 text-right">Conversation</th>
                   </tr>
@@ -261,13 +260,13 @@ export default function StudentMonitorPage() {
                               student.secondsSinceLastMessage > 180 ? (
                                 <span className="flex w-max items-center gap-1.5 rounded-md bg-[rgba(223,47,38,0.08)] px-2.5 py-1 text-xs font-medium text-[var(--signal)]">
                                   <span className="h-2 w-2 rounded-full bg-[var(--signal)]" />
-                                  Needs help
+                                  May need follow-up
                                 </span>
                               ) : null}
                               {student.hasRecentEngagementConcern ? (
                                 <span className="flex w-max items-center gap-1.5 rounded-md bg-[rgba(144,111,18,0.10)] px-2.5 py-1 text-xs font-medium text-[#906f12]">
                                   <span className="h-2 w-2 rounded-full bg-[#906f12]" />
-                                  Engagement block
+                                  Possible engagement concern
                                 </span>
                               ) : null}
                               {!student.hasRecentEngagementConcern && (!student.isWaitingForStudentReply || (student.secondsSinceLastMessage && student.secondsSinceLastMessage <= 180)) ? (
@@ -284,22 +283,22 @@ export default function StudentMonitorPage() {
                                 student.latestRubricScore === '3_proficient' || student.latestRubricScore === 'meets' ? 'bg-[rgba(17,120,144,0.10)] text-[var(--teal)]' :
                                 'bg-[rgba(114,133,3,0.12)] text-[var(--olive)]'
                                }`}>
-                                 {student.latestRubricScore === '0_no_submission' ? 'Score: 0 / 4' :
-                                  student.latestRubricScore === '1_beginning' ? 'Score: 1 / 4' :
-                                  student.latestRubricScore === '2_developing' ? 'Score: 2 / 4' :
-                                  student.latestRubricScore === '3_proficient' ? 'Score: 3 / 4' :
-                                  student.latestRubricScore === '4_advanced' ? 'Score: 4 / 4' :
+                                 {student.latestRubricScore === '0_no_submission' ? 'Evidence: 0 / 4' :
+                                  student.latestRubricScore === '1_beginning' ? 'Evidence: 1 / 4' :
+                                  student.latestRubricScore === '2_developing' ? 'Evidence: 2 / 4' :
+                                  student.latestRubricScore === '3_proficient' ? 'Evidence: 3 / 4' :
+                                  student.latestRubricScore === '4_advanced' ? 'Evidence: 4 / 4' :
                                   student.latestRubricScore.replace('_', ' ')}
                                </span>
                             ) : (
-                               <span className="text-xs text-[var(--dim-grey)] opacity-60 italic">Pending report</span>
+                               <span className="text-xs text-[var(--dim-grey)] opacity-60 italic">Pending brief</span>
                             )}
                           </td>
                           <td className="px-6 py-4">
                             {student.misconceptionCount > 0 ? (
                               <span className="flex w-max items-center gap-1.5 rounded-md bg-[rgba(144,111,18,0.10)] px-2.5 py-1 text-xs font-medium text-[#906f12]">
                                 <span className="h-2 w-2 rounded-full bg-[#906f12]" />
-                                {student.misconceptionCount} unresolved
+                                {student.misconceptionCount} unresolved signal{student.misconceptionCount !== 1 ? "s" : ""}
                               </span>
                             ) : (
                               <span className="text-xs text-[var(--dim-grey)] text-opacity-60">—</span>
@@ -331,7 +330,7 @@ export default function StudentMonitorPage() {
                               className="border-t border-[var(--rule)] bg-[rgba(34,34,34,0.02)] p-0"
                             >
                               <div className="mx-6 my-5 max-w-4xl border-l-2 border-[var(--teal)] bg-white p-8">
-                                <h4 className="eyebrow eyebrow-teal mb-6">Full Conversation</h4>
+                                <h4 className="eyebrow eyebrow-teal mb-6">Full conversation</h4>
                                 {loadingDetail ? (
                                   <div className="py-4">
                                     <LoadingState message="Loading conversation…" />
@@ -341,7 +340,7 @@ export default function StudentMonitorPage() {
                                     {expandedDetail.topicMastery.length > 0 && (
                                       <div className="mb-4 rounded-lg border border-[var(--rule)] bg-[rgba(34,34,34,0.02)] p-4">
                                         <p className="text-xs font-semibold uppercase tracking-widest text-[var(--dim-grey)]">
-                                          Topic mastery
+                                          Topic evidence
                                         </p>
                                         <div className="mt-2 flex flex-wrap gap-2">
                                           {expandedDetail.topicMastery.map((topicMastery) => (

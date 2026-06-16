@@ -70,10 +70,14 @@ interface StudentLOAssessmentGroup {
 
 const SECTION_PATTERNS: Array<{ key: string; patterns: string[] }> = [
   { key: "snapshot", patterns: ["SESSION SNAPSHOT"] },
-  { key: "what_to_do", patterns: ["WHAT TO DO NEXT"] },
+  { key: "what_to_do", patterns: ["SUGGESTED TEACHING MOVES", "WHAT TO DO NEXT"] },
   {
     key: "heatmap",
     patterns: [
+      "READINESS EVIDENCE MAP",
+      "ACTIVATION EVIDENCE MAP",
+      "CONSOLIDATION EVIDENCE MAP",
+      "TRANSFER EVIDENCE MAP",
       "READINESS HEATMAP",
       "ACTIVATION HEATMAP",
       "CONSOLIDATION HEATMAP",
@@ -640,10 +644,10 @@ export default function SessionAnalysisPage() {
                   Sessions
                 </Link>
                 <span>/</span>
-                <span className="text-[var(--charcoal)]">Session analysis</span>
+                <span className="text-[var(--charcoal)]">Teaching brief</span>
               </nav>
               <h1 className="mt-4 font-serif text-[42px] leading-[0.96] tracking-[-0.03em] text-[var(--charcoal)]">
-                Session analysis
+                Teaching brief
               </h1>
               {/* Inline metadata — not hero-number cards */}
               <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -774,14 +778,14 @@ export default function SessionAnalysisPage() {
 
             <div className="px-6 py-5 md:px-8">
               {loadingClusters ? (
-                <LoadingState message="Loading misconception data…" />
+                <LoadingState message="Loading misunderstanding data..." />
               ) : clusterError ? (
                 <p className="text-sm text-[var(--signal)]">{clusterError}</p>
               ) : (
                 <>
                   {clusters.length === 0 ? (
                     <p className="text-sm text-[var(--dim-grey)]">
-                      No misconceptions logged yet. Patterns will appear as learners engage.
+                      No misunderstanding signals logged yet. Patterns will appear as learners engage.
                     </p>
                   ) : (
                     <div className="space-y-3">
@@ -892,7 +896,7 @@ export default function SessionAnalysisPage() {
                 )}
 
                 <p className="text-center text-xs text-[var(--dim-grey)] pt-2">
-                  Switch to &ldquo;Full analysis&rdquo; for readiness heatmap, misconception details, and learning outcomes.
+                  Switch to &ldquo;Full analysis&rdquo; for the evidence map, misunderstanding details, and learning outcome evidence.
                 </p>
               </div>
             ) : null}
@@ -968,7 +972,7 @@ export default function SessionAnalysisPage() {
             {report && (
               <section className="minerva-card p-6 md:p-8">
                 <h3 className="font-serif text-[30px] leading-[1.02] tracking-[-0.03em] text-[var(--charcoal)]">
-                  Class readiness
+                  Readiness evidence
                 </h3>
                 <p className="mt-2 max-w-[42rem] text-sm text-[var(--dim-grey)]">
                   How prepared students are for each concept area based on their session work.
@@ -985,7 +989,7 @@ export default function SessionAnalysisPage() {
                 <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
                   <div>
                     <h3 className="font-serif text-[30px] leading-[1.02] tracking-[-0.03em] text-[var(--charcoal)]">
-                      Question difficulty
+                      Question evidence
                     </h3>
                     <p className="mt-2 text-sm text-[var(--dim-grey)]">
                       How each question performed. Hard questions may need more support.
@@ -1018,11 +1022,11 @@ export default function SessionAnalysisPage() {
                               <span className="font-medium text-[var(--teal)]">
                                 {checkpoint.masteredCount}
                               </span>{" "}
-                              mastered
+                              showed strong evidence
                             </span>
                             {checkpoint.strugglingCount > 0 && (
                               <span className="flex items-center gap-1.5 font-medium text-[var(--signal)]">
-                                {checkpoint.strugglingCount} struggling
+                                {checkpoint.strugglingCount} may need support
                               </span>
                             )}
                             <span className="opacity-60">Avg {checkpoint.averageTurnsSpent} turns</span>
@@ -1050,7 +1054,7 @@ export default function SessionAnalysisPage() {
             {/* Misconception clusters — with clear button affordances */}
             {loadingClusters ? (
               <div className="minerva-card p-8">
-                <LoadingState message="Loading misconception data…" />
+                <LoadingState message="Loading misunderstanding data..." />
               </div>
             ) : clusterError ? (
               <div className="border border-[rgba(223,47,38,0.24)] bg-[rgba(223,47,38,0.08)] px-4 py-3 text-sm text-[var(--signal)]">
@@ -1079,7 +1083,7 @@ export default function SessionAnalysisPage() {
 
                 {topClusters.length === 0 ? (
                   <div className="minerva-card p-6 text-sm text-[var(--dim-grey)]">
-                    No misconceptions have been logged for this session yet.
+                    No misunderstanding signals have been logged for this session yet.
                   </div>
                 ) : (
                   topClusters.map((cluster) => (
@@ -1188,7 +1192,7 @@ export default function SessionAnalysisPage() {
                             }
                             className="minerva-button minerva-button-secondary w-full"
                           >
-                            {expandedClusterId === cluster.id ? "Hide details" : "Expand details"}
+                            {expandedClusterId === cluster.id ? "Hide details" : "Review evidence"}
                           </button>
                         </div>
                       </div>
@@ -1294,7 +1298,7 @@ export default function SessionAnalysisPage() {
                   Teaching recommendations
                 </h3>
                 <p className="mt-2 max-w-[46rem] text-sm text-[var(--dim-grey)]">
-                  Active learning moves derived from the misconception patterns above.
+                  Active learning moves derived from the misunderstanding patterns above.
                 </p>
               </div>
 
@@ -1507,7 +1511,7 @@ export default function SessionAnalysisPage() {
                     <thead className="border-b border-[var(--rule)] bg-[rgba(34,34,34,0.02)]">
                       <tr>
                         <th className="px-6 py-4">Learner</th>
-                        <th className="px-6 py-4">Rubric projection</th>
+                        <th className="px-6 py-4">Outcome evidence</th>
                         <th className="px-6 py-4">Misconceptions</th>
                         <th className="px-6 py-4 text-right">Details</th>
                       </tr>
@@ -1536,11 +1540,11 @@ export default function SessionAnalysisPage() {
                                     student.latestRubricScore === '3_proficient' || student.latestRubricScore === 'meets' ? 'bg-[rgba(17,120,144,0.10)] text-[var(--teal)]' :
                                     'bg-[rgba(114,133,3,0.12)] text-[var(--olive)]'
                                    }`}>
-                                     {student.latestRubricScore === '0_no_submission' ? '0 / 4' :
-                                      student.latestRubricScore === '1_beginning' ? '1 / 4' :
-                                      student.latestRubricScore === '2_developing' ? '2 / 4' :
-                                      student.latestRubricScore === '3_proficient' ? '3 / 4' :
-                                      student.latestRubricScore === '4_advanced' ? '4 / 4' :
+                                     {student.latestRubricScore === '0_no_submission' ? 'Evidence: 0 / 4' :
+                                      student.latestRubricScore === '1_beginning' ? 'Evidence: 1 / 4' :
+                                      student.latestRubricScore === '2_developing' ? 'Evidence: 2 / 4' :
+                                      student.latestRubricScore === '3_proficient' ? 'Evidence: 3 / 4' :
+                                      student.latestRubricScore === '4_advanced' ? 'Evidence: 4 / 4' :
                                       student.latestRubricScore.replace('_', ' ')}
                                    </span>
                                 ) : (

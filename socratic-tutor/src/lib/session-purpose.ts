@@ -21,7 +21,7 @@ export const SESSION_PURPOSE_OPTIONS: SessionPurposeOption[] = [
     label: "Pre-class",
     shortLabel: "Pre-Class",
     description:
-      "Check readiness and surface misconceptions before class begins.",
+      "Gather formative evidence about readiness and possible misconceptions before class begins.",
     cognitiveLevel: "Comprehension",
   },
   {
@@ -29,7 +29,7 @@ export const SESSION_PURPOSE_OPTIONS: SessionPurposeOption[] = [
     label: "During class (prep)",
     shortLabel: "In-Class Prep",
     description:
-      "Refresh memory and prime retrieval for the upcoming activity.",
+      "Refresh memory, prime retrieval, and surface evidence before an activity.",
     cognitiveLevel: "Activation",
   },
   {
@@ -37,7 +37,7 @@ export const SESSION_PURPOSE_OPTIONS: SessionPurposeOption[] = [
     label: "During class (reflect)",
     shortLabel: "In-Class Reflection",
     description:
-      "Make the lesson stick by surfacing fragile understanding through self-explanation.",
+      "Use self-explanation to surface fragile understanding during reflection.",
     cognitiveLevel: "Consolidation",
   },
   {
@@ -45,7 +45,7 @@ export const SESSION_PURPOSE_OPTIONS: SessionPurposeOption[] = [
     label: "After class",
     shortLabel: "After Class",
     description:
-      "Test application depth in new and novel contexts.",
+      "Gather evidence of application and transfer in new contexts.",
     cognitiveLevel: "Transfer",
   },
 ];
@@ -84,12 +84,12 @@ export function getSessionPurposeBadgeClasses(
 export function getHeatmapTitle(purpose: string | null | undefined) {
   switch (normalizeSessionPurpose(purpose)) {
     case "pre_class":
-      return "Readiness Heatmap";
+      return "Readiness Evidence Map";
     case "during_class_prep":
-      return "Activation Heatmap";
+      return "Activation Evidence Map";
     case "during_class_reflection":
-      return "Consolidation Heatmap";
+      return "Consolidation Evidence Map";
     case "after_class":
-      return "Transfer Heatmap";
+      return "Transfer Evidence Map";
   }
 }

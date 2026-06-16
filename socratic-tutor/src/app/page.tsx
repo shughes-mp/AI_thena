@@ -3,39 +3,39 @@ import Link from "next/link";
 const steps = [
   {
     step: "01",
-    title: "Pick your focus",
-    body: "Choose what you want to focus on (e.g., initial understanding, real-world transfer) as well as the materials which will inform your learner's interactions with the AI tutor.",
+    title: "Set the learning purpose",
+    body: "Choose when learners will use AI_thena, define the outcomes you want evidence for, and upload the source materials it should stay grounded in.",
   },
   {
     step: "02",
-    title: "Reveal the reasoning",
-    body: "Learners join with a code and work through Socratic questions that demand reasoning and self-explanation, not recall.",
+    title: "Make thinking visible",
+    body: "Learners join with a code and work through guided questions that ask for reasoning, textual evidence, and self-explanation.",
   },
   {
     step: "03",
-    title: "Evidence based instruction",
-    body: "Receive a custom teaching brief that identifies misconceptions and reasoning gaps, providing the evidence you need to adapt your teaching in real-time.",
+    title: "Review formative evidence",
+    body: "Receive a teaching brief that surfaces readiness, misunderstanding patterns, confidence gaps, and next teaching moves for instructor review.",
   },
 ];
 
 const capabilities = [
   {
-    label: "Actionable Teaching Briefs",
+    label: "Teaching Intelligence",
     accent: "var(--teal)",
     description:
-      "Move from raw data to instructional insight. Every session produces a guide on exactly what to address in your next lesson.",
+      "See what learners can explain, where reasoning breaks down, and what to address next.",
   },
   {
-    label: "Precision Misconception Mapping",
+    label: "Misunderstanding Signals",
     accent: "var(--olive)",
     description:
-      "Surface the 'why' behind the broken reasoning. Identify exactly where student models fail and where they remain fragile.",
+      "Review patterns AI_thena found in learner dialogue, with evidence excerpts and space for instructor judgment.",
   },
   {
-    label: "Confidence vs. Mastery",
+    label: "Learning Outcome Evidence",
     accent: "var(--rose)",
     description:
-      "Surface the 'illusion of competence'—where students think they understand but can't yet explain the reasoning.",
+      "Use formative, reviewable signals to understand progress without turning AI output into an automated grade.",
   },
 ];
 
@@ -43,9 +43,7 @@ export default function HomePage() {
   return (
     <main className="minerva-page">
       <div className="minerva-shell">
-
-        {/* ── Header ───────────────────────────────────────────────────── */}
-        <header className="top-rule bottom-rule grid min-h-[74px] grid-cols-1 items-center gap-4 px-0 md:grid-cols-[156px_1fr_220px]">
+        <header className="top-rule bottom-rule grid min-h-[74px] grid-cols-1 items-center gap-4 px-0 md:grid-cols-[156px_1fr_260px]">
           <div className="hidden md:block" />
           <div className="px-4 py-5 md:px-8">
             <p className="text-[12px] font-extrabold tracking-[0.01em]">
@@ -54,12 +52,11 @@ export default function HomePage() {
           </div>
           <div className="px-4 py-5 md:px-8 md:text-right">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--dim-grey)]">
-              Learning System
+              Teaching / Learning / Assessment
             </p>
           </div>
         </header>
 
-        {/* ── Hero ─────────────────────────────────────────────────────── */}
         <section className="section-rule grid grid-cols-1 md:grid-cols-[156px_minmax(0,1fr)]">
           <div className="hidden border-r border-[var(--rule)] md:block" />
           <div className="px-4 py-16 md:px-8 md:py-24 lg:py-32">
@@ -68,9 +65,9 @@ export default function HomePage() {
               Evidence-led teaching for every stage of the learning cycle.
             </h1>
             <p className="body-copy mt-6 max-w-[38rem]">
-              From pre-class readiness to after-class transfer. The Socratic AI 
-              Tutor surfaces your students&apos; reasoning - before, during, or 
-              after your sessions.
+              AI_thena helps instructors turn learner dialogue into formative
+              evidence before, during, or after class - without replacing
+              instructor judgment.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
               <Link
@@ -87,12 +84,12 @@ export default function HomePage() {
               </a>
             </div>
             <p className="mt-5 text-[13px] leading-6 text-[var(--dim-grey)]">
-              Five minutes to set up. Learners join with an access code — no account required.
+              Five minutes to set up. Learners join with an access code;
+              instructors review evidence, not automated grades.
             </p>
           </div>
         </section>
 
-        {/* ── How it works ─────────────────────────────────────────────── */}
         <section
           id="how-it-works"
           className="section-rule grid grid-cols-1 md:grid-cols-[156px_minmax(0,1fr)]"
@@ -122,7 +119,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── Key capabilities ──────────────────────────────────────────── */}
         <section className="section-rule grid grid-cols-1 md:grid-cols-[156px_minmax(0,1fr)]">
           <div className="hidden border-r border-[var(--rule)] md:block" />
           <div className="px-4 py-14 md:px-8 md:py-20">
@@ -145,19 +141,18 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── Final CTA ─────────────────────────────────────────────────── */}
         <section className="section-rule grid grid-cols-1 md:grid-cols-[156px_minmax(0,1fr)]">
           <div className="hidden border-r border-[var(--rule)] md:block" />
           <div className="px-4 py-16 md:px-8 md:py-24">
             <div className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,1fr)_260px] md:items-center">
               <div>
                 <p className="lead-copy max-w-[18ch]">
-                  Know where your learners stand, exactly when it matters most.
+                  See the thinking behind the answers.
                 </p>
                 <p className="body-copy muted-copy mt-5 max-w-[36rem]">
-                  Whether it&apos;s pre-class prep, in-class reflection, or 
-                  after-class transfer - get tailored evidence on each 
-                  learner&apos;s strengths and areas for improvement.
+                  Whether it&apos;s pre-class preparation, in-class reflection,
+                  or after-class transfer, AI_thena gives you reviewable
+                  evidence on learner strengths, gaps, and next teaching moves.
                 </p>
               </div>
               <div className="md:justify-self-end">
@@ -171,7 +166,6 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-
       </div>
     </main>
   );

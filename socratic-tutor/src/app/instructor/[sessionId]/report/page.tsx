@@ -37,14 +37,18 @@ interface StudentLOAssessmentGroup {
 // ─── Section parser ────────────────────────────────────────────────────────────
 // Splits report markdown by known section headers and returns them keyed by a
 // normalised label. We render them in the new priority order:
-// snapshot → what_to_do → heatmap → gaps → strengths → per_student → (rest)
+// snapshot -> teaching moves -> heatmap -> gaps -> strengths -> per_student -> (rest)
 
 const SECTION_PATTERNS: Array<{ key: string; patterns: string[] }> = [
   { key: "snapshot", patterns: ["SESSION SNAPSHOT"] },
-  { key: "what_to_do", patterns: ["WHAT TO DO NEXT"] },
+  { key: "what_to_do", patterns: ["SUGGESTED TEACHING MOVES", "WHAT TO DO NEXT"] },
   {
     key: "heatmap",
     patterns: [
+      "READINESS EVIDENCE MAP",
+      "ACTIVATION EVIDENCE MAP",
+      "CONSOLIDATION EVIDENCE MAP",
+      "TRANSFER EVIDENCE MAP",
       "READINESS HEATMAP",
       "ACTIVATION HEATMAP",
       "CONSOLIDATION HEATMAP",
@@ -235,10 +239,10 @@ export default function ReportPage() {
                   Setup
                 </Link>
                 <span>/</span>
-                <span className="text-[var(--charcoal)]">Instructor recommendations</span>
+                <span className="text-[var(--charcoal)]">Teaching brief</span>
               </nav>
               <h1 className="mt-4 font-serif text-[42px] leading-[0.96] tracking-[-0.03em] text-[var(--charcoal)]">
-                Instructor recommendations
+                Teaching brief
               </h1>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <span
@@ -256,7 +260,7 @@ export default function ReportPage() {
                 Back to setup
               </Link>
               <button onClick={() => fetchReport(true)} className="minerva-button minerva-button-secondary" disabled={isRefreshing}>
-                {isRefreshing ? "Refreshing…" : "Refresh recommendations"}
+                {isRefreshing ? "Refreshing..." : "Refresh brief"}
               </button>
               <button onClick={handleExport} className="minerva-button">
                 Export PDF
@@ -278,7 +282,7 @@ export default function ReportPage() {
         {sections.what_to_do && (
           <section className="minerva-card border-l-4 border-[var(--teal)] p-6 md:p-8">
             <h2 className="font-serif text-[28px] leading-[1] tracking-[-0.03em] text-[var(--charcoal)]">
-              What to do next
+              Suggested teaching moves
             </h2>
             <div className="prose prose-slate mt-4 max-w-none text-[var(--charcoal)]">
               <ReactMarkdown>{sections.what_to_do}</ReactMarkdown>
@@ -335,14 +339,14 @@ export default function ReportPage() {
           </section>
         )}
 
-        {/* Learning outcome review */}
+        {/* Learning outcome evidence */}
         {Object.keys(loAssessmentsByStudent).length > 0 && (
           <section className="minerva-card p-8 md:p-12">
             <h3 className="font-serif text-[34px] leading-[1] tracking-[-0.03em] text-[var(--charcoal)]">
-              Learning outcome review
+              Learning outcome evidence
             </h3>
             <p className="mt-3 max-w-[44rem] text-sm text-[var(--dim-grey)]">
-              These assessments are formative and AI-generated. They reflect observed engagement during the tutoring
+              These signals are formative and AI-generated. They reflect evidence observed during the AI_thena
               session and should be reviewed by the instructor before informing any grading decisions.
             </p>
             <div className="mt-8 space-y-8">

@@ -96,7 +96,8 @@ export default async function StudentEntryPage({ params }: PageProps) {
               <ul className="space-y-2.5">
                 {[
                   "Start by explaining what you already know about this topic, in your own words.",
-                  "The tutor will ask follow-up questions to deepen your thinking — it won't hand you the answers.",
+                  "AI_thena will ask follow-up questions to deepen your thinking. It will not simply hand you the answers.",
+                  "Your instructor may review the conversation as formative evidence of your reasoning.",
                   "Take your time. Thoughtful reasoning matters more than speed.",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2.5">

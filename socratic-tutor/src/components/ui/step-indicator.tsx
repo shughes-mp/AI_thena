@@ -1,9 +1,9 @@
 export function StepIndicator({ currentStep }: { currentStep: 1 | 2 | 3 | 4 }) {
   const steps = [
-    { number: 1 as const, label: "Session Target" },
+    { number: 1 as const, label: "Purpose & Outcomes" },
     { number: 2 as const, label: "Source Materials" },
-    { number: 3 as const, label: "Key Questions" },
-    { number: 4 as const, label: "Share with Students" },
+    { number: 3 as const, label: "Evidence Questions" },
+    { number: 4 as const, label: "Learner Link" },
   ];
 
   return (

@@ -23,7 +23,7 @@ const FALLBACK_REGEX = /^[-*•]?\s*(.+?)\s*[:\-–]\s*\[(GREEN|YELLOW|RED)\]\s*
 
 function parseHeatmapItems(content: string, heatmapTitle: string): HeatmapItem[] {
   // Extract just the heatmap section
-  // Match the section title (e.g. READINESS HEATMAP, ACTIVATION HEATMAP, etc.)
+  // Match the section title (e.g. READINESS EVIDENCE MAP, ACTIVATION EVIDENCE MAP, etc.)
   const escapedTitle = heatmapTitle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const sectionRegex = new RegExp(
     `${escapedTitle}\\s*([\\s\\S]*?)(?=\\n##?\\s+[A-Z]|\\nWHAT YOUR|\\nWHERE YOUR|\\nWHAT TO DO|\\nPER-STUDENT|\\nLEARNING OUTCOME|$)`,
@@ -79,17 +79,17 @@ const STATUS_CONFIG = {
   green: {
     badge: "bg-[rgba(96,140,34,0.12)] text-[#5b7f22] border-[rgba(96,140,34,0.22)]",
     dot: "bg-[#5b7f22]",
-    label: "Ready for class",
+    label: "Evidence suggests ready",
   },
   yellow: {
     badge: "bg-[rgba(144,111,18,0.10)] text-[#906f12] border-[rgba(144,111,18,0.22)]",
     dot: "bg-[#906f12]",
-    label: "Gaps remain",
+    label: "Evidence suggests gaps",
   },
   red: {
     badge: "bg-[rgba(223,47,38,0.08)] text-[var(--signal)] border-[rgba(223,47,38,0.20)]",
     dot: "bg-[var(--signal)]",
-    label: "Not yet ready",
+    label: "Evidence suggests review",
   },
 };
 
@@ -101,7 +101,7 @@ export function ReadinessHeatmap({ reportContent, sessionPurpose }: HeatmapProps
   if (items.length === 0) {
     return (
       <p className="text-sm italic text-[var(--dim-grey)]">
-        Heatmap data not available for this report. Regenerate the brief to include it.
+        Evidence map data is not available for this brief. Regenerate the brief to include it.
       </p>
     );
   }

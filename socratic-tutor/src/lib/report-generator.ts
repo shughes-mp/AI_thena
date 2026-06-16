@@ -14,16 +14,16 @@ const VALID_LO_STATUSES = [
 const VALID_LO_CONFIDENCE = ["low", "medium", "high"] as const;
 
 // Legacy static prompt — kept for reference. Use buildReportSystemPrompt() instead.
-const REPORT_SYSTEM_PROMPT_LEGACY = `You generate instructor teaching briefs from Socratic tutoring sessions.`;
+const REPORT_SYSTEM_PROMPT_LEGACY = `You generate instructor teaching briefs from AI_thena learning sessions.`;
 
 const LO_ASSESSMENT_RULES = `
-LEARNING OUTCOME ASSESSMENT
-- Assess each student's observed engagement against each outcome formatively.
+LEARNING OUTCOME EVIDENCE
+- Review each student's observed engagement against each outcome formatively.
 - After the main brief, emit one tag per student per learning outcome using this exact format:
 [LO_ASSESSMENT: student session id | learning outcome text | status | confidence | evidence summary]
 - Do not use the pipe character inside the evidence summary.
 
-For each learning outcome assessment:
+For each learning outcome evidence tag:
 - status must be exactly one of: 0_no_submission, 1_beginning, 2_developing, 3_proficient, 4_advanced
 - confidence must be one of: low, medium, high
 - evidence summary should be 2-4 short sentences with exchange references, brief quotes under 20 words, and question-type cues where possible
@@ -39,7 +39,7 @@ Use this exact rubric to determine the status value:
 CRITICAL RATING RULES
 - 0_no_submission or 1_beginning is always valid if evidence is lacking. Do not force a stronger rating.
 - Require at least two distinct question-type opportunities before rating 3_proficient or 4_advanced.
-- Score text grounding and reasoning quality, not polish or vocabulary.
+- Evaluate text grounding and reasoning quality, not polish or vocabulary.
 - If unresolved high-severity misconceptions remain on a topic related to the learning outcome, the maximum rating is 2_developing.
 - These assessments are formative and instructor-facing, not summative records.`;
 
@@ -56,23 +56,23 @@ interface ReportPurposeFraming {
 function getReportPurposeFraming(purpose: string): ReportPurposeFraming {
   const framings: Record<string, ReportPurposeFraming> = {
     pre_class: {
-      overallFrame: "This was a PRE-CLASS session. Help the instructor decide whether students are READY for the upcoming class. Frame everything around readiness to apply, not depth of mastery.",
-      heatmapTitle: "READINESS HEATMAP",
-      heatmapInstruction: `Rate class READINESS on each major topic as GREEN (ready to apply in class), YELLOW (understands basics but has gaps that may surface during application), or RED (significant misunderstandings that will block productive class work).
-After the ratings, write ONE sentence: "Overall, the class is [ready/mostly ready/not yet ready] for [topic]."
+      overallFrame: "This was a PRE-CLASS session. Help the instructor review evidence of readiness for the upcoming class. Frame everything around readiness to apply, not depth of mastery.",
+      heatmapTitle: "READINESS EVIDENCE MAP",
+      heatmapInstruction: `Classify observed READINESS EVIDENCE on each major topic as GREEN (evidence suggests ready to apply in class), YELLOW (evidence suggests basics with gaps that may surface during application), or RED (evidence suggests significant misunderstandings that could block productive class work).
+After the ratings, write ONE sentence: "Overall, the evidence suggests the class is [ready/mostly ready/not yet ready] for [topic]."
 IMPORTANT: Format as a structured list, one topic per line:
 - **Topic name**: [GREEN] Brief explanation
 - **Topic name**: [YELLOW] Brief explanation
 - **Topic name**: [RED] Brief explanation`,
-      strengthsSectionTitle: "WHAT YOUR STUDENTS ARE READY FOR",
-      gapsSectionTitle: "WHERE YOUR STUDENTS ARE NOT YET READY",
+      strengthsSectionTitle: "WHAT THE EVIDENCE SUGGESTS STUDENTS CAN BUILD ON",
+      gapsSectionTitle: "WHERE THE EVIDENCE SUGGESTS FOLLOW-UP",
       nextStepsInstruction: `For each gap, suggest what the instructor should do BEFORE or AT THE START of the upcoming class. Frame as "Before class, consider..." or "At the start of class, try..." Prioritize: what will most block productive class time if unaddressed?`,
       perStudentInstruction: "For each student: 2-3 sentences covering readiness level, key gaps to watch for during class, and one strength to build on. Flag students who may need extra support during class activities.",
     },
     during_class_prep: {
       overallFrame: "This was a DURING-CLASS PREP session (activation phase). Help the instructor understand what prior knowledge students activated and where retrieval gaps exist — so they can adapt the class session that is about to begin.",
-      heatmapTitle: "ACTIVATION HEATMAP",
-      heatmapInstruction: `Rate ACTIVATION LEVEL on each major topic as GREEN (strong retrieval, ready for application), YELLOW (partial retrieval, may need brief review before applying), or RED (failed to retrieve or retrieved incorrectly).
+      heatmapTitle: "ACTIVATION EVIDENCE MAP",
+      heatmapInstruction: `Classify observed ACTIVATION EVIDENCE on each major topic as GREEN (strong retrieval, ready for application), YELLOW (partial retrieval, may need brief review before applying), or RED (failed to retrieve or retrieved incorrectly).
 Write ONE sentence summarizing what the class is primed for.
 IMPORTANT: Format as a structured list, one topic per line:
 - **Topic name**: [GREEN] Brief explanation
@@ -85,8 +85,8 @@ IMPORTANT: Format as a structured list, one topic per line:
     },
     during_class_reflection: {
       overallFrame: "This was a DURING-CLASS REFLECTION session (consolidation phase). Help the instructor understand what students consolidated from the class session and what remains fragile before they leave.",
-      heatmapTitle: "CONSOLIDATION HEATMAP",
-      heatmapInstruction: `Rate CONSOLIDATION LEVEL on each major topic as GREEN (student can self-explain accurately), YELLOW (partial consolidation — remembers but cannot fully explain), or RED (did not consolidate or consolidated incorrectly).
+      heatmapTitle: "CONSOLIDATION EVIDENCE MAP",
+      heatmapInstruction: `Classify observed CONSOLIDATION EVIDENCE on each major topic as GREEN (student can self-explain accurately), YELLOW (partial consolidation - remembers but cannot fully explain), or RED (did not consolidate or consolidated incorrectly).
 Write ONE sentence on overall consolidation.
 IMPORTANT: Format as a structured list, one topic per line:
 - **Topic name**: [GREEN] Brief explanation
@@ -99,8 +99,8 @@ IMPORTANT: Format as a structured list, one topic per line:
     },
     after_class: {
       overallFrame: "This was an AFTER-CLASS session focused on far transfer and application depth. Help the instructor assess whether students can apply concepts flexibly in novel contexts, not just recall them.",
-      heatmapTitle: "TRANSFER HEATMAP",
-      heatmapInstruction: `Rate TRANSFER READINESS on each major topic as GREEN (can apply flexibly to novel contexts), YELLOW (can apply to familiar contexts but struggles with novel ones), or RED (cannot transfer beyond the original reading context).
+      heatmapTitle: "TRANSFER EVIDENCE MAP",
+      heatmapInstruction: `Classify observed TRANSFER EVIDENCE on each major topic as GREEN (can apply flexibly to novel contexts), YELLOW (can apply to familiar contexts but struggles with novel ones), or RED (cannot transfer beyond the original reading context).
 Write ONE sentence on overall depth.
 IMPORTANT: Format as a structured list, one topic per line:
 - **Topic name**: [GREEN] Brief explanation
@@ -119,12 +119,12 @@ IMPORTANT: Format as a structured list, one topic per line:
 function buildReportSystemPrompt(sessionPurpose: string): string {
   const framing = getReportPurposeFraming(sessionPurpose);
 
-  return `You generate instructor teaching briefs from Socratic tutoring sessions. ${framing.overallFrame} Write in professional, direct prose. Use these section headers exactly:
+  return `You generate instructor teaching briefs from AI_thena learning sessions. ${framing.overallFrame} Write in professional, direct prose. Use these section headers exactly:
 
 SESSION SNAPSHOT
 - Session name, number of students, total exchanges, session purpose. One sentence framing how the session went overall — momentum, not just numbers.
 
-WHAT TO DO NEXT
+SUGGESTED TEACHING MOVES
 - For each gap identified in the session, suggest one concrete, specific teaching move. ${framing.nextStepsInstruction}
 - Connect each suggestion to the evidence. Do not give generic advice — tie it to what actually happened.
 
@@ -132,11 +132,11 @@ ${framing.heatmapTitle}
 ${framing.heatmapInstruction}
 
 ${framing.strengthsSectionTitle}
-- 2-3 bullet points on topics or concepts where most students demonstrated solid understanding. Include brief representative evidence. Keep this section SHORT — the instructor needs to know what's safe to build on.
+- 2-3 bullet points on topics or concepts where most students demonstrated solid understanding. Include brief representative evidence. Keep this section SHORT - the instructor needs to know what can be built on.
 
 ${framing.gapsSectionTitle}
 - For each area of concern, describe the specific pattern, how many students showed it, and whether it was resolved in-session or remains open.
-- Distinguish between "resolved in session — reinforce briefly" vs. "unresolved — needs direct attention."
+- Distinguish between "resolved in session - reinforce briefly" vs. "unresolved - needs direct attention."
 - Include one representative student quote (first name only) per pattern.
 
 PER-STUDENT NOTES
@@ -289,7 +289,7 @@ export async function generateInstructorReport(sessionId: string) {
     transcriptData += `Feedback breakdown: ${JSON.stringify(feedbackCounts)}\n`;
 
     if (student.topicMastery.length > 0) {
-      transcriptData += "Mastery:\n";
+      transcriptData += "Topic evidence:\n";
       student.topicMastery.forEach((mastery) => {
         transcriptData += `- ${mastery.topicThread}: ${mastery.status} (criteria: ${mastery.criteriamet}, rung: ${mastery.hintLadderRung})\n`;
       });
@@ -314,8 +314,8 @@ export async function generateInstructorReport(sessionId: string) {
 
   const prompt =
     learningOutcomes.length > 0
-      ? `Analyze the following session data and generate the instructor report. Include LO assessments for each student using the required tag format.\n\n${transcriptData}`
-      : `Analyze the following session data and generate the instructor report.\n\n${transcriptData}`;
+      ? `Analyze the following session data and generate the instructor teaching brief. Include LO evidence tags for each student using the required tag format.\n\n${transcriptData}`
+      : `Analyze the following session data and generate the instructor teaching brief.\n\n${transcriptData}`;
 
   const { text } = await generateText({
     model: anthropic(MODEL_PRIMARY),

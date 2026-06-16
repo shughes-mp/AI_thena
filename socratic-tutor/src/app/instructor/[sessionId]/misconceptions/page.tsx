@@ -381,10 +381,10 @@ export default function MisconceptionDashboardPage() {
                   Setup
                 </Link>
                 <span>/</span>
-                <span className="text-[var(--charcoal)]">Common misunderstandings</span>
+                <span className="text-[var(--charcoal)]">Misunderstanding patterns</span>
               </nav>
               <h1 className="mt-4 font-serif text-[42px] leading-[0.96] tracking-[-0.03em] text-[var(--charcoal)]">
-                Common misunderstandings
+                Misunderstanding patterns
               </h1>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <span
@@ -393,7 +393,7 @@ export default function MisconceptionDashboardPage() {
                   {getSessionPurposeOption(sessionPurpose).shortLabel}
                 </span>
                 <p className="max-w-[42rem] text-[15px] leading-7 text-[var(--dim-grey)]">
-                  Review the patterns learners struggled with most, decide which need class discussion, and turn them into active learning moves.
+                  Review patterns AI_thena found in learner dialogue, decide which need class discussion, and turn them into active learning moves.
                 </p>
               </div>
             </div>
@@ -412,7 +412,7 @@ export default function MisconceptionDashboardPage() {
                   mode === "post-session" ? "" : "minerva-button-secondary"
                 }`}
               >
-                Post-session summary
+                Post-session signals
               </button>
               <button
                 type="button"
@@ -429,7 +429,7 @@ export default function MisconceptionDashboardPage() {
 
         {loading ? (
           <div className="minerva-card p-8">
-            <LoadingState message="Loading misconception data…" />
+            <LoadingState message="Loading misunderstanding data..." />
           </div>
         ) : error ? (
           <div className="border border-[rgba(223,47,38,0.24)] bg-[rgba(223,47,38,0.08)] px-4 py-3 text-sm text-[var(--signal)]">
@@ -449,7 +449,7 @@ export default function MisconceptionDashboardPage() {
                   </p>
                 </div>
                 <div className="minerva-card p-5">
-                  <p className="eyebrow eyebrow-rose">Logged misconceptions</p>
+                  <p className="eyebrow eyebrow-rose">Logged misunderstanding signals</p>
                   <p className="mt-3 text-3xl font-semibold text-[var(--charcoal)]">
                     {stats.totalMisconceptions}
                   </p>
@@ -461,12 +461,12 @@ export default function MisconceptionDashboardPage() {
                   </p>
                 </div>
                 <div className="minerva-card p-5">
-                  <p className="eyebrow eyebrow-olive">Resolution rate</p>
+                  <p className="eyebrow eyebrow-olive">Resolution signal</p>
                   <p className="mt-3 text-3xl font-semibold text-[var(--charcoal)]">
                     {formatPercent(stats.overallResolutionRate)}
                   </p>
                   <p className="mt-1 text-sm text-[var(--dim-grey)]">
-                    across the misconception patterns shown here
+                    across the misunderstanding patterns shown here
                   </p>
                 </div>
               </div>
@@ -477,7 +477,7 @@ export default function MisconceptionDashboardPage() {
                 <div className="minerva-card p-5">
                   <p className="text-sm text-[var(--dim-grey)]">
                     Live view refreshes every 30 seconds and highlights the
-                    highest-prevalence patterns first.
+                        highest-prevalence evidence patterns first.
                   </p>
                 </div>
 
@@ -520,7 +520,7 @@ export default function MisconceptionDashboardPage() {
                 {mode === "post-session" && checkpointDifficulty.length > 0 && (
                   <section className="minerva-card p-6 md:p-8">
                     <h2 className="font-serif text-[30px] leading-[1.02] tracking-[-0.03em] text-[var(--charcoal)]">
-                      Question difficulty
+                      Question evidence
                     </h2>
                     <p className="mt-2 max-w-[42rem] text-sm text-[var(--dim-grey)]">
                       How each question performed across the class. Hard questions
@@ -551,10 +551,10 @@ export default function MisconceptionDashboardPage() {
                               <span>
                                 {checkpoint.addressedCount}/{checkpoint.totalStudents} attempted
                               </span>
-                              <span>{checkpoint.masteredCount} mastered</span>
+                              <span>{checkpoint.masteredCount} showed strong evidence</span>
                               {checkpoint.strugglingCount > 0 && (
                                 <span className="text-[var(--signal)]">
-                                  {checkpoint.strugglingCount} struggling
+                                  {checkpoint.strugglingCount} may need support
                                 </span>
                               )}
                               <span>Avg {checkpoint.averageTurnsSpent} turns</span>
@@ -570,7 +570,7 @@ export default function MisconceptionDashboardPage() {
                   <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                     <div>
                       <h2 className="font-serif text-[34px] leading-[1] tracking-[-0.03em] text-[var(--charcoal)]">
-                        Top misconception clusters
+                        Top misunderstanding patterns
                       </h2>
                       <p className="mt-2 max-w-[44rem] text-sm text-[var(--dim-grey)]">
                         These patterns group similar learner misunderstandings
@@ -585,7 +585,7 @@ export default function MisconceptionDashboardPage() {
 
                 {topClusters.length === 0 ? (
                   <div className="minerva-card p-6 text-sm text-[var(--dim-grey)]">
-                    No misconceptions have been logged for this session yet.
+                    No misunderstanding signals have been logged for this session yet.
                   </div>
                 ) : (
                   topClusters.map((cluster) => (
@@ -655,7 +655,7 @@ export default function MisconceptionDashboardPage() {
                               disabled={submittingOverride === cluster.label}
                               className="minerva-button minerva-button-secondary w-full"
                             >
-                              Acceptable interpretation
+                              Mark as acceptable
                             </button>
                             <button
                               type="button"
@@ -665,7 +665,7 @@ export default function MisconceptionDashboardPage() {
                               disabled={submittingOverride === cluster.label}
                               className="minerva-button w-full"
                             >
-                              Needs class discussion
+                              Flag for class discussion
                             </button>
                             <button
                               type="button"
@@ -678,7 +678,7 @@ export default function MisconceptionDashboardPage() {
                             >
                               {expandedClusterId === cluster.id
                                 ? "Hide details"
-                                : "Expand details"}
+                                : "Review evidence"}
                             </button>
                           </div>
                         </div>
@@ -765,7 +765,7 @@ export default function MisconceptionDashboardPage() {
                       </h2>
                       <p className="mt-2 max-w-[46rem] text-sm text-[var(--dim-grey)]">
                         Generate text-grounded active learning moves from the
-                        misconception patterns above. These are intended as
+                        misunderstanding patterns above. These are intended as
                         planning support, not a script you must follow exactly.
                       </p>
                     </div>
