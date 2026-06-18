@@ -27,10 +27,6 @@ const VALID_CONFIDENCE: TeachingRecommendationConfidence[] = [
   "high",
 ];
 
-const teachingRecommendationClient = prisma as typeof prisma & {
-  teachingRecommendation: any;
-};
-
 const RECOMMENDATION_SYSTEM_PROMPT = `You are an instructional design consultant for a discussion-based reading class.
 
 You generate concrete teaching recommendations that respond to clustered student misconceptions.
@@ -296,7 +292,7 @@ export async function GET(
     await ensureDatabaseReady();
     const { sessionId } = await params;
 
-    const recommendations = await teachingRecommendationClient.teachingRecommendation.findMany({
+    const recommendations = await prisma.teachingRecommendation.findMany({
       where: { sessionId },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     });
@@ -350,7 +346,7 @@ export async function POST(
 
     const relevantClusters = clusters.slice(0, 8);
     if (relevantClusters.length === 0) {
-      await teachingRecommendationClient.teachingRecommendation.deleteMany({ where: { sessionId } });
+      await prisma.teachingRecommendation.deleteMany({ where: { sessionId } });
       return NextResponse.json({
         recommendations: [] as TeachingRecommendationRecord[],
         message:
@@ -414,13 +410,13 @@ ${transcriptContext || "No transcript excerpts available."}`;
         ? parsedRecommendations
         : buildFallbackRecommendations(relevantClusters);
 
-    await teachingRecommendationClient.teachingRecommendation.deleteMany({
+    await prisma.teachingRecommendation.deleteMany({
       where: { sessionId },
     });
 
     const savedRecommendations = [];
     for (const recommendation of finalRecommendations) {
-      const saved = await teachingRecommendationClient.teachingRecommendation.create({
+      const saved = await prisma.teachingRecommendation.create({
         data: {
           sessionId,
           whatToAddress: recommendation.whatToAddress,

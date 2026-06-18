@@ -119,7 +119,7 @@ interface StatusBarProps {
  export function StatusBar({ learnerCount, readingsCount, assessmentsCount, checkpointsCount, purposeLabel }: StatusBarProps & { checkpointsCount: number, purposeLabel: string }) {
   return (
     <div className="border border-[var(--rule)] bg-[rgba(17,120,144,0.04)] px-6 py-3 text-sm text-[var(--dim-grey)]">
-      Session signal: {readingsCount} source material{readingsCount !== 1 ? "s" : ""}, {checkpointsCount} evidence question{checkpointsCount !== 1 ? "s" : ""}, {assessmentsCount} protected assessment{assessmentsCount !== 1 ? "s" : ""}. AI_thena purpose: {purposeLabel}.
+      Session signal: {learnerCount} learner{learnerCount !== 1 ? "s" : ""}, {readingsCount} source material{readingsCount !== 1 ? "s" : ""}, {checkpointsCount} evidence question{checkpointsCount !== 1 ? "s" : ""}, {assessmentsCount} protected assessment{assessmentsCount !== 1 ? "s" : ""}. AI_thena purpose: {purposeLabel}.
     </div>
   );
 }
@@ -313,7 +313,7 @@ export function SessionInsightsCard({
   // ── Review mode (pre-class / after-class) ──
 
   const completed = liveStatus.filter((l) => l.endedAt).length;
-  const total = liveStatus.length;
+  const total = Math.max(learnerCount, liveStatus.length);
   const participationLabel =
     sessionPurpose === "pre_class"
       ? "Learner readiness signals"

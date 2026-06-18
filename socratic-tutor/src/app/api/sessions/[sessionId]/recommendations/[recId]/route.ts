@@ -5,10 +5,6 @@ import type { ApiError, TeachingRecommendationAction } from "@/types";
 export const dynamic = "force-dynamic";
 
 const VALID_ACTIONS = ["used", "dismissed", "edited"] as const;
-const teachingRecommendationClient = prisma as typeof prisma & {
-  teachingRecommendation: any;
-};
-
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ sessionId: string; recId: string }> }
@@ -21,7 +17,7 @@ export async function PATCH(
       instructorNote?: string | null;
     };
 
-    const existing = await teachingRecommendationClient.teachingRecommendation.findUnique({
+    const existing = await prisma.teachingRecommendation.findUnique({
       where: { id: recId },
       select: { id: true, sessionId: true },
     });
@@ -50,7 +46,7 @@ export async function PATCH(
       );
     }
 
-    const updated = await teachingRecommendationClient.teachingRecommendation.update({
+    const updated = await prisma.teachingRecommendation.update({
       where: { id: recId },
       data: {
         instructorAction: action as TeachingRecommendationAction,

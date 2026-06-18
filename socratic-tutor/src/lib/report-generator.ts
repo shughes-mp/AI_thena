@@ -13,9 +13,6 @@ const VALID_LO_STATUSES = [
 
 const VALID_LO_CONFIDENCE = ["low", "medium", "high"] as const;
 
-// Legacy static prompt — kept for reference. Use buildReportSystemPrompt() instead.
-const REPORT_SYSTEM_PROMPT_LEGACY = `You generate instructor teaching briefs from AI_thena learning sessions.`;
-
 const LO_ASSESSMENT_RULES = `
 LEARNING OUTCOME EVIDENCE
 - Review each student's observed engagement against each outcome formatively.

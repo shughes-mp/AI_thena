@@ -337,7 +337,7 @@ export async function POST(
       goalInfo,
     });
 
-    let normalized = dedupeSuggestions(
+    const normalized = dedupeSuggestions(
       (firstPass.suggestions ?? [])
         .map(normalizeSuggestion)
         .filter((suggestion) => suggestion.prompt.length > 0)

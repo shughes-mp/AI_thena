@@ -44,7 +44,6 @@ export default function SessionManagementPage() {
   const [session, setSession] = useState<SessionDetails | null>(null);
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
   const [uploadingCategory, setUploadingCategory] = useState<"reading" | "assessment" | null>(null);
   const [savingConfig, setSavingConfig] = useState(false);
   const [generatingMap, setGeneratingMap] = useState(false);
@@ -261,7 +260,6 @@ export default function SessionManagementPage() {
   }, [loading, learnerCount, sectionsInitialized]);
 
   async function handleUpload(file: File, category: "reading" | "assessment") {
-    setUploading(true);
     setUploadingCategory(category);
     setError("");
     try {
@@ -303,7 +301,6 @@ export default function SessionManagementPage() {
       setError(message);
       setToast({ tone: "error", message });
     } finally {
-      setUploading(false);
       setUploadingCategory(null);
     }
   }

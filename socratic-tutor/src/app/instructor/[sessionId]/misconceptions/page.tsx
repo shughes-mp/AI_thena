@@ -191,7 +191,7 @@ export default function MisconceptionDashboardPage() {
       .catch((err) => {
         console.error("Failed to load checkpoint difficulty:", err);
       });
-  }, [fetchDashboard, fetchRecommendations]);
+  }, [fetchDashboard, fetchRecommendations, sessionId]);
 
   useEffect(() => {
     if (mode !== "live") {
@@ -617,7 +617,7 @@ export default function MisconceptionDashboardPage() {
                           </p>
 
                           <div className="mt-4 rounded-md bg-[rgba(34,34,34,0.03)] px-4 py-3 text-sm italic text-[var(--charcoal)]">
-                            "{cluster.representativeExcerpt}"
+                            &ldquo;{cluster.representativeExcerpt}&rdquo;
                           </div>
 
                           {(cluster.passageAnchor || cluster.topicThread) && (
@@ -700,7 +700,7 @@ export default function MisconceptionDashboardPage() {
                                 </p>
                                 {record.studentMessage && (
                                   <p className="mt-2 text-xs text-[var(--dim-grey)]">
-                                    Learner's words: “{record.studentMessage}”
+                                    Learner&apos;s words: &ldquo;{record.studentMessage}&rdquo;
                                   </p>
                                 )}
                                 <p className="mt-2 text-xs text-[var(--dim-grey)]">

@@ -239,7 +239,6 @@ export default function StudentMonitorPage() {
                 </thead>
                 <tbody className="divide-y divide-[var(--rule)]">
                   {students.map((student) => {
-                    const turns = Math.floor(student.messageCount / 2);
                     const isExpanded = expandedId === student.id;
                     const lastActive = student.lastActiveAt;
 

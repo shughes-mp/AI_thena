@@ -10,7 +10,6 @@ import { LOAssessmentCard } from "@/components/LOAssessmentCard";
 import {
   getSessionPurposeBadgeClasses,
   getSessionPurposeOption,
-  getHeatmapTitle,
 } from "@/lib/session-purpose";
 import type {
   ApiError,
@@ -64,6 +63,13 @@ type ReportLOAssessment = NonNullable<ReportData["loAssessments"]>[number];
 interface StudentLOAssessmentGroup {
   studentName: string;
   assessments: ReportLOAssessment[];
+}
+
+interface StudentSummaryRecord {
+  id: string;
+  studentName: string;
+  misconceptionCount: number;
+  latestRubricScore: string | null;
 }
 
 // ─── Section parser (from report page) ────────────────────────────────────────
@@ -213,17 +219,6 @@ function getTypeTone(value: string | null) {
   }
 }
 
-function getSeverityTone(value: "low" | "medium" | "high") {
-  switch (value) {
-    case "high":
-      return "text-[var(--signal)]";
-    case "medium":
-      return "text-[#906f12]";
-    case "low":
-      return "text-[var(--teal)]";
-  }
-}
-
 /** Consistent severity badge used throughout the page */
 function SeverityBadge({ severity }: { severity: "low" | "medium" | "high" }) {
   const config = {
@@ -306,7 +301,7 @@ export default function SessionAnalysisPage() {
   const [openDo, setOpenDo] = useState(true);
 
   // ── Student results data ──
-  const [studentsSummary, setStudentsSummary] = useState<any[]>([]);
+  const [studentsSummary, setStudentsSummary] = useState<StudentSummaryRecord[]>([]);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null);
 
@@ -597,7 +592,6 @@ export default function SessionAnalysisPage() {
   // ─── Report-derived data ────────────────────────────────────────────────────
 
   const sections = report ? parseReportSections(report.content) : null;
-  const heatmapTitle = getHeatmapTitle(sessionPurpose) ?? "Readiness Heatmap";
   const purposeOption = getSessionPurposeOption(sessionPurpose);
 
   const loAssessmentsByStudent = useMemo(() => {

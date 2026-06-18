@@ -2,12 +2,14 @@
   "name": "ai_thena",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
     "db:push": "prisma db push",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --test tests/*.test.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.68",

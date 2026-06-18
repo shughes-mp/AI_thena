@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { normalizeSessionPurpose, isValidSessionPurpose } from "@/lib/session-purpose";
+import { isValidSessionPurpose } from "@/lib/session-purpose";
 import type { ApiError } from "@/types";
 
 export async function PATCH(
