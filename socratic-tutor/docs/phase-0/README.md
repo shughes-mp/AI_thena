@@ -29,3 +29,4 @@ The main gap is epistemic infrastructure. Important outputs are generated from m
 
 Phase 1 should therefore begin with product, terminology, evidence, facilitation, and governance contracts. It should not begin with another dashboard feature.
 
+Phase 1 contract outcome: completed in [../phase-1/README.md](../phase-1/README.md).

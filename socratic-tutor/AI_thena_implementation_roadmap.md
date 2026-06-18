@@ -160,6 +160,8 @@ Verification result: `npm run lint`, `npm test`, `npx tsc --noEmit`, and `npm ru
 
 ## Phase 1: Define The Product And Evidence Contracts
 
+Status: **Complete (2026-06-18).** The binding contract set is recorded in `docs/phase-1/`.
+
 ### Objective
 
 Define what AI_thena means and what it is allowed to claim before changing deeper behavior.
@@ -268,17 +270,19 @@ Decide:
 
 ### Deliverables
 
-- Product contract
-- Terminology specification
-- Evidence schema specification
-- Evidence-level rubric
-- Facilitation-mode specification
-- Governance and data-use specification
-- Versioning policy for prompts and evidence logic
+- [x] Product contract
+- [x] Terminology specification
+- [x] Evidence schema specification
+- [x] Evidence-level rubric
+- [x] Facilitation-mode specification
+- [x] Governance and data-use specification
+- [x] Versioning policy for prompts and evidence logic
 
 ### Acceptance Gate
 
 Product, engineering, pedagogy, and governance decisions use one shared vocabulary and one evidence model.
+
+Gate result: **Passed at contract level.** Phase 2 must implement these contracts in the provenance, citation, review, authorization, and versioning data architecture before new consequential inference features are added.
 
 ---
 
