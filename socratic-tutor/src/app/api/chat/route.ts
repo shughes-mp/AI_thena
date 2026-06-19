@@ -22,6 +22,10 @@ import { runDiagnostic } from "@/lib/diagnostic";
 import { ensureNormalizedEvidenceDefinitions } from "@/lib/evidence-definitions";
 import { matchesLearnerCapability } from "@/lib/learner-capability";
 import {
+  buildLearnerResponseSupportInstruction,
+  countHelpRequests,
+} from "@/lib/learner-experience";
+import {
   appendLearnerCitations,
   buildUnsupportedSourceResponse,
   ensureKnowledgeScopeCue,
@@ -263,6 +267,11 @@ export async function POST(req: Request) {
       checkpoints
     );
 
+    const helpRequestCount = countHelpRequests([...dbMessages, lastUserMessage]);
+    const effectiveHintRung = Math.max(
+      topicMastery?.hintLadderRung ?? 0,
+      Math.min(Math.max(helpRequestCount - 1, 0), 6)
+    );
     const instruction = buildContextInstruction({
       lastTopicThread: currentTopicThread,
       currentAttemptCount: attemptCount,
@@ -274,10 +283,14 @@ export async function POST(req: Request) {
       unresolvedMisconceptions,
       confidenceRating,
       activeSoftRevisit,
-      hintLadderRung: topicMastery?.hintLadderRung ?? 0,
+      hintLadderRung: effectiveHintRung,
       prerequisiteMap: activePrerequisiteMap,
       sessionPurpose: studentSession.session.sessionPurpose,
     });
+    const learnerSupportInstruction = buildLearnerResponseSupportInstruction(
+      lastUserMessage.content,
+      helpRequestCount
+    );
 
     let currentConfidenceCheckId: string | null = null;
     if (confidenceRating) {
@@ -350,7 +363,7 @@ export async function POST(req: Request) {
       if (index === incomingMessages.length - 1 && message.role === "user") {
         return {
           role: message.role,
-          content: `${instruction}\n\nUser Message: ${message.content}`,
+          content: `${instruction}${learnerSupportInstruction ? `\n${learnerSupportInstruction}` : ""}\n\nUser Message: ${message.content}`,
         };
       }
 
@@ -425,7 +438,7 @@ export async function POST(req: Request) {
             topicThread: normalizedTopicThread,
           });
 
-          const currentHintRung = topicMastery?.hintLadderRung ?? 0;
+          const currentHintRung = effectiveHintRung;
           const nextHintRung = determineNextHintLadderRung(currentHintRung, tags);
           const checkpointStatusMatches = Array.from(
             fullResponse.matchAll(

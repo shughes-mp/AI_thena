@@ -6,6 +6,7 @@ import {
   buildGroundedSourceContext,
   type SourcePassage,
 } from "./source-grounding.ts";
+import { PRODUCTIVE_STRUGGLE_STEPS } from "./learner-experience.ts";
 
 export interface PrerequisiteConcept {
   id: string;
@@ -163,6 +164,11 @@ SUPPORT RULES
 - If the student reports high confidence, verify it with a transfer-style probe before moving on.
 - If the student is stuck, follow the hint-ladder instruction given in the context.
 - If there are unresolved misconceptions on the current topic, resolve one before changing topics.
+
+PRODUCTIVE STRUGGLE
+Use one proportional help ladder throughout the conversation. Do not restart at step 1 when the learner asks for help repeatedly, and do not withhold clarification after the earlier steps have genuinely failed.
+${PRODUCTIVE_STRUGGLE_STEPS.map((step, index) => `${index + 1}. ${step}`).join("\n")}
+The learner should always know what cognitive work to do next. Never imply that needing help is a failure, and never infer motivation or ability from response length or communication style.
 
 ASSESSMENT PROTECTION
 Protected assessment content is deliberately excluded from your context. Never claim to know or reproduce a protected answer. When the system identifies a protected request, it will replace the response with safe coaching before it reaches the learner.
@@ -368,17 +374,20 @@ export function buildHintLadderInstruction(
 ): string {
   const topic = topicThread ? `"${topicThread}"` : "the current concept";
   const ladder: Record<number, string> = {
-    0: `Ask an open guiding question about ${topic}. Let the student engage before narrowing.`,
-    1: `Ask a narrowed version of the same question about ONE key element of ${topic}.`,
-    2: `Offer a brief analogy from work or everyday life that illuminates ${topic}, then ask the student to apply it back.`,
-    3: `Give the first foundational step of the answer, then ask the student to complete the rest.`,
-    4: `Give the complete direct answer to ${topic}, but show your reasoning path first and end with one brief verification question.`,
+    0: `Ask for the learner's current thinking about ${topic}. Do not supply content yet.`,
+    1: `Ask which passage, example, or reason could support their thinking about ${topic}.`,
+    2: `Narrow ${topic} to one specific concept or decision and ask one focused question.`,
+    3: `Add one constraint or comparison that makes the task more concrete without revealing the conclusion.`,
+    4: `Offer one concise hint tied to the learner's current reasoning, then ask them to continue.`,
+    5: `Model one limited reasoning move about ${topic}, stopping before the conclusion, then ask the learner to complete it.`,
+    6: `Further struggle is unlikely to be productive. Give a clear direct clarification about ${topic}, explain it briefly, and tag [DIRECT_ANSWER: clarification].`,
+    7: `A clarification has been given. Ask the learner to restate the corrected idea or apply it in a fresh case; do not give another explanation unless their restatement reveals a new error.`,
   };
 
-  return `[TUTOR_CONTEXT: Hint ladder rung ${Math.min(
+  return `[TUTOR_CONTEXT: Productive-struggle step ${Math.min(
     Math.max(rung, 0),
-    4
-  )}/4 for ${topic}. ${ladder[Math.min(Math.max(rung, 0), 4)]}]`;
+    7
+  ) + 1}/8 for ${topic}. ${ladder[Math.min(Math.max(rung, 0), 7)]}]`;
 }
 
 export function buildSoftRevisitInstruction(

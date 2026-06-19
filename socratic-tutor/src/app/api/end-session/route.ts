@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { ensureDatabaseReady, prisma } from "@/lib/db";
 import { anthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
 import { MODEL_PRIMARY } from "@/lib/models";
 import { matchesLearnerCapability } from "@/lib/learner-capability";
+import { buildLearnerSummaryPrompt } from "@/lib/learner-experience";
 
 export async function POST(req: Request) {
   try {
+    await ensureDatabaseReady();
     const { studentSessionId, capabilityToken } = await req.json();
 
     if (!studentSessionId) {
@@ -37,7 +39,21 @@ export async function POST(req: Request) {
     }
 
     if (studentSession.sessionSummary) {
-      return NextResponse.json({ summary: studentSession.sessionSummary }, { status: 200 });
+      return NextResponse.json(
+        {
+          summary: studentSession.sessionSummary,
+          reflection: {
+            changedThinking: studentSession.reflectionChangedThinking ?? "",
+            supportedClaim: studentSession.reflectionSupportedClaim ?? "",
+            remainingUncertainty: studentSession.reflectionRemainingUncertainty ?? "",
+            nextStep: studentSession.reflectionNextStep ?? "",
+            summaryAnnotation: studentSession.summaryAnnotation ?? "",
+            summaryContested: studentSession.summaryContested,
+            submittedAt: studentSession.reflectionSubmittedAt,
+          },
+        },
+        { status: 200 }
+      );
     }
 
     // Format transcripts
@@ -48,29 +64,13 @@ export async function POST(req: Request) {
       (item) => !item.resolved || item.persistentlyUnresolved
     );
 
-    const prompt = `The student has just completed a guided AI_thena learning session. Generate a concise formative session summary using the transcript below.
-
-Format the summary using markdown with these four sections. Use ## for section headers and - for bullet points. Write in second person (addressing the student as "you").
-
-## Topics covered
-List 2-4 main concepts or ideas explored during the session.
-
-## Where you showed strong understanding
-2-3 specific things the student reasoned through well. Be concrete - reference actual ideas from the transcript, not generic praise.
-
-## What's worth revisiting
-Concepts where the student struggled, hedged, or expressed low confidence. Be specific. If there are unresolved misconceptions listed below, name them here explicitly.
-
-## A question to carry forward
-One thought-provoking question the student can bring to the next learning moment. Make it genuinely open-ended.
-
-Do not add any preamble before the first section header. Do not add any closing remarks after the final section. Keep each section brief - 2-4 bullet points maximum.
-
-Unresolved misconceptions:
-${unresolvedMisconceptions.map((item) => `- ${item.topicThread}: ${item.description}`).join("\n") || "None"}
-
-Transcript:
-${transcript}`;
+    const prompt = buildLearnerSummaryPrompt({
+      transcript,
+      unresolvedMisconceptions: unresolvedMisconceptions.map((item) => ({
+        topicThread: item.topicThread,
+        description: item.description,
+      })),
+    });
 
     const { text } = await generateText({
       model: anthropic(MODEL_PRIMARY),

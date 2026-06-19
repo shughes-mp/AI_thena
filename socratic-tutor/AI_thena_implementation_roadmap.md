@@ -432,6 +432,8 @@ Gate result: **Passed.** Enforcement occurs before learner display, protected ma
 
 ## Phase 4: Strengthen The Learner Learning Experience
 
+Status: **Complete (2026-06-19).** Learner orientation, an eight-step productive-struggle ladder, purpose-aware learning behaviors, formative summary safeguards, learner reflection and summary correction, additive persistence, and learner-experience verification are implemented. Details are recorded in `docs/phase-4/README.md`.
+
 ### Objective
 
 Ensure the core conversation produces genuine learning and useful evidence without becoming an answer engine or hidden grading experience.
@@ -515,6 +517,8 @@ Test:
 ### Acceptance Gate
 
 Learner dialogue consistently asks for cognitive work, adapts help proportionately, produces inspectable evidence, and communicates its formative purpose clearly.
+
+Gate result: **Passed.** Help requests advance proportionately through a persisted ladder, purpose-aware prompts cover the required learning behaviors, and learners can annotate or contest explicitly limited AI summaries before instructor review.
 
 ---
 

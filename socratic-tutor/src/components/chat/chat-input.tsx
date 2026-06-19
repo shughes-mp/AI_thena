@@ -47,10 +47,11 @@ export function ChatInput({ input, handleInputChange, handleSubmit, isLoading, d
       
       <button
         type="submit"
+        aria-label="Send message"
         disabled={!input.trim() || isLoading || disabled}
         className="ml-2 flex h-[48px] w-[48px] flex-shrink-0 items-center justify-center border border-[var(--signal)] bg-[var(--signal)] text-white transition-colors hover:bg-[#c92c24] disabled:border-[var(--light-grey)] disabled:bg-[rgba(255,255,255,0.6)] disabled:text-[var(--light-grey-2,#b4afaa)]"
       >
-        <svg className="w-5 h-5 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg aria-hidden="true" className="w-5 h-5 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
         </svg>
       </button>

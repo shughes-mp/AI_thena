@@ -238,6 +238,16 @@ export async function generateInstructorReport(sessionId: string) {
     totalExchanges += exchanges;
     transcriptData += `--- STUDENT: ${student.studentName} (Session ID: ${student.id}, Exchanges: ${exchanges}) ---\n`;
 
+    if (student.reflectionSubmittedAt) {
+      transcriptData += "Learner reflection (learner-authored; do not treat as verified evidence):\n";
+      if (student.reflectionChangedThinking) transcriptData += `- Changed thinking: ${student.reflectionChangedThinking}\n`;
+      if (student.reflectionSupportedClaim) transcriptData += `- Claim now supported: ${student.reflectionSupportedClaim}\n`;
+      if (student.reflectionRemainingUncertainty) transcriptData += `- Remaining uncertainty: ${student.reflectionRemainingUncertainty}\n`;
+      if (student.reflectionNextStep) transcriptData += `- Next step: ${student.reflectionNextStep}\n`;
+      if (student.summaryAnnotation) transcriptData += `- Summary annotation: ${student.summaryAnnotation}\n`;
+      if (student.summaryContested) transcriptData += "- The learner marked the AI-generated summary as inaccurate or incomplete.\n";
+    }
+
     if (student.confidenceChecks.length > 0) {
       transcriptData += `Confidence ratings: ${student.confidenceChecks
         .map(

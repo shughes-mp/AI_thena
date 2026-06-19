@@ -19,6 +19,8 @@ export async function GET(
         studentName: true,
         startedAt: true,
         endedAt: true,
+        reflectionSubmittedAt: true,
+        summaryContested: true,
         _count: {
           select: {
             messages: true,
@@ -70,6 +72,8 @@ export async function GET(
           studentName: studentSession.studentName,
           startedAt: studentSession.startedAt,
           endedAt: studentSession.endedAt,
+          reflectionSubmittedAt: studentSession.reflectionSubmittedAt,
+          summaryContested: studentSession.summaryContested,
           messageCount: studentSession._count.messages,
           misconceptionCount: studentSession._count.misconceptions,
           lastActiveAt: lastMessage?.createdAt ?? studentSession.startedAt,

@@ -97,8 +97,10 @@ export default async function StudentEntryPage({ params }: PageProps) {
                 {[
                   "Start by explaining what you already know about this topic, in your own words.",
                   "AI_thena will ask follow-up questions to deepen your thinking. It will not simply hand you the answers.",
-                  "Your instructor may review the conversation as formative evidence of your reasoning.",
+                  "It begins with your instructor's materials and may add clearly identified broader context when useful.",
+                  "Your instructor may review the conversation formatively. This is learning support, not hidden automated grading.",
                   "Take your time. Thoughtful reasoning matters more than speed.",
+                  "Any AI-generated summary may be incomplete or inaccurate, and you can add your own reflection or correction.",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2.5">
                     <span className="mt-1 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-[rgba(17,120,144,0.12)]">

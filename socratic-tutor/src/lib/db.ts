@@ -94,6 +94,13 @@ CREATE TABLE IF NOT EXISTS "StudentSession" (
   "startedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "endedAt" DATETIME,
   "sessionSummary" TEXT,
+  "reflectionChangedThinking" TEXT,
+  "reflectionSupportedClaim" TEXT,
+  "reflectionRemainingUncertainty" TEXT,
+  "reflectionNextStep" TEXT,
+  "summaryAnnotation" TEXT,
+  "summaryContested" BOOLEAN NOT NULL DEFAULT false,
+  "reflectionSubmittedAt" DATETIME,
   "accessTokenHash" TEXT,
   CONSTRAINT "StudentSession_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -558,6 +565,22 @@ async function ensureTursoSchemaUpgrades(client: LibsqlClient) {
   }
   if (!studentSessionCols.has("accessTokenHash")) {
     alters.push('ALTER TABLE "StudentSession" ADD COLUMN "accessTokenHash" TEXT');
+  }
+  const learnerReflectionColumns: Array<[string, string]> = [
+    ["reflectionChangedThinking", "TEXT"],
+    ["reflectionSupportedClaim", "TEXT"],
+    ["reflectionRemainingUncertainty", "TEXT"],
+    ["reflectionNextStep", "TEXT"],
+    ["summaryAnnotation", "TEXT"],
+    ["summaryContested", "BOOLEAN NOT NULL DEFAULT false"],
+    ["reflectionSubmittedAt", "DATETIME"],
+  ];
+  for (const [columnName, definition] of learnerReflectionColumns) {
+    if (!studentSessionCols.has(columnName)) {
+      alters.push(
+        `ALTER TABLE "StudentSession" ADD COLUMN "${columnName}" ${definition}`
+      );
+    }
   }
 
   if (alters.length > 0) {

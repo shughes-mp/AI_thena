@@ -1,34 +1,12 @@
 import { prisma } from "./db";
 import { isSubstantiveResponse } from "./attempt-tracker";
+export { determineNextHintLadderRung } from "./learner-experience.ts";
 
 export type TopicMasteryStatus =
   | "mastered"
   | "direct_answer_given"
   | "uncertain"
   | "in_progress";
-
-export function determineNextHintLadderRung(
-  currentRung: number,
-  tags: {
-    directAnswer: string | null;
-    feedbackType: "corrective" | "extension" | "redirection" | null;
-    isGenuineAttempt: boolean | null;
-  }
-): number {
-  if (tags.directAnswer) {
-    return 4;
-  }
-
-  if (
-    tags.isGenuineAttempt &&
-    tags.feedbackType &&
-    tags.feedbackType !== "extension"
-  ) {
-    return Math.min(currentRung + 1, 4);
-  }
-
-  return currentRung;
-}
 
 export async function evaluateMastery(
   studentSessionId: string,

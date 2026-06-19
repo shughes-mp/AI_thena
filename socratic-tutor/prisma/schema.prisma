@@ -110,25 +110,32 @@ model StudentCheckpoint {
 }
 
 model StudentSession {
-  id                 String                     @id @default(cuid())
-  sessionId          String
-  studentName        String
-  softRevisitQueue   String                     @default("[]")
-  startedAt          DateTime                   @default(now())
-  endedAt            DateTime?
-  sessionSummary     String?
-  accessTokenHash    String?                    @unique
-  messages           Message[]
-  misconceptions     Misconception[]
-  confidenceChecks   ConfidenceCheck[]
-  topicMastery       TopicMastery[]
-  studentCheckpoints StudentCheckpoint[]
-  loAssessments      LOAssessment[]
-  diagnosticLogs     DiagnosticLog[]
-  evidenceSignals    EvidenceSignal[]
-  tutorGroundings    TutorGrounding[]
-  protectedAudits    ProtectedAssessmentAudit[]
-  session            Session                    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  id                             String                     @id @default(cuid())
+  sessionId                      String
+  studentName                    String
+  softRevisitQueue               String                     @default("[]")
+  startedAt                      DateTime                   @default(now())
+  endedAt                        DateTime?
+  sessionSummary                 String?
+  reflectionChangedThinking      String?
+  reflectionSupportedClaim       String?
+  reflectionRemainingUncertainty String?
+  reflectionNextStep             String?
+  summaryAnnotation              String?
+  summaryContested               Boolean                    @default(false)
+  reflectionSubmittedAt          DateTime?
+  accessTokenHash                String?                    @unique
+  messages                       Message[]
+  misconceptions                 Misconception[]
+  confidenceChecks               ConfidenceCheck[]
+  topicMastery                   TopicMastery[]
+  studentCheckpoints             StudentCheckpoint[]
+  loAssessments                  LOAssessment[]
+  diagnosticLogs                 DiagnosticLog[]
+  evidenceSignals                EvidenceSignal[]
+  tutorGroundings                TutorGrounding[]
+  protectedAudits                ProtectedAssessmentAudit[]
+  session                        Session                    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId])
 }

@@ -16,6 +16,8 @@
 
 [Phase 3](phase-3/README.md) implements passage-grounded tutor responses, unsupported-source handling, protected-answer interception, and instructor audit records.
 
+[Phase 4](phase-4/README.md) strengthens learner orientation, proportional help, purpose-aware dialogue, formative summaries, and learner-authored reflection or correction.
+
 ## Governing Planning Documents
 
 - [Higher-rigor recommendations](../AI_thena_higher_rigor_recommendations.md)
