@@ -46,15 +46,16 @@ function getPurposeLinks(sessionId: string, purpose: string) {
   const monitor = { href: `/instructor/${sessionId}/monitor`, label: "Learner progress" };
   const analysis = { href: `/instructor/${sessionId}/analysis`, label: "Teaching brief" };
   const evidence = { href: `/instructor/${sessionId}/evidence`, label: "Evidence review" };
+  const grounding = { href: `/instructor/${sessionId}/grounding`, label: "Grounding audit" };
 
   switch (purpose) {
     case "during_class_prep":
     case "during_class_reflection":
-      return [monitor, evidence, analysis];
+      return [monitor, evidence, grounding, analysis];
     case "after_class":
     case "pre_class":
     default:
-      return [analysis, evidence, monitor];
+      return [analysis, evidence, grounding, monitor];
   }
 }
 

@@ -8,20 +8,20 @@ datasource db {
 }
 
 model Session {
-  id                     String                   @id @default(cuid())
+  id                     String                     @id @default(cuid())
   name                   String
   description            String?
   courseContext          String?
   learningGoal           String?
   learningOutcomes       String?
   prerequisiteMap        String?
-  accessCode             String                   @unique
-  createdAt              DateTime                 @default(now())
+  accessCode             String                     @unique
+  createdAt              DateTime                   @default(now())
   opensAt                DateTime?
   closesAt               DateTime?
-  maxExchanges           Int                      @default(20)
-  stance                 String                   @default("directed")
-  sessionPurpose         String                   @default("pre_class")
+  maxExchanges           Int                        @default(20)
+  stance                 String                     @default("directed")
+  sessionPurpose         String                     @default("pre_class")
   ownerClerkUserId       String?
   readings               Reading[]
   assessments            Assessment[]
@@ -35,6 +35,7 @@ model Session {
   normalizedOutcomes     LearningOutcome[]
   evidenceQuestions      EvidenceQuestion[]
   instructorAccess       SessionInstructor[]
+  protectedAuditEvents   ProtectedAssessmentAudit[]
 }
 
 model SessionInstructor {
@@ -52,13 +53,14 @@ model SessionInstructor {
 }
 
 model Reading {
-  id                String             @id @default(cuid())
+  id                String                @id @default(cuid())
   sessionId         String
   filename          String
   content           String
-  uploadedAt        DateTime           @default(now())
-  session           Session            @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  uploadedAt        DateTime              @default(now())
+  session           Session               @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   evidenceCitations EvidenceCitation[]
+  tutorCitations    TutorSourceCitation[]
 
   @@index([sessionId])
 }
@@ -108,14 +110,14 @@ model StudentCheckpoint {
 }
 
 model StudentSession {
-  id                 String              @id @default(cuid())
+  id                 String                     @id @default(cuid())
   sessionId          String
   studentName        String
-  softRevisitQueue   String              @default("[]")
-  startedAt          DateTime            @default(now())
+  softRevisitQueue   String                     @default("[]")
+  startedAt          DateTime                   @default(now())
   endedAt            DateTime?
   sessionSummary     String?
-  accessTokenHash    String?             @unique
+  accessTokenHash    String?                    @unique
   messages           Message[]
   misconceptions     Misconception[]
   confidenceChecks   ConfidenceCheck[]
@@ -124,7 +126,9 @@ model StudentSession {
   loAssessments      LOAssessment[]
   diagnosticLogs     DiagnosticLog[]
   evidenceSignals    EvidenceSignal[]
-  session            Session             @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  tutorGroundings    TutorGrounding[]
+  protectedAudits    ProtectedAssessmentAudit[]
+  session            Session                    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId])
 }
@@ -146,7 +150,7 @@ model LOAssessment {
 }
 
 model Message {
-  id                     String             @id @default(cuid())
+  id                     String                     @id @default(cuid())
   studentSessionId       String
   role                   String // "user" | "assistant"
   content                String
@@ -157,16 +161,75 @@ model Message {
   questionType           String?
   feedbackType           String?
   expertModelType        String?
-  selfExplainPrompted    Boolean            @default(false)
+  selfExplainPrompted    Boolean                    @default(false)
   cognitiveConflictStage String?
-  misconceptionResolved  Boolean            @default(false)
-  isRevisitProbe         Boolean            @default(false)
+  misconceptionResolved  Boolean                    @default(false)
+  isRevisitProbe         Boolean                    @default(false)
   engagementFlag         String?
   engagementNote         String?
-  createdAt              DateTime           @default(now())
-  studentSession         StudentSession     @relation(fields: [studentSessionId], references: [id], onDelete: Cascade)
+  createdAt              DateTime                   @default(now())
+  studentSession         StudentSession             @relation(fields: [studentSessionId], references: [id], onDelete: Cascade)
   evidenceCitations      EvidenceCitation[]
+  tutorGrounding         TutorGrounding?
+  protectedAuditEvents   ProtectedAssessmentAudit[]
 
+  @@index([studentSessionId])
+}
+
+model TutorGrounding {
+  id                     String                @id @default(cuid())
+  messageId              String                @unique
+  message                Message               @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  studentSessionId       String
+  studentSession         StudentSession        @relation(fields: [studentSessionId], references: [id], onDelete: Cascade)
+  status                 String
+  sourceSetVersion       String?
+  retrievalVersion       String
+  promptVersion          String
+  parserVersion          String
+  learnerCitationVisible Boolean               @default(false)
+  unsupportedReason      String?
+  createdAt              DateTime              @default(now())
+  citations              TutorSourceCitation[]
+
+  @@index([studentSessionId, createdAt])
+  @@index([status])
+}
+
+model TutorSourceCitation {
+  id          String         @id @default(cuid())
+  groundingId String
+  grounding   TutorGrounding @relation(fields: [groundingId], references: [id], onDelete: Cascade)
+  readingId   String?
+  reading     Reading?       @relation(fields: [readingId], references: [id], onDelete: SetNull)
+  filename    String
+  passageId   String
+  quotedText  String
+  startOffset Int
+  endOffset   Int
+  createdAt   DateTime       @default(now())
+
+  @@index([groundingId])
+  @@index([readingId])
+}
+
+model ProtectedAssessmentAudit {
+  id               String         @id @default(cuid())
+  sessionId        String
+  session          Session        @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  studentSessionId String
+  studentSession   StudentSession @relation(fields: [studentSessionId], references: [id], onDelete: Cascade)
+  messageId        String?
+  message          Message?       @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  assessmentIds    String
+  triggerType      String
+  action           String
+  sourceConflict   Boolean        @default(false)
+  detail           String
+  policyVersion    String
+  createdAt        DateTime       @default(now())
+
+  @@index([sessionId, createdAt])
   @@index([studentSessionId])
 }
 

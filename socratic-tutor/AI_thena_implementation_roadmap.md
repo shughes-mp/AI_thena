@@ -379,28 +379,30 @@ Gate result: **Passed.** The complete pathway is citation-gated, versioned, revi
 
 ## Phase 3: Enforce Source Grounding And Assessment Protection
 
+Status: **Complete (2026-06-19).** Passage retrieval, validated tutor-response citations, unsupported-source handling, protected-material isolation and interception, audit persistence, instructor-visible grounding review, additive migrations, adversarial tests, and running-app verification are implemented. Details and limitations are recorded in `docs/phase-3/README.md`.
+
 ### Objective
 
 Make source grounding and protected assessment behavior operational rather than merely described in copy.
 
 ### 3.1 Source Grounding
 
-- [ ] Associate AI claims with uploaded source passages.
-- [ ] Require source support for course-content claims.
-- [ ] Provide an explicit unsupported-by-source response path.
-- [ ] Show source citations to instructors.
-- [ ] Decide when source citations should be visible to learners.
-- [ ] Test conflicting, incomplete, and ambiguous source sets.
-- [ ] Prevent arbitrary outside knowledge from silently overriding instructor materials.
+- [x] Associate AI claims with uploaded source passages.
+- [x] Require source support for course-content claims.
+- [x] Provide an explicit unsupported-by-source response path.
+- [x] Show source citations to instructors.
+- [x] Decide when source citations should be visible to learners.
+- [x] Test conflicting, incomplete, and ambiguous source sets.
+- [x] Prevent arbitrary outside knowledge from silently overriding instructor materials.
 
 ### 3.2 Protected Assessment Materials
 
-- [ ] Separate protected assessment content from learner-visible source context.
-- [ ] Prevent direct answer disclosure.
-- [ ] Permit coaching on reasoning without reproducing protected answers.
-- [ ] Add adversarial tests for answer extraction.
-- [ ] Add instructor-visible audit records when protected material influences coaching.
-- [ ] Define behavior when a source and protected answer conflict.
+- [x] Separate protected assessment content from learner-visible source context.
+- [x] Prevent direct answer disclosure.
+- [x] Permit coaching on reasoning without reproducing protected answers.
+- [x] Add adversarial tests for answer extraction.
+- [x] Add instructor-visible audit records when protected material influences coaching.
+- [x] Define behavior when a source and protected answer conflict.
 
 ### 3.3 Instructor Workspace
 
@@ -417,9 +419,13 @@ Verify and complete:
 - Interaction style
 - Foundational concept map
 
+Verification result: all listed workspace capabilities remain operational, with new readiness explanations and a dedicated Grounding & Protection audit surface.
+
 ### Acceptance Gate
 
 Course-content claims are source-grounded, protected answers are not exposed, and both behaviors are testable and visible to the instructor.
+
+Gate result: **Passed.** Enforcement occurs before learner display, protected material is excluded from normal generation context, and versioned audit records make both outcomes inspectable.
 
 ---
 
@@ -1210,13 +1216,10 @@ The recommendation programme is complete only when all of the following are true
 
 ## Immediate Next Actions
 
-The next implementation cycle should not begin with a new dashboard component. It should begin with the following ordered actions:
+The next implementation cycle is Phase 4 and should strengthen the learner learning experience in this order:
 
-1. Create the recommendation traceability matrix.
-2. Complete the terminology, evidence, facilitation, and governance contracts.
-3. Design the provenance and instructor-review data model.
-4. Select one misunderstanding fixture for the first vertical slice.
-5. Implement that slice end to end.
-6. Evaluate it with an instructor before extending the architecture.
-
-That sequence creates the reusable foundation for every later proposal in the recommendation set.
+1. Complete the learner orientation and formative-use disclosure.
+2. Implement the consistent productive-struggle help ladder.
+3. Verify purpose-aware reasoning behaviors across the Phase 0 fixtures.
+4. Add learner summary, reflection, and correction opportunities.
+5. Test the complete learner pathway against the Phase 4 acceptance gate before expanding instructor synthesis features.

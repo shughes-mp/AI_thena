@@ -735,6 +735,23 @@ export default function SessionManagementPage() {
           purposeLabel={getSessionPurposeOption(session.sessionPurpose).shortLabel}
         />
 
+        <div className="minerva-card grid gap-5 p-6 text-sm md:grid-cols-2 md:p-8">
+          <div>
+            <p className="eyebrow eyebrow-teal">Source grounding</p>
+            <p className="mt-2 leading-6 text-[var(--dim-grey)]">
+              {readings.length > 0
+                ? "Tutor course-content claims must cite retrieved passages from your uploaded source materials. Unsupported claims are replaced before learners see them."
+                : "Upload at least one source material. Until then, AI_thena will not make course-content claims."}
+            </p>
+          </div>
+          <div>
+            <p className="eyebrow eyebrow-rose">Assessment protection</p>
+            <p className="mt-2 leading-6 text-[var(--dim-grey)]">
+              Protected files are excluded from the normal tutor prompt. Answer-extraction attempts receive reasoning coaching and create an instructor audit record.
+            </p>
+          </div>
+        </div>
+
         {error ? (
           <div className="border border-[rgba(223,47,38,0.24)] bg-[rgba(223,47,38,0.08)] px-4 py-3 text-sm text-[var(--signal)]">
             {error}

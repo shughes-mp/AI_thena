@@ -93,6 +93,50 @@ test("migrated evidence database preserves normalized links and provenance", asy
           content: "Efficiency and effectiveness mean the same thing.",
         },
       });
+      const assistantMessage = await client.message.create({
+        data: {
+          studentSessionId: learnerSession.id,
+          role: "assistant",
+          content: "The source distinguishes the concepts.",
+        },
+      });
+      const grounding = await client.tutorGrounding.create({
+        data: {
+          messageId: assistantMessage.id,
+          studentSessionId: learnerSession.id,
+          status: "grounded",
+          sourceSetVersion: "sha256:fixture",
+          retrievalVersion: "source-retrieval-1.0.0",
+          promptVersion: "tutor-grounding-1.0.0",
+          parserVersion: "tutor-grounding-parser-1.0.0",
+          learnerCitationVisible: true,
+          citations: {
+            create: {
+              readingId: reading.id,
+              filename: reading.filename,
+              passageId: "fixture-passage",
+              quotedText: reading.content,
+              startOffset: 0,
+              endOffset: reading.content.length,
+            },
+          },
+        },
+        include: { citations: true },
+      });
+      assert.equal(grounding.citations[0].readingId, reading.id);
+      const protectionAudit = await client.protectedAssessmentAudit.create({
+        data: {
+          sessionId: session.id,
+          studentSessionId: learnerSession.id,
+          messageId: assistantMessage.id,
+          assessmentIds: "[]",
+          triggerType: "answer_extraction",
+          action: "coaching_without_disclosure",
+          detail: "Protected fixture request.",
+          policyVersion: "assessment-protection-1.0.0",
+        },
+      });
+      assert.equal(protectionAudit.action, "coaching_without_disclosure");
 
       const signal = await client.evidenceSignal.create({
         data: {

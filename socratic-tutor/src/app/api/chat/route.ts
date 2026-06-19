@@ -21,6 +21,21 @@ import {
 import { runDiagnostic } from "@/lib/diagnostic";
 import { ensureNormalizedEvidenceDefinitions } from "@/lib/evidence-definitions";
 import { matchesLearnerCapability } from "@/lib/learner-capability";
+import {
+  appendLearnerCitations,
+  buildUnsupportedSourceResponse,
+  GROUNDING_VERSIONS,
+  parseSourceIds,
+  responseRequiresGrounding,
+  retrieveRelevantPassages,
+  shouldShowLearnerCitation,
+  sourceSetVersion,
+  validateSourceIds,
+} from "@/lib/source-grounding";
+import {
+  assessProtectedRequest,
+  buildProtectedCoachingResponse,
+} from "@/lib/assessment-protection";
 
 export const maxDuration = 60;
 const VALID_CHECKPOINT_STATUSES = [
@@ -209,9 +224,33 @@ export async function POST(req: Request) {
     const activeSoftRevisit =
       exchangeCount >= revisitTriggerAt && softRevisitQueue.length > 0 ? softRevisitQueue[0] : null;
 
-    const systemPrompt = buildSystemPrompt(
-      studentSession.session.readings,
+    const sourceDocuments = studentSession.session.readings.map((reading) => ({
+      id: reading.id,
+      filename: reading.filename,
+      content: reading.content,
+    }));
+    const sourcePassages = retrieveRelevantPassages(
+      [
+        currentTopicThread,
+        lastUserMessage.content,
+        studentSession.session.courseContext,
+        studentSession.session.learningGoal,
+        studentSession.session.learningOutcomes,
+        ...checkpoints.map((checkpoint) => checkpoint.prompt),
+      ]
+        .filter(Boolean)
+        .join("\n"),
+      sourceDocuments
+    );
+    const protectionDecision = assessProtectedRequest(
+      lastUserMessage.content,
       studentSession.session.assessments,
+      sourcePassages
+    );
+
+    const systemPrompt = buildSystemPrompt(
+      sourcePassages,
+      studentSession.session.assessments.length > 0,
       {
         courseContext: studentSession.session.courseContext,
         learningGoal: studentSession.session.learningGoal,
@@ -260,6 +299,51 @@ export async function POST(req: Request) {
       },
     });
 
+    if (protectionDecision.protected) {
+      const protectedResponse = buildProtectedCoachingResponse();
+      const persistedAssistantMessage = await prisma.message.create({
+        data: {
+          studentSessionId,
+          role: "assistant",
+          content: protectedResponse,
+          topicThread: currentTopicThread,
+          mode: "socratic",
+          questionType: "explain",
+          feedbackType: "redirection",
+          tutorGrounding: {
+            create: {
+              studentSessionId,
+              status: "protected_coaching",
+              sourceSetVersion: sourceSetVersion(sourceDocuments),
+              retrievalVersion: GROUNDING_VERSIONS.retrieval,
+              promptVersion: GROUNDING_VERSIONS.prompt,
+              parserVersion: GROUNDING_VERSIONS.parser,
+              learnerCitationVisible: false,
+              unsupportedReason: null,
+            },
+          },
+        },
+      });
+
+      await prisma.protectedAssessmentAudit.create({
+        data: {
+          sessionId: studentSession.session.id,
+          studentSessionId,
+          messageId: persistedAssistantMessage.id,
+          assessmentIds: JSON.stringify(protectionDecision.assessmentIds),
+          triggerType: protectionDecision.triggerType,
+          action: "coaching_without_disclosure",
+          sourceConflict: protectionDecision.sourceConflict,
+          detail: protectionDecision.rationale,
+          policyVersion: GROUNDING_VERSIONS.protection,
+        },
+      });
+
+      return new Response(protectedResponse, {
+        headers: { "Content-Type": "text/plain; charset=utf-8" },
+      });
+    }
+
     const anthropicMessages = incomingMessages.map((message, index) => {
       if (index === incomingMessages.length - 1 && message.role === "user") {
         return {
@@ -294,11 +378,33 @@ export async function POST(req: Request) {
               event.delta.type === "text_delta"
             ) {
               fullResponse += event.delta.text;
-              controller.enqueue(encoder.encode(event.delta.text));
             }
           }
 
-          const { cleanedText, tags } = parseTags(fullResponse);
+          const requestedSourceIds = parseSourceIds(fullResponse);
+          const validCitations = validateSourceIds(
+            requestedSourceIds,
+            sourcePassages,
+            fullResponse
+          );
+          const requiresGrounding = responseRequiresGrounding(fullResponse, sourcePassages);
+          const learnerCitationVisible =
+            requiresGrounding &&
+            validCitations.length > 0 &&
+            shouldShowLearnerCitation(fullResponse);
+          const parsedResponse = parseTags(fullResponse);
+          const finalCleanedText =
+            requiresGrounding && validCitations.length === 0
+              ? buildUnsupportedSourceResponse()
+              : learnerCitationVisible
+                ? appendLearnerCitations(parsedResponse.cleanedText, validCitations)
+                : parsedResponse.cleanedText;
+          const groundingStatus = requiresGrounding
+            ? validCitations.length > 0
+              ? "grounded"
+              : "unsupported"
+            : "not_required";
+          const { tags } = parsedResponse;
           const normalizedTopicThread =
             confidenceRating === "uncertain" && currentTopicThread
               ? currentTopicThread
@@ -320,7 +426,7 @@ export async function POST(req: Request) {
             data: {
               studentSessionId,
               role: "assistant",
-              content: cleanedText,
+              content: finalCleanedText,
               topicThread: normalizedTopicThread,
               attemptNumber: nextState.newAttemptCount,
               isGenuineAttempt: tags.isGenuineAttempt,
@@ -332,8 +438,35 @@ export async function POST(req: Request) {
               cognitiveConflictStage: tags.cognitiveConflictStage,
               misconceptionResolved: tags.misconceptionResolved,
               isRevisitProbe: tags.isRevisitProbe,
+              tutorGrounding: {
+                create: {
+                  studentSessionId,
+                  status: groundingStatus,
+                  sourceSetVersion: sourceSetVersion(sourceDocuments),
+                  retrievalVersion: GROUNDING_VERSIONS.retrieval,
+                  promptVersion: GROUNDING_VERSIONS.prompt,
+                  parserVersion: GROUNDING_VERSIONS.parser,
+                  learnerCitationVisible,
+                  unsupportedReason:
+                    groundingStatus === "unsupported"
+                      ? "The model made a course-content claim without a valid retrieved passage citation."
+                      : null,
+                  citations: {
+                    create: validCitations.map((citation) => ({
+                      readingId: citation.readingId,
+                      filename: citation.filename,
+                      passageId: citation.id,
+                      quotedText: citation.content,
+                      startOffset: citation.startOffset,
+                      endOffset: citation.endOffset,
+                    })),
+                  },
+                },
+              },
             },
           });
+
+          controller.enqueue(encoder.encode(finalCleanedText));
 
           const diagnosticInput = {
             studentSessionId,
@@ -341,7 +474,7 @@ export async function POST(req: Request) {
             userMessageId: persistedUserMessage.id,
             assistantMessageId: persistedAssistantMessage.id,
             studentMessage: lastUserMessage.content,
-            assistantMessage: cleanedText,
+            assistantMessage: finalCleanedText,
             topicThread: normalizedTopicThread,
             exchangeIndex: exchangeCount + 1,
             readings: studentSession.session.readings.map((reading) => ({
