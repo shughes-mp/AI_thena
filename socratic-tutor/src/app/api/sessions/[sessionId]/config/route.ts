@@ -108,6 +108,7 @@ export async function PATCH(
       maxExchanges: updated.maxExchanges,
       stance: updated.stance,
       sessionPurpose: updated.sessionPurpose,
+      instructorRole: access.role,
     });
   } catch (error) {
     console.error("Error updating session config:", error);

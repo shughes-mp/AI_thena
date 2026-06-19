@@ -183,12 +183,20 @@ pnpm lint
 pnpm test
 ```
 
+Or run the complete local quality gate:
+
+```bash
+pnpm check
+```
+
 Current status:
 
 - `pnpm build` succeeds.
 - `pnpm exec tsc --noEmit` succeeds.
 - `pnpm lint` succeeds.
-- `pnpm test` currently passes 35 tests covering migrations, evidence provenance and review, authentication and authorization, learner capabilities, source grounding, protected assessment behavior, the productive-struggle ladder, purpose-aware tutoring, formative summaries, and learner reflection.
+- `pnpm test` currently passes 42 tests covering migrations, evidence provenance and review, authentication and authorization, learner capabilities, source grounding, protected assessment behavior, the productive-struggle ladder, purpose-aware tutoring, formative summaries, learner reflection, rate limiting, deletion, build-safe clients, route fallbacks, and database-schema parity.
+- `pnpm audit` reports zero known dependency vulnerabilities.
+- GitHub Actions runs install, audit, tests, lint, type checking, and build automatically.
 
 ## Database and Deployment
 
@@ -242,13 +250,14 @@ Do not rely on `prisma db push` during the Vercel build for Turso schema creatio
 
 ## Implementation Status
 
-The implementation roadmap is complete through Phase 4:
+The implementation roadmap is complete through Phase 4 plus the Phase 4.5 hardening audit:
 
 - **Phase 0:** architecture, terminology, risk, and test baseline.
 - **Phase 1:** product, evidence, facilitation, governance, and versioning contracts.
 - **Phase 2:** evidence provenance, instructor review actions, authorization, and learner capabilities.
 - **Phase 3:** source-first grounding, passage citations, broader-context transparency, and protected-assessment enforcement.
 - **Phase 4:** learner orientation, proportional help, purpose-aware dialogue, formative summaries, and learner reflection or correction.
+- **Phase 4.5:** dependency and repository security, CI gates, resilient route states, request throttling, owner deletion, and hardening tests.
 
 See the [implementation roadmap](AI_thena_implementation_roadmap.md) and [phase documentation](docs/README.md) for acceptance gates, limitations, and verification details.
 
@@ -262,6 +271,8 @@ See the [implementation roadmap](AI_thena_implementation_roadmap.md) and [phase 
 - Assessment protection reduces answer leakage but should not be treated as a formal exam-security guarantee.
 - AI-generated diagnostics, learning outcome assessments, summaries, and teaching recommendations are formative aids that instructors should review.
 - Misconception detection runs after the tutor response, so dashboard updates may lag slightly behind the learner-visible chat.
+- Request throttling in the application is per running instance. Broad public deployment should also enable Vercel Firewall rate limits.
+- Owners can delete a session and its associated learner data from the session workspace. Automated retention schedules and institutional data-export policy remain future governance work.
 - Recommendation generation falls back to deterministic cards when structured AI output cannot be parsed.
 - Changing the session purpose affects future tutor behavior and future report framing, but it does not retroactively change recorded conversations.
 - Live engagement flags are lightweight heuristics, not definitive judgments about learner effort.

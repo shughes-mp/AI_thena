@@ -3,7 +3,7 @@
 import { LoadingState } from "@/components/ui/loading-state";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   AccessCodeCard,
@@ -40,6 +40,7 @@ function formatSavedTime(date: Date) {
 
 export default function SessionManagementPage() {
   const params = useParams();
+  const router = useRouter();
   const sessionId = params.sessionId as string;
   const [session, setSession] = useState<SessionDetails | null>(null);
   const [files, setFiles] = useState<FileInfo[]>([]);
@@ -184,6 +185,7 @@ export default function SessionManagementPage() {
             closesAt: configData.closesAt ?? null,
             readingsCount: filesData.files.filter((f: FileInfo) => f.category === "reading").length,
             assessmentsCount: filesData.files.filter((f: FileInfo) => f.category === "assessment").length,
+            instructorRole: configData.instructorRole,
           });
         }
       }
@@ -667,6 +669,33 @@ export default function SessionManagementPage() {
     setDragTargetCheckpointId(null);
   }
 
+  async function deleteSession() {
+    const confirmed = window.confirm(
+      `Delete “${session?.name ?? "this session"}” and all of its learner conversations, evidence, and reports? This cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`/api/sessions/${sessionId}`, {
+        method: "DELETE",
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(data?.error || "Failed to delete the session.");
+      }
+      router.push("/instructor");
+      router.refresh();
+    } catch (deleteError) {
+      setToast({
+        tone: "error",
+        message:
+          deleteError instanceof Error
+            ? deleteError.message
+            : "Failed to delete the session.",
+      });
+    }
+  }
+
   const readings = files.filter((f) => f.category === "reading");
   const assessments = files.filter((f) => f.category === "assessment");
   const isActive = readings.length > 0 && Boolean(session?.learningOutcomes?.trim());
@@ -883,6 +912,26 @@ export default function SessionManagementPage() {
           hasReadings={readings.length > 0}
           onCopyLink={copyLink}
         />
+
+        {session.instructorRole === "owner" ? (
+          <section className="border border-[rgba(223,47,38,0.3)] bg-white p-6 md:p-8">
+            <p className="eyebrow eyebrow-rose">Data controls</p>
+            <h2 className="mt-3 font-serif text-3xl text-[var(--charcoal)]">
+              Delete this session
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--dim-grey)]">
+              Permanently removes the session and its uploaded materials, learner
+              conversations, evidence, reflections, reports, and audit records.
+            </p>
+            <button
+              type="button"
+              onClick={() => void deleteSession()}
+              className="mt-5 border border-[var(--signal)] px-4 py-2 text-sm font-semibold text-[var(--signal)] hover:bg-[rgba(223,47,38,0.08)]"
+            >
+              Delete session and learner data
+            </button>
+          </section>
+        ) : null}
 
       </div>
     </main>

@@ -58,13 +58,14 @@ The system supports instructor decisions; it does not silently convert model out
 
 ## Implementation Status
 
-The implementation roadmap is complete through Phase 4:
+The implementation roadmap is complete through Phase 4 plus a Phase 4.5 hardening audit:
 
 - **Phase 0:** architecture, terminology, risk, and test baseline.
 - **Phase 1:** product, evidence, facilitation, governance, and versioning contracts.
 - **Phase 2:** evidence provenance, instructor review, authorization, and learner capabilities.
 - **Phase 3:** source grounding, broader-context transparency, passage citations, and assessment protection.
 - **Phase 4:** learner orientation, proportional support, purpose-aware tutoring, formative summaries, and learner reflection or correction.
+- **Phase 4.5:** dependency and repository security, CI gates, resilient route states, request throttling, owner deletion, and hardening tests.
 
 See the [implementation roadmap](socratic-tutor/AI_thena_implementation_roadmap.md), [phase documentation](socratic-tutor/docs/README.md), and [detailed application README](socratic-tutor/README.md).
 
@@ -72,8 +73,10 @@ See the [implementation roadmap](socratic-tutor/AI_thena_implementation_roadmap.
 
 - Production build passes.
 - TypeScript and ESLint checks pass.
-- 35 automated tests pass.
-- Tests cover migrations, evidence provenance and review, authentication and authorization, learner capabilities, source grounding, protected assessment behavior, productive struggle, purpose-aware tutoring, formative summaries, and learner reflection.
+- 42 automated tests pass.
+- The dependency audit reports zero known vulnerabilities.
+- GitHub Actions verifies frozen installation, audit, tests, lint, type checking, and production build.
+- Tests cover migrations, evidence provenance and review, authentication and authorization, learner capabilities, source grounding, protected assessment behavior, productive struggle, purpose-aware tutoring, formative summaries, learner reflection, rate limiting, deletion, route fallbacks, lazy clients, and schema parity.
 - Desktop and mobile learner orientation checks pass without overflow or framework errors.
 
 ## Quick Start
@@ -107,3 +110,5 @@ Copy the placeholder configuration from [`socratic-tutor/.env.example`](socratic
 - Assessment protection reduces answer leakage but is not a formal exam-security guarantee.
 - AI-generated evidence, summaries, and recommendations require instructor judgment.
 - Text extraction works best with text-based PDFs rather than scanned documents.
+- In-app request throttling is per running instance; broad public use should also enable Vercel Firewall rate limits.
+- Owners can delete sessions and associated learner data. Automated retention and institutional data-export policy remain future governance work.

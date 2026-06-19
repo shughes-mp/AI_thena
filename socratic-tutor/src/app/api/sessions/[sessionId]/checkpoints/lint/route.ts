@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { anthropic } from "@/lib/anthropic";
+import { getAnthropic } from "@/lib/anthropic";
 import { prisma } from "@/lib/db";
 import type { ApiError, CheckpointLintResult } from "@/types";
 import { MODEL_FAST } from "@/lib/models";
@@ -51,7 +51,7 @@ Respond ONLY with valid JSON:
   "suggestedMisconceptions": ["misreading 1", "misreading 2"]
 }`;
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: MODEL_FAST,
       max_tokens: 500,
       system: systemPrompt,

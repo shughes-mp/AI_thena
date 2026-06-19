@@ -522,6 +522,16 @@ Gate result: **Passed.** Help requests advance proportionately through a persist
 
 ---
 
+## Phase 4.5: Security And Reliability Hardening
+
+Status: **Complete (2026-06-20), with external key rotation required.** The repository now has secret-safe ignore rules, updated dependencies with a zero-finding package audit, CI quality gates, lazy service initialization, route failure states, learner request throttling, owner-controlled session deletion, and additional regression tests. See `docs/phase-4/hardening-audit.md`.
+
+The previously committed Anthropic key must be treated as compromised. Repository cleanup and history purging cannot substitute for revoking and replacing that credential in Anthropic and Vercel.
+
+Remaining governance work—automatic retention, export, institutional privacy policy, distributed rate limiting, durable diagnostic retries, and full evaluation—stays explicitly assigned to later roadmap phases rather than being silently treated as complete.
+
+---
+
 ## Phase 5: Build Instructor Evidence Review Surfaces
 
 ### Objective
@@ -1172,28 +1182,28 @@ The recommendation programme is complete only when all of the following are true
 
 ### Purpose And Language
 
-- [ ] A naive reader can explain AI_thena's purpose accurately.
-- [ ] Terminology is consistent across UI, prompts, APIs, exports, and documentation.
-- [ ] No visible feature implies automated grading or complete learner diagnosis.
+- [x] A naive reader can explain AI_thena's purpose accurately.
+- [x] Terminology is consistent across UI, prompts, APIs, exports, and documentation.
+- [x] No visible feature implies automated grading or complete learner diagnosis.
 
 ### Learner Experience
 
-- [ ] Learners understand the role of AI_thena and instructor review.
-- [ ] Conversations require reasoning rather than merely answer retrieval.
-- [ ] Help is graduated and proportionate.
-- [ ] Learners receive a formative summary and reflection opportunity.
+- [x] Learners understand the role of AI_thena and instructor review.
+- [x] Conversations require reasoning rather than merely answer retrieval.
+- [x] Help is graduated and proportionate.
+- [x] Learners receive a formative summary and reflection opportunity.
 
 ### Evidence Integrity
 
-- [ ] Every consequential signal is traceable to evidence.
-- [ ] Confidence and uncertainty are explained.
-- [ ] Missing and contradictory evidence are represented.
-- [ ] Evidence opportunities are recorded.
+- [x] Every consequential signal is traceable to evidence.
+- [x] Confidence and uncertainty are explained.
+- [x] Missing and contradictory evidence are represented.
+- [x] Evidence opportunities are recorded.
 
 ### Instructor Authority
 
-- [ ] Instructors can approve, revise, reject, and annotate AI signals.
-- [ ] Reviewed and unreviewed outputs are visibly distinct.
+- [x] Instructors can approve, revise, reject, and annotate AI signals.
+- [x] Reviewed and unreviewed outputs are visibly distinct.
 - [ ] Teaching briefs reflect instructor review states.
 
 ### Facilitation Intelligence
@@ -1206,14 +1216,14 @@ The recommendation programme is complete only when all of the following are true
 
 ### Trust And Governance
 
-- [ ] Source grounding is operational.
-- [ ] Protected assessment answers are not disclosed.
+- [x] Source grounding is operational.
+- [x] Protected assessment answers are not disclosed.
 - [ ] Privacy, retention, access, and deletion controls are implemented.
 - [ ] Prohibited uses are documented and constrained.
 
 ### Evaluation
 
-- [ ] Technical reliability is measured.
+- [x] Technical reliability is measured.
 - [ ] Evidence accuracy is calibrated against instructors.
 - [ ] Pedagogical effects are evaluated.
 - [ ] Equity and accessibility are evaluated.
@@ -1221,10 +1231,10 @@ The recommendation programme is complete only when all of the following are true
 
 ## Immediate Next Actions
 
-The next implementation cycle is Phase 4 and should strengthen the learner learning experience in this order:
+The next implementation cycle is Phase 5 and should strengthen instructor evidence review in this order:
 
-1. Complete the learner orientation and formative-use disclosure.
-2. Implement the consistent productive-struggle help ladder.
-3. Verify purpose-aware reasoning behaviors across the Phase 0 fixtures.
-4. Add learner summary, reflection, and correction opportunities.
-5. Test the complete learner pathway against the Phase 4 acceptance gate before expanding instructor synthesis features.
+1. Audit each instructor signal against the Phase 5 evidence-and-uncertainty display requirements.
+2. Complete live review signal explanations, timestamps, and suggested follow-up actions.
+3. Complete outcome and topic evidence drill-down, filtering, sorting, and review-history views.
+4. Verify that aggregate patterns and teaching briefs use reviewed evidence states correctly.
+5. Run desktop, mobile, keyboard, screen-reader, long-content, and color-independent acceptance checks.

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { anthropic } from "@/lib/anthropic";
+import { getAnthropic } from "@/lib/anthropic";
 import { ensureDatabaseReady, prisma } from "@/lib/db";
 import { MODEL_FAST } from "@/lib/models";
 import type {
@@ -156,7 +156,7 @@ async function buildSemanticGroups(bin: Bin): Promise<SemanticGroup[]> {
       return `${index}. "${getRepresentativeExcerpt(record)}"`;
     });
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: MODEL_FAST,
       max_tokens: 500,
       messages: [

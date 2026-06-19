@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { anthropic } from "@/lib/anthropic";
+import { getAnthropic } from "@/lib/anthropic";
 import { ensureDatabaseReady, prisma } from "@/lib/db";
 import { MODEL_FAST } from "@/lib/models";
 import { requireSessionAccess } from "@/lib/instructor-auth";
@@ -163,7 +163,7 @@ ${session.readings
 </untrusted_readings>`;
 
   try {
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: MODEL_FAST,
       max_tokens: 1024,
       messages: [{ role: "user", content: prompt }],

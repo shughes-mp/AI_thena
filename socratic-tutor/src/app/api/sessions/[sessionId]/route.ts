@@ -51,6 +51,7 @@ export async function GET(
       closesAt: session.closesAt?.toISOString() ?? null,
       readingsCount: session.readings.length,
       assessmentsCount: session.assessments.length,
+      instructorRole: access.role,
     });
   } catch (error) {
     console.error("Error fetching session:", error);
@@ -184,11 +185,38 @@ export async function PATCH(
       closesAt: updated.closesAt?.toISOString() ?? null,
       readingsCount: updated.readings.length,
       assessmentsCount: updated.assessments.length,
+      instructorRole: access.role,
     });
   } catch (error) {
     console.error("Error updating session:", error);
     return NextResponse.json<ApiError>(
       { error: "Failed to update session.", code: "UPDATE_FAILED" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ sessionId: string }> }
+) {
+  try {
+    await ensureDatabaseReady();
+    const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "owner");
+    if (!access.ok) return access.response;
+
+    await prisma.session.delete({ where: { id: sessionId } });
+
+    return NextResponse.json({
+      deleted: true,
+      sessionId,
+      message: "The session and its associated learner data were deleted.",
+    });
+  } catch (error) {
+    console.error("Error deleting session:", error);
+    return NextResponse.json<ApiError>(
+      { error: "Failed to delete session.", code: "DELETE_FAILED" },
       { status: 500 }
     );
   }

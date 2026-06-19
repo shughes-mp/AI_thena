@@ -1,6 +1,6 @@
 import { after, NextResponse } from "next/server";
 import { ensureDatabaseReady, prisma } from "@/lib/db";
-import { anthropic } from "@/lib/anthropic";
+import { getAnthropic } from "@/lib/anthropic";
 import { MODEL_PRIMARY } from "@/lib/models";
 import {
   buildContextInstruction,
@@ -42,6 +42,10 @@ import {
   assessProtectedRequest,
   buildProtectedCoachingResponse,
 } from "@/lib/assessment-protection";
+import {
+  checkRateLimit,
+  rateLimitExceededResponse,
+} from "@/lib/rate-limit";
 
 export const maxDuration = 60;
 const VALID_CHECKPOINT_STATUSES = [
@@ -73,6 +77,13 @@ function hasCycle(mapValue: { concepts: Array<{ id: string; prerequisites: strin
 }
 
 export async function POST(req: Request) {
+  const rateLimit = checkRateLimit(req, {
+    scope: "learner-chat",
+    limit: 30,
+    windowMs: 60 * 1000,
+  });
+  if (!rateLimit.allowed) return rateLimitExceededResponse(rateLimit);
+
   try {
     await ensureDatabaseReady();
 
@@ -355,7 +366,10 @@ export async function POST(req: Request) {
       });
 
       return new Response(protectedResponse, {
-        headers: { "Content-Type": "text/plain; charset=utf-8" },
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          ...rateLimit.headers,
+        },
       });
     }
 
@@ -377,7 +391,7 @@ export async function POST(req: Request) {
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          const anthropicStream = await anthropic.messages.create({
+          const anthropicStream = await getAnthropic().messages.create({
             model: MODEL_PRIMARY,
             system: systemPrompt,
             messages: anthropicMessages,
@@ -696,7 +710,10 @@ export async function POST(req: Request) {
     });
 
     return new Response(stream, {
-      headers: { "Content-Type": "text/plain; charset=utf-8" },
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        ...rateLimit.headers,
+      },
     });
   } catch (error) {
     console.error("Chat API Error:", error);

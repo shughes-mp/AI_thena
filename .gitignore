@@ -1,0 +1,13 @@
+# Repository-wide secrets and local environment files
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Generated logs and local artifacts
+*.log
+*.err.log
+**/.next/
+**/node_modules/
+**/.vercel/
+**/*.tsbuildinfo

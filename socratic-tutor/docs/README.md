@@ -18,6 +18,8 @@
 
 [Phase 4](phase-4/README.md) strengthens learner orientation, proportional help, purpose-aware dialogue, formative summaries, and learner-authored reflection or correction.
 
+[Phase 0–4 hardening audit](phase-4/hardening-audit.md) records the security, dependency, CI, resilience, abuse-control, deletion, and verification work completed before Phase 5.
+
 ## Governing Planning Documents
 
 - [Higher-rigor recommendations](../AI_thena_higher_rigor_recommendations.md)

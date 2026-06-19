@@ -1,10 +1,22 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { ensureDatabaseReady, prisma } from "@/lib/db";
 import type { ApiError } from "@/types";
 import { createLearnerCapability } from "@/lib/learner-capability";
+import {
+  checkRateLimit,
+  rateLimitExceededResponse,
+} from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
+  const rateLimit = checkRateLimit(request, {
+    scope: "learner-session-start",
+    limit: 10,
+    windowMs: 10 * 60 * 1000,
+  });
+  if (!rateLimit.allowed) return rateLimitExceededResponse(rateLimit);
+
   try {
+    await ensureDatabaseReady();
     const body = await request.json();
     const { sessionId, studentName } = body;
 
@@ -51,7 +63,7 @@ export async function POST(request: Request) {
         studentName: studentSession.studentName,
         capabilityToken: capability.token,
       },
-      { status: 201 }
+      { status: 201, headers: rateLimit.headers }
     );
   } catch (error) {
     console.error("Error creating student session:", error);

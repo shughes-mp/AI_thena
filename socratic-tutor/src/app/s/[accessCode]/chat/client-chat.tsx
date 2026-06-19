@@ -87,38 +87,6 @@ export function ClientChat({
     }
   };
 
-  useEffect(() => {
-    const sid = sessionStorage.getItem("studentSessionId");
-    const token = sessionStorage.getItem("studentCapabilityToken");
-    const sname = sessionStorage.getItem("studentName");
-
-    if (!sid || !token) {
-      router.push(`/s/${accessCode}`);
-      return;
-    }
-
-    setStudentSessionId(sid);
-    setCapabilityToken(token);
-    setStudentName(sname);
-
-    if (!initialized.current && messages.length === 0) {
-      initialized.current = true;
-      sendMessage(
-        `Hi. My name is ${sname || "a learner"}. I'm ready to begin the session.
-OPENING SEQUENCE INSTRUCTION: This is the opening exchange.
-1. Greet me by name.
-2. Ask ONE question about what I already know or believe about the main topic before doing the reading.
-3. Do NOT ask about the reading content yet.
-4. Wait for my response before bridging to the reading and asking the first Socratic question.
-If course context is available, use it naturally in the first three exchanges.`,
-        sid,
-        true,
-        token
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const triggerEndSession = async (sid: string) => {
     if (isEnded || isEnding) return;
     setIsEnding(true);
@@ -229,6 +197,39 @@ If course context is available, use it naturally in the first three exchanges.`,
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const sid = sessionStorage.getItem("studentSessionId");
+    const token = sessionStorage.getItem("studentCapabilityToken");
+    const sname = sessionStorage.getItem("studentName");
+
+    if (!sid || !token) {
+      router.push(`/s/${accessCode}`);
+      return;
+    }
+
+    setStudentSessionId(sid);
+    setCapabilityToken(token);
+    setStudentName(sname);
+
+    if (!initialized.current) {
+      initialized.current = true;
+      void sendMessage(
+        `Hi. My name is ${sname || "a learner"}. I'm ready to begin the session.
+OPENING SEQUENCE INSTRUCTION: This is the opening exchange.
+1. Greet me by name.
+2. Ask ONE question about what I already know or believe about the main topic before doing the reading.
+3. Do NOT ask about the reading content yet.
+4. Wait for my response before bridging to the reading and asking the first Socratic question.
+If course context is available, use it naturally in the first three exchanges.`,
+        sid,
+        true,
+        token
+      );
+    }
+    // This one-time hydration deliberately reads browser session state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);

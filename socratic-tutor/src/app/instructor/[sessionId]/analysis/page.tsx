@@ -594,9 +594,10 @@ export default function SessionAnalysisPage() {
   const sections = report ? parseReportSections(report.content) : null;
   const purposeOption = getSessionPurposeOption(sessionPurpose);
 
+  const loAssessments = report?.loAssessments;
   const loAssessmentsByStudent = useMemo(() => {
-    if (!report?.loAssessments) return {};
-    return report.loAssessments.reduce(
+    if (!loAssessments) return {};
+    return loAssessments.reduce(
       (acc, assessment) => {
         const studentId = assessment.studentSession.id;
         const studentName = assessment.studentSession.studentName;
@@ -606,7 +607,7 @@ export default function SessionAnalysisPage() {
       },
       {} as Record<string, StudentLOAssessmentGroup>
     );
-  }, [report?.loAssessments]);
+  }, [loAssessments]);
 
   // ─── Render ─────────────────────────────────────────────────────────────────
 

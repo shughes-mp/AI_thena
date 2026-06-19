@@ -623,9 +623,20 @@ function createPrismaClient(): PrismaClient {
   return new PrismaClient({ adapter } as never);
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+function getPrismaClient() {
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = createPrismaClient();
+  }
+  return globalForPrisma.prisma;
+}
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+export const prisma = new Proxy({} as PrismaClient, {
+  get(_target, property) {
+    const client = getPrismaClient();
+    const value = Reflect.get(client, property, client);
+    return typeof value === "function" ? value.bind(client) : value;
+  },
+});
 
 export async function ensureDatabaseReady() {
   const remoteDatabaseUrl = getRemoteDatabaseUrl();
@@ -649,7 +660,7 @@ export async function ensureDatabaseReady() {
 
   const legacyOwner = process.env.LEGACY_SESSION_OWNER_CLERK_USER_ID?.trim();
   if (legacyOwner && !globalForPrisma.legacyOwnerReady) {
-    globalForPrisma.legacyOwnerReady = prisma.session
+    globalForPrisma.legacyOwnerReady = getPrismaClient().session
       .updateMany({
         where: { ownerClerkUserId: null },
         data: { ownerClerkUserId: legacyOwner },

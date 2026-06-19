@@ -59,3 +59,12 @@ The following are release blockers rather than ordinary backlog items:
 - Add a risk whenever a new inference or data type is introduced.
 - Do not close a risk based only on revised copy.
 - Record evidence of mitigation and the test that guards against regression.
+
+## 2026-06-20 Hardening Review
+
+- **Mitigated:** R-20 now has bounded learner-entry and chat limits, regression tests, and cost containment through per-session exchange caps. Distributed Vercel Firewall enforcement remains required before broad public use.
+- **Partially mitigated:** R-14 now has an automated Prisma-model/Turso-bootstrap parity test. Column-level parity and one migration source remain open.
+- **Partially mitigated:** R-19 now has visible learner formative-use disclosure, learner contestability, and owner-controlled cascading deletion. Automatic retention, export, and institutional policy remain Phase 9 blockers.
+- **Partially mitigated:** R-30 now benefits from route error recovery, CI, dependency auditing, and server logs. Durable diagnostic retries and privacy-aware telemetry remain open.
+- **Improved:** R-26 now has 42 automated tests and CI enforcement, but full browser E2E, accessibility, calibration, and adversarial suites remain incomplete.
+- **New operational incident:** a credential-shaped Anthropic key was found in public Git history. The tracked file is removed; revocation, replacement, and history purging are mandatory follow-up actions.

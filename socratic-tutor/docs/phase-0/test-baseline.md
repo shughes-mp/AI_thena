@@ -144,3 +144,9 @@ The fixtures are specifications, not yet executable tests. They are deliberately
 - Learning quality
 - Facilitation appropriateness
 - Communication-style and equity analysis
+
+## 2026-06-20 Hardening Baseline
+
+The automated suite now contains 42 passing tests. GitHub Actions runs a frozen pnpm install, package audit, tests, lint, TypeScript checking, and production build on pull requests and pushes to `main` or `codex/**` branches. The package audit reports zero known vulnerabilities after controlled direct upgrades and constrained transitive overrides.
+
+New hardening coverage includes learner request limits, owner-only cascading deletion, Next.js route fallbacks, lazy SDK/database initialization, and Prisma-model/Turso-bootstrap table parity. Browser-level end-to-end, accessibility, calibration, and larger adversarial evaluations remain intentionally open.

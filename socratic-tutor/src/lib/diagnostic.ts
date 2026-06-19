@@ -1,4 +1,4 @@
-import { anthropic } from "@/lib/anthropic";
+import { getAnthropic } from "@/lib/anthropic";
 import { prisma } from "@/lib/db";
 import { MODEL_FAST } from "@/lib/models";
 import {
@@ -304,7 +304,7 @@ export async function runDiagnostic(input: DiagnosticInput): Promise<void> {
   try {
     const prompt = buildDiagnosticPrompt(input);
 
-    const response = await anthropic.messages.create({
+    const response = await getAnthropic().messages.create({
       model: MODEL_FAST,
       max_tokens: 800,
       messages: [{ role: "user", content: prompt }],

@@ -53,6 +53,7 @@ export interface SessionDetails {
   closesAt: string | null;
   readingsCount: number;
   assessmentsCount: number;
+  instructorRole?: "viewer" | "editor" | "owner";
 }
 
 export type CheckpointProcessLevel =
