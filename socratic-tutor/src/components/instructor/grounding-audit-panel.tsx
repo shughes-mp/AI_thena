@@ -64,18 +64,19 @@ export function GroundingAuditPanel({ sessionId }: { sessionId: string }) {
 
   return (
     <div className="space-y-8">
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Metric label="Grounded responses" value={data.counts.grounded ?? 0} />
+        <Metric label="Grounded + broader context" value={data.counts.mixed_grounded ?? 0} />
+        <Metric label="Broader context" value={data.counts.background_context ?? 0} />
         <Metric label="Unsupported responses" value={data.counts.unsupported ?? 0} />
-        <Metric label="Protection interventions" value={data.protectionEvents.length} />
       </section>
 
       <section className="minerva-card p-6">
         <h2 className="font-serif text-3xl text-[var(--charcoal)]">Readiness</h2>
         <p className="mt-3 text-sm leading-6 text-[var(--dim-grey)]">
           {data.readiness.sourceGroundingReady
-            ? `${data.readiness.sourceMaterials} source material(s) are available for passage retrieval and citation.`
-            : "No source material is available. Course-content claims will take the unsupported-by-source path."}
+            ? `${data.readiness.sourceMaterials} source material(s) are the tutor's primary reference. Claims about the readings are passage-checked; broader explanations and connections are allowed and identified separately.`
+            : "No source material is available. The tutor may offer clearly identified general background, but cannot make claims about an assigned reading."}
           {` ${data.readiness.protectedAssessments} protected assessment file(s) are isolated from the normal tutor prompt.`}
         </p>
       </section>

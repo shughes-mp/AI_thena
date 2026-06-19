@@ -24,7 +24,9 @@ import { matchesLearnerCapability } from "@/lib/learner-capability";
 import {
   appendLearnerCitations,
   buildUnsupportedSourceResponse,
+  ensureKnowledgeScopeCue,
   GROUNDING_VERSIONS,
+  parseKnowledgeScope,
   parseSourceIds,
   responseRequiresGrounding,
   retrieveRelevantPassages,
@@ -382,6 +384,7 @@ export async function POST(req: Request) {
           }
 
           const requestedSourceIds = parseSourceIds(fullResponse);
+          const knowledgeScope = parseKnowledgeScope(fullResponse);
           const validCitations = validateSourceIds(
             requestedSourceIds,
             sourcePassages,
@@ -393,17 +396,25 @@ export async function POST(req: Request) {
             validCitations.length > 0 &&
             shouldShowLearnerCitation(fullResponse);
           const parsedResponse = parseTags(fullResponse);
+          const transparentResponse = ensureKnowledgeScopeCue(
+            parsedResponse.cleanedText,
+            knowledgeScope
+          );
           const finalCleanedText =
             requiresGrounding && validCitations.length === 0
               ? buildUnsupportedSourceResponse()
               : learnerCitationVisible
-                ? appendLearnerCitations(parsedResponse.cleanedText, validCitations)
-                : parsedResponse.cleanedText;
+                ? appendLearnerCitations(transparentResponse, validCitations)
+                : transparentResponse;
           const groundingStatus = requiresGrounding
             ? validCitations.length > 0
-              ? "grounded"
+              ? knowledgeScope === "mixed"
+                ? "mixed_grounded"
+                : "grounded"
               : "unsupported"
-            : "not_required";
+            : knowledgeScope === "background"
+              ? "background_context"
+              : "not_required";
           const { tags } = parsedResponse;
           const normalizedTopicThread =
             confidenceRating === "uncertain" && currentTopicThread

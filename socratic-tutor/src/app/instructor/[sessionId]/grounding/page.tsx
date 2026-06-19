@@ -20,7 +20,7 @@ export default async function GroundingAuditPage({
         <header className="mb-8 mt-5">
           <h1 className="font-serif text-[44px] leading-none tracking-[-0.03em] text-[var(--charcoal)]">Grounding &amp; protection</h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--dim-grey)]">
-            Inspect which tutor responses were grounded in uploaded passages, when the source set was insufficient, and when protected assessment material changed the coaching path.
+            Inspect which tutor responses used uploaded passages, which added clearly identified broader context, and when protected assessment material changed the coaching path.
           </p>
         </header>
         <GroundingAuditPanel sessionId={sessionId} />

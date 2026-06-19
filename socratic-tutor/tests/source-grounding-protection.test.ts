@@ -5,6 +5,8 @@ import {
   appendLearnerCitations,
   buildGroundedSourceContext,
   buildUnsupportedSourceResponse,
+  ensureKnowledgeScopeCue,
+  parseKnowledgeScope,
   parseSourceIds,
   responseRequiresGrounding,
   retrieveRelevantPassages,
@@ -63,6 +65,36 @@ test("course-content claims require valid retrieved passage ids", () => {
   assert.equal(validateSourceIds(parseSourceIds(response), passages).length, 1);
   assert.equal(validateSourceIds(parseSourceIds(response), passages, response).length, 1);
   assert.equal(validateSourceIds(["fabricated-id"], passages).length, 0);
+});
+
+test("broader model knowledge is allowed without being misrepresented as source content", () => {
+  const response = "A useful analogy is a team that works quickly but solves the wrong problem.\n[KNOWLEDGE_SCOPE: background]\n[SOURCE_IDS: none]\n[DIRECT_ANSWER: analogy]";
+  assert.equal(parseKnowledgeScope(response), "background");
+  assert.equal(responseRequiresGrounding(response), false);
+  assert.match(
+    ensureKnowledgeScopeCue("A useful analogy is a team that works quickly.", "background"),
+    /reading does not address this directly/i
+  );
+});
+
+test("mixed responses keep the reading grounded and identify the broader connection", () => {
+  const passages = retrieveRelevantPassages("efficiency and effectiveness", sources);
+  const response = `The reading distinguishes efficiency from effectiveness. A broader connection is that this distinction also appears in project evaluation.\n[KNOWLEDGE_SCOPE: mixed]\n[SOURCE_IDS: ${passages[0].id}]`;
+  assert.equal(parseKnowledgeScope(response), "mixed");
+  assert.equal(responseRequiresGrounding(response, passages), true);
+  assert.equal(validateSourceIds(parseSourceIds(response), passages, response).length, 1);
+  assert.equal(ensureKnowledgeScopeCue(response, "mixed"), response);
+});
+
+test("a source attribution cannot bypass citation checks by claiming background scope", () => {
+  const response = "The author argues that speed matters most.\n[KNOWLEDGE_SCOPE: background]\n[SOURCE_IDS: none]";
+  assert.equal(responseRequiresGrounding(response), true);
+});
+
+test("a response that supplies passage ids is always treated as source-grounded", () => {
+  const passage = retrieveRelevantPassages("efficiency", sources)[0];
+  const response = `Efficiency is different from effectiveness.\n[KNOWLEDGE_SCOPE: background]\n[SOURCE_IDS: ${passage.id}]`;
+  assert.equal(responseRequiresGrounding(response), true);
 });
 
 test("unsupported and learner-visible citation paths are explicit", () => {

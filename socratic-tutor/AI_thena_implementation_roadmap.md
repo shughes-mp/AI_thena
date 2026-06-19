@@ -379,7 +379,7 @@ Gate result: **Passed.** The complete pathway is citation-gated, versioned, revi
 
 ## Phase 3: Enforce Source Grounding And Assessment Protection
 
-Status: **Complete (2026-06-19).** Passage retrieval, validated tutor-response citations, unsupported-source handling, protected-material isolation and interception, audit persistence, instructor-visible grounding review, additive migrations, adversarial tests, and running-app verification are implemented. Details and limitations are recorded in `docs/phase-3/README.md`.
+Status: **Complete (2026-06-19; source-first policy refined 2026-06-19).** Passage retrieval, validated tutor-response citations, source-first use of broader model knowledge, unsupported-source-attribution handling, protected-material isolation and interception, audit persistence, instructor-visible grounding review, additive migrations, adversarial tests, and running-app verification are implemented. Details and limitations are recorded in `docs/phase-3/README.md`.
 
 ### Objective
 
@@ -394,6 +394,7 @@ Make source grounding and protected assessment behavior operational rather than 
 - [x] Decide when source citations should be visible to learners.
 - [x] Test conflicting, incomplete, and ambiguous source sets.
 - [x] Prevent arbitrary outside knowledge from silently overriding instructor materials.
+- [x] Allow clearly identified broader model knowledge for explanation, examples, connections, application, and critique without presenting it as reading content.
 
 ### 3.2 Protected Assessment Materials
 

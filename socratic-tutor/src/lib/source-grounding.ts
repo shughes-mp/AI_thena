@@ -4,10 +4,12 @@ import { buildSourceSetVersion, type SourceDocument } from "./evidence.ts";
 
 export const GROUNDING_VERSIONS = {
   retrieval: "source-retrieval-1.0.0",
-  prompt: "tutor-grounding-1.0.0",
-  parser: "tutor-grounding-parser-1.0.0",
+  prompt: "tutor-grounding-1.1.0",
+  parser: "tutor-grounding-parser-1.1.0",
   protection: "assessment-protection-1.0.0",
 } as const;
+
+export type KnowledgeScope = "source" | "background" | "mixed" | "process";
 
 export interface SourcePassage {
   id: string;
@@ -136,6 +138,13 @@ export function parseSourceIds(response: string): string[] {
   );
 }
 
+export function parseKnowledgeScope(response: string): KnowledgeScope | null {
+  const match = response.match(
+    /\[KNOWLEDGE_SCOPE:\s*(source|background|mixed|process)\]/i
+  );
+  return match ? (match[1].toLowerCase() as KnowledgeScope) : null;
+}
+
 export function validateSourceIds(
   ids: string[],
   passages: SourcePassage[],
@@ -155,18 +164,46 @@ export function responseRequiresGrounding(
   response: string,
   passages: SourcePassage[] = []
 ): boolean {
+  const knowledgeScope = parseKnowledgeScope(response);
+  const explicitlyAttributesToSource =
+    /\b(the (reading|text|author|source) (says|argues|shows|defines|explains)|according to the (reading|text|source))\b/i.test(
+      response
+    );
+
+  if (explicitlyAttributesToSource) return true;
+  if (knowledgeScope === "source" || knowledgeScope === "mixed") return true;
+  if (parseSourceIds(response).length > 0) return true;
+  if (knowledgeScope === "background" || knowledgeScope === "process") return false;
+
+  // Preserve conservative behavior if a model response omits the scope tag.
   const responseTerms = new Set(terms(response));
   const overlapsSource = passages.some((passage) => {
     const passageTerms = new Set(terms(passage.content));
     return Array.from(responseTerms).filter((term) => passageTerms.has(term)).length >= 2;
   });
-  return /\[(DIRECT_ANSWER|FEEDBACK_TYPE|EXPERT_MODEL):/i.test(response) ||
-    /\b(the (reading|text|author|source) (says|argues|shows|defines|explains)|according to the (reading|text|source))\b/i.test(response) ||
-    overlapsSource;
+  return /\[(DIRECT_ANSWER|FEEDBACK_TYPE|EXPERT_MODEL):/i.test(response) || overlapsSource;
 }
 
 export function shouldShowLearnerCitation(response: string): boolean {
   return /\[(DIRECT_ANSWER|FEEDBACK_TYPE|EXPERT_MODEL):/i.test(response);
+}
+
+export function ensureKnowledgeScopeCue(
+  response: string,
+  knowledgeScope: KnowledgeScope | null
+): string {
+  if (knowledgeScope !== "background" && knowledgeScope !== "mixed") return response;
+
+  const alreadySignalsBroaderContext =
+    /\b(beyond|outside|not (?:covered|discussed|stated|addressed)|broader (?:context|connection|knowledge)|building on the reading|the reading does not)\b/i.test(
+      response
+    );
+  if (alreadySignalsBroaderContext) return response;
+
+  const cue = knowledgeScope === "background"
+    ? "The reading does not address this directly, but broader context can help:"
+    : "Building on the reading, here is a broader connection:";
+  return `${cue}\n\n${response}`;
 }
 
 export function buildUnsupportedSourceResponse(): string {

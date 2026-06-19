@@ -740,8 +740,8 @@ export default function SessionManagementPage() {
             <p className="eyebrow eyebrow-teal">Source grounding</p>
             <p className="mt-2 leading-6 text-[var(--dim-grey)]">
               {readings.length > 0
-                ? "Tutor course-content claims must cite retrieved passages from your uploaded source materials. Unsupported claims are replaced before learners see them."
-                : "Upload at least one source material. Until then, AI_thena will not make course-content claims."}
+                ? "Your readings are the tutor's primary reference. Claims about them are passage-checked, while useful broader explanations, examples, and connections are allowed and clearly distinguished."
+                : "Upload at least one source material to make it the tutor's primary reference. General background can still be offered, but it will not be presented as course-reading content."}
             </p>
           </div>
           <div>
