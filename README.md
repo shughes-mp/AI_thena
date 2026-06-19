@@ -1,242 +1,109 @@
 # AI_thena
 
-AI_thena is an AI teaching, learning, and formative assessment tool for reading-based courses and programs.
+AI_thena is a source-first AI tutoring and formative-evidence platform for reading-based learning.
 
-Instructors upload course materials and define learning outcomes. Learners then work through the material in a guided Socratic dialogue. As learners respond, AI_thena analyzes their reasoning and gives instructors evidence about readiness, misconceptions, progress, and next teaching moves.
+It combines guided Socratic dialogue for learners with traceable, instructor-reviewed evidence about how learners interpret, explain, apply, and question course material. It is designed as learning support—not an answer engine, hidden grading system, or replacement for instructor judgment.
 
-It is not just a chatbot. It is a learning conversation for students, a teaching intelligence layer for instructors, and a formative assessment signal for programs that care about how learners think.
+The active Next.js application is in [`socratic-tutor/`](socratic-tutor/).
 
-## At a Glance
+## What It Does
 
-| Function | What AI_thena Does |
-| --- | --- |
-| Teaching | Helps instructors see learner progress, common misunderstandings, readiness patterns, and recommended teaching moves. |
-| Learning | Guides learners through uploaded readings with Socratic questions, confidence checks, and targeted support. |
-| Assessment | Produces formative evidence against instructor-defined learning outcomes, including rubric-style signals and supporting evidence. |
+### For learners
 
-## How It Works
+- Opens with prior knowledge rather than a cold quiz.
+- Treats instructor-provided readings as the primary authority.
+- Adds broader model knowledge for examples, explanations, connections, and critique only when it is clearly distinguished from the reading.
+- Uses one Socratic question at a time.
+- Escalates help through an eight-step productive-struggle ladder.
+- Supports retrieval, self-explanation, interpretation, evidence use, confidence calibration, misconception repair, transfer, and synthesis.
+- Protects assessment materials by coaching reasoning without exposing protected answers.
+- Produces an explicitly limited formative summary that the learner can reflect on, correct, or contest.
 
-1. An instructor creates a session.
-2. The instructor chooses the session purpose, defines learning outcomes, and uploads source readings.
-3. The instructor can add key questions, teaching context, and protected assessment materials.
-4. Learners open a shared link, enter their name, and begin a guided chat.
-5. The tutor starts with prior knowledge, then asks one Socratic question at a time.
-6. After each exchange, a separate diagnostic pass analyzes misconceptions, engagement, confidence, and progress.
-7. Instructors review learner progress, misconception patterns, teaching recommendations, learning outcome evidence, and reports.
+### For instructors
 
-AI_thena can support different moments in the learning cycle:
+- Secure Clerk sign-in with session owner, editor, and viewer roles.
+- Session setup for purpose, learning outcomes, readings, evidence questions, teaching context, and protected assessments.
+- Learner progress and conversation replay.
+- Passage-level grounding records for tutor claims.
+- Auditable evidence signals with learner-message and source-passage citations.
+- Approve, revise, reject, annotate, and supersede review actions with retained history.
+- Possible misunderstanding patterns, confidence checks, checkpoint coverage, and qualified learning-outcome evidence.
+- Purpose-aware teaching recommendations, reports, heatmaps, and PDF export.
 
-- `Pre-class`: check comprehension and readiness before class.
-- `In-class Prep`: activate retrieval before an activity.
-- `In-class Reflection`: consolidate learning through self-explanation.
-- `After Class`: push toward transfer and application.
+## Source-First, Not Source-Only
 
-New sessions currently default to `Pre-class`. Instructors can change the session purpose in the session workspace.
+Claims about what an assigned reading or author says require support from retrieved source passages. The tutor can still use broader model knowledge when it adds learning value, but it must identify that context rather than presenting it as part of the reading.
 
-## Who It Is For
+Protected assessment content is excluded from normal tutoring context. Answer-extraction attempts receive reasoning support and create an instructor-visible audit record without exposing protected material.
 
-- Instructors who want better evidence of learner understanding before, during, or after class.
-- Adult, executive, and professional learning programs.
-- Courses where reading, interpretation, reasoning, and application matter.
-- Teams exploring AI-supported tutoring, teaching analytics, and formative assessment.
+## Evidence And Human Review
 
-## What Learners Experience
+AI-generated interpretations are provisional. Consequential evidence retains:
 
-Learners do not need an account. They open the session link, enter their name, and chat with a tutor grounded in the instructor's uploaded materials.
+- the learner exchange;
+- the relevant source passage;
+- confidence and qualification information;
+- generation and parser versions;
+- instructor review state and history;
+- learner-authored reflection or disagreement where available.
 
-The tutor:
+The system supports instructor decisions; it does not silently convert model output into a definitive grade or judgment.
 
-- begins by asking what the learner already knows or believes;
-- uses the uploaded readings as its source of truth;
-- asks one guiding question at a time;
-- gives direct comprehension help when appropriate;
-- uses deeper Socratic probing for interpretation, application, and conceptual confusion;
-- checks confidence and revisits fragile topics;
-- protects uploaded assessment materials by coaching without supplying protected answers;
-- ends with a learner-facing session summary.
+## Learning-Cycle Purposes
 
-A session is available to learners only after it has at least one uploaded source reading and at least one learning outcome.
+- **Pre-class:** comprehension and readiness.
+- **In-class preparation:** retrieval and activation.
+- **In-class reflection:** consolidation and self-explanation.
+- **After class:** application and transfer.
 
-## What Instructors Can Do
+## Implementation Status
 
-Instructors can:
+The implementation roadmap is complete through Phase 4:
 
-- create sessions with shareable learner links and access codes;
-- upload `.pdf`, `.docx`, `.txt`, and `.md` readings;
-- optionally upload protected assessment materials;
-- define learning outcomes and session goals;
-- choose a session purpose;
-- configure tutor stance, exchange limits, and availability dates;
-- add key questions manually or generate suggestions from readings;
-- monitor learner progress and conversation traces;
-- review common misunderstandings across the class;
-- generate teaching recommendations;
-- review AI-generated reports and export them as PDFs.
+- **Phase 0:** architecture, terminology, risk, and test baseline.
+- **Phase 1:** product, evidence, facilitation, governance, and versioning contracts.
+- **Phase 2:** evidence provenance, instructor review, authorization, and learner capabilities.
+- **Phase 3:** source grounding, broader-context transparency, passage citations, and assessment protection.
+- **Phase 4:** learner orientation, proportional support, purpose-aware tutoring, formative summaries, and learner reflection or correction.
 
-## What AI_thena Produces
+See the [implementation roadmap](socratic-tutor/AI_thena_implementation_roadmap.md), [phase documentation](socratic-tutor/docs/README.md), and [detailed application README](socratic-tutor/README.md).
 
-AI_thena turns learner conversations into instructor-facing evidence:
+## Current Verification
 
-- learner progress summaries;
-- confidence checks;
-- topic mastery signals;
-- checkpoint coverage;
-- misconception clusters;
-- prevalence and resolution rates;
-- engagement flags;
-- question difficulty signals;
-- 5-minute, 15-minute, and 30-minute teaching recommendations;
-- formative learning outcome assessments;
-- purpose-aware reports and heatmaps;
-- per-student notes and summaries.
+- Production build passes.
+- TypeScript and ESLint checks pass.
+- 35 automated tests pass.
+- Tests cover migrations, evidence provenance and review, authentication and authorization, learner capabilities, source grounding, protected assessment behavior, productive struggle, purpose-aware tutoring, formative summaries, and learner reflection.
+- Desktop and mobile learner orientation checks pass without overflow or framework errors.
 
-These outputs are formative teaching aids. They are designed to help instructors make better decisions, not to replace instructor judgment.
+## Quick Start
 
-## Instructor Surfaces
-
-- `Session workspace`: setup, access-code sharing, readings, key questions, teaching context, and assessments.
-- `Learner progress`: live or snapshot view of who joined, who may need support, and each learner's conversation trace.
-- `Session analysis`: quick brief, full analysis, learner outcomes, misconception patterns, question difficulty, and teaching recommendations.
-- `Common misunderstandings`: class-level misconception clusters and recommendation generation.
-- `Instructor recommendations`: generated teaching brief/report with heatmaps, next steps, per-student notes, learning outcome review, and PDF export.
-
-## Local Development
-
-### Requirements
-
-- Node.js
-- npm
-- An Anthropic API key
-
-### Environment Variables
-
-Create a local `.env.local` file inside the app folder.
-
-For local development, the app runtime uses `file:./prisma/dev.db`. Prisma CLI commands use `LOCAL_DATABASE_URL`, then `DATABASE_URL`, then the fallback configured in `prisma.config.ts`.
+Requirements: Node.js, `pnpm`, an Anthropic API key, and a Clerk application for deployed instructor authentication.
 
 ```bash
-ANTHROPIC_API_KEY=your_anthropic_api_key
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-LOCAL_DATABASE_URL=file:./prisma/dev.db
-DATABASE_URL=file:./prisma/dev.db
+cd socratic-tutor
+pnpm install
+pnpm exec prisma migrate dev
+pnpm dev
 ```
 
-Optional production variables:
+Copy the placeholder configuration from [`socratic-tutor/.env.example`](socratic-tutor/.env.example) or follow the environment-variable guide in the [application README](socratic-tutor/README.md#environment-variables). Never commit real credentials.
 
-```bash
-TURSO_DATABASE_URL=libsql://your-production-database.turso.io
-TURSO_AUTH_TOKEN=your_turso_auth_token
-```
+## Technology
 
-Optional model overrides:
-
-```bash
-ANTHROPIC_MODEL_PRIMARY=claude-sonnet-4-6
-ANTHROPIC_MODEL_FAST=claude-haiku-4-5-20251001
-```
-
-Do not commit `.env.local`.
-
-### Install and Run
-
-From the app folder:
-
-```bash
-npm install
-npx prisma migrate dev
-npm run dev
-```
-
-Then open [http://localhost:3000](http://localhost:3000).
-
-## Verification
-
-Useful checks:
-
-```bash
-npm run build
-npx tsc --noEmit
-npm run lint
-```
-
-Current status:
-
-- `npm run build` succeeds.
-- `npx tsc --noEmit` succeeds.
-- `npm run lint` currently reports existing lint issues, including source lint errors and the untracked local `scratch/` helper folder if it is present.
-- There is currently no `npm test` script.
-
-## Database and Deployment
-
-AI_thena uses two database modes:
-
-- Local development: `better-sqlite3` with `prisma/dev.db`.
-- Production: Turso Cloud through Prisma's libsql adapter.
-
-Important details:
-
-- Prisma CLI schema commands use `LOCAL_DATABASE_URL`, `DATABASE_URL`, or the fallback in `prisma.config.ts`.
-- Local app runtime uses the Better SQLite adapter with `file:./prisma/dev.db`.
-- Production runtime uses `TURSO_DATABASE_URL` or a `DATABASE_URL` that starts with `libsql://`.
-- Production without a Turso/libsql URL throws a configuration error.
-- The app includes runtime Turso bootstrap SQL for production tables, indexes, and incremental schema upgrades.
-
-The production build command is:
-
-```bash
-prisma generate && next build
-```
-
-For Vercel, configure:
-
-- `ANTHROPIC_API_KEY`
-- `TURSO_DATABASE_URL`
-- `TURSO_AUTH_TOKEN`
-- `NEXT_PUBLIC_APP_URL`
-
-Do not rely on `prisma db push` during the Vercel build for Turso schema creation. Use `npx prisma migrate dev` for local schema work and handle Turso schema rollout as a separate operational step.
-
-## Quick Test Flow
-
-1. Create an instructor session.
-2. Choose the session purpose and add at least one learning outcome.
-3. Upload a reading.
-4. Add key questions manually or generate suggestions from the reading.
-5. Copy the learner link and open it in another browser window.
-6. Enter a learner name and begin the chat.
-7. Have a short tutoring conversation.
-8. End the learner session and review the learner summary.
-9. Return to the instructor workspace and open learner progress or session analysis.
-10. Generate or review reports, recommendations, misconception patterns, and PDF exports.
-
-## Caveats
-
-- This is an MVP and should be treated as an early production prototype.
-- PDF extraction works best with text-based PDFs, not scanned-image PDFs.
-- Scanned or image-based PDFs should be converted or replaced with DOCX, TXT, or Markdown.
-- The file parser enforces a 10MB upload limit.
-- Tutoring quality depends heavily on the quality of uploaded source material and learning outcomes.
-- Assessment protection reduces answer leakage but should not be treated as a formal exam-security guarantee.
-- AI-generated diagnostics, learning outcome assessments, summaries, and teaching recommendations are formative aids that instructors should review.
-- Misconception detection runs after the tutor response, so dashboard updates may lag slightly behind the learner-visible chat.
-- Recommendation generation falls back to deterministic cards when structured AI output cannot be parsed.
-- Changing the session purpose affects future tutor behavior and future report framing, but it does not retroactively change recorded conversations.
-- Live engagement flags are lightweight heuristics, not definitive judgments about learner effort.
-
-## Tech Stack
-
-- Next.js 16
-- React 19
+- Next.js 16 and React 19
 - Prisma 7
-- SQLite for local development
-- Turso/libsql for production
-- Anthropic SDK and AI SDK
+- SQLite locally and Turso/libSQL in production
+- Anthropic SDK and Vercel AI SDK
+- Clerk authentication
 - Tailwind CSS 4
-- Puppeteer for PDF export
+- Puppeteer PDF export
 
-## Repository Safety
+## Current Limitations
 
-- Keep `.env.local` out of Git.
-- Never commit real API keys or Turso tokens.
-- Do not commit local database files.
-- Use placeholder credentials in examples only.
+- This remains an early production prototype.
+- Source retrieval currently uses deterministic lexical matching rather than semantic retrieval.
+- Broader model knowledge may be incomplete or outdated and is identified separately from assigned readings.
+- Assessment protection reduces answer leakage but is not a formal exam-security guarantee.
+- AI-generated evidence, summaries, and recommendations require instructor judgment.
+- Text extraction works best with text-based PDFs rather than scanned documents.
