@@ -40,6 +40,7 @@ export default function StudentEntryForm({ sessionId, accessCode }: StudentEntry
       const data = await res.json();
       // Store student session ID in sessionStorage for the chat page
       sessionStorage.setItem("studentSessionId", data.id);
+      sessionStorage.setItem("studentCapabilityToken", data.capabilityToken);
       sessionStorage.setItem("studentName", name.trim());
       router.push(`/s/${accessCode}/chat`);
     } catch (err) {

@@ -3,10 +3,11 @@ import { prisma } from "@/lib/db";
 import { anthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
 import { MODEL_PRIMARY } from "@/lib/models";
+import { matchesLearnerCapability } from "@/lib/learner-capability";
 
 export async function POST(req: Request) {
   try {
-    const { studentSessionId } = await req.json();
+    const { studentSessionId, capabilityToken } = await req.json();
 
     if (!studentSessionId) {
       return NextResponse.json({ error: "Missing studentSessionId", code: "INVALID_REQUEST" }, { status: 400 });
@@ -24,6 +25,15 @@ export async function POST(req: Request) {
 
     if (!studentSession) {
       return NextResponse.json({ error: "Session not found", code: "SESSION_NOT_FOUND" }, { status: 404 });
+    }
+
+    if (
+      !matchesLearnerCapability(capabilityToken, studentSession.accessTokenHash)
+    ) {
+      return NextResponse.json(
+        { error: "Learner session authorization failed", code: "FORBIDDEN" },
+        { status: 403 }
+      );
     }
 
     if (studentSession.sessionSummary) {

@@ -19,6 +19,8 @@ import {
   evaluateMastery,
 } from "@/lib/mastery";
 import { runDiagnostic } from "@/lib/diagnostic";
+import { ensureNormalizedEvidenceDefinitions } from "@/lib/evidence-definitions";
+import { matchesLearnerCapability } from "@/lib/learner-capability";
 
 export const maxDuration = 60;
 const VALID_CHECKPOINT_STATUSES = [
@@ -55,6 +57,7 @@ export async function POST(req: Request) {
 
     const payload = (await req.json()) as {
       studentSessionId?: string;
+      capabilityToken?: string;
       messages?: Array<{ role: "user" | "assistant"; content: string }>;
     };
 
@@ -94,6 +97,18 @@ export async function POST(req: Request) {
       );
     }
 
+    if (
+      !matchesLearnerCapability(
+        payload.capabilityToken,
+        studentSession.accessTokenHash
+      )
+    ) {
+      return NextResponse.json(
+        { error: "Learner session authorization failed", code: "FORBIDDEN" },
+        { status: 403 }
+      );
+    }
+
     if (studentSession.session.closesAt && new Date(studentSession.session.closesAt) < new Date()) {
       return NextResponse.json(
         { error: "Session closed", code: "SESSION_CLOSED" },
@@ -101,9 +116,15 @@ export async function POST(req: Request) {
       );
     }
 
-    const [checkpoints, studentCheckpoints, dbMessages] = await Promise.all([
+    await ensureNormalizedEvidenceDefinitions(studentSession.session.id);
+    const [checkpoints, normalizedOutcomes, studentCheckpoints, dbMessages] = await Promise.all([
       prisma.checkpoint.findMany({
         where: { sessionId: studentSession.session.id },
+        include: { evidenceQuestion: true },
+        orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }],
+      }),
+      prisma.learningOutcome.findMany({
+        where: { sessionId: studentSession.session.id, active: true },
         orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }],
       }),
       prisma.studentCheckpoint.findMany({
@@ -230,7 +251,7 @@ export async function POST(req: Request) {
       currentConfidenceCheckId = confidenceCheck.id;
     }
 
-    await prisma.message.create({
+    const persistedUserMessage = await prisma.message.create({
       data: {
         studentSessionId,
         role: "user",
@@ -295,7 +316,7 @@ export async function POST(req: Request) {
             )
           );
 
-          await prisma.message.create({
+          const persistedAssistantMessage = await prisma.message.create({
             data: {
               studentSessionId,
               role: "assistant",
@@ -317,16 +338,25 @@ export async function POST(req: Request) {
           const diagnosticInput = {
             studentSessionId,
             sessionId: studentSession.session.id,
+            userMessageId: persistedUserMessage.id,
+            assistantMessageId: persistedAssistantMessage.id,
             studentMessage: lastUserMessage.content,
             assistantMessage: cleanedText,
             topicThread: normalizedTopicThread,
             exchangeIndex: exchangeCount + 1,
-            readingContent: studentSession.session.readings
-              .map((reading) => reading.content)
-              .join("\n\n"),
+            readings: studentSession.session.readings.map((reading) => ({
+              id: reading.id,
+              filename: reading.filename,
+              content: reading.content,
+            })),
             checkpoints: checkpoints.map((checkpoint) => ({
               id: checkpoint.id,
               prompt: checkpoint.prompt,
+              evidenceQuestionId: checkpoint.evidenceQuestion?.id ?? null,
+            })),
+            learningOutcomes: normalizedOutcomes.map((outcome) => ({
+              id: outcome.id,
+              label: outcome.label,
             })),
             unresolvedMisconceptionIds: unresolvedMisconceptions.map(
               (misconception) => misconception.id

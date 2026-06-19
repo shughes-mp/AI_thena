@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { ensureDatabaseReady, prisma } from "@/lib/db";
+import { syncLearningOutcomes } from "@/lib/evidence-definitions";
+import { requireSessionAccess } from "@/lib/instructor-auth";
 import { isValidSessionPurpose } from "@/lib/session-purpose";
 import type { ApiError } from "@/types";
 
@@ -8,7 +10,10 @@ export async function PATCH(
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
+    await ensureDatabaseReady();
     const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "editor");
+    if (!access.ok) return access.response;
     const body = await request.json();
     const {
       name,
@@ -80,9 +85,15 @@ export async function PATCH(
       updateData.sessionPurpose = sessionPurpose;
     }
 
-    const updated = await prisma.session.update({
-      where: { id: sessionId },
-      data: updateData,
+    const updated = await prisma.$transaction(async (tx) => {
+      const next = await tx.session.update({
+        where: { id: sessionId },
+        data: updateData,
+      });
+      if (learningOutcomes !== undefined) {
+        await syncLearningOutcomes(tx, sessionId, next.learningOutcomes);
+      }
+      return next;
     });
 
     return NextResponse.json({

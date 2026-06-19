@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import puppeteer from "puppeteer";
 import { marked } from "marked";
+import { requireSessionAccess } from "@/lib/instructor-auth";
 
 export async function GET(req: Request, { params }: { params: Promise<{ sessionId: string }> }) {
   try {
     const p = await params;
     const { sessionId } = p;
+    const access = await requireSessionAccess(sessionId, "viewer");
+    if (!access.ok) return access.response;
 
     // Fetch the target report and session data
     const session = await prisma.session.findUnique({

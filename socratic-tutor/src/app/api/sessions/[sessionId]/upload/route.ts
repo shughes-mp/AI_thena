@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ensureDatabaseReady, prisma } from "@/lib/db";
 import { parseFile, validateFile } from "@/lib/file-parser";
 import type { ApiError, FileCategory } from "@/types";
+import { requireSessionAccess } from "@/lib/instructor-auth";
 
 const MAX_FILES_PER_TYPE = 10;
 
@@ -11,6 +12,8 @@ export async function POST(
 ) {
   try {
     const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "editor");
+    if (!access.ok) return access.response;
     await ensureDatabaseReady();
 
     // Verify session exists

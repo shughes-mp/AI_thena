@@ -3,10 +3,13 @@ import { ensureDatabaseReady, prisma } from "@/lib/db";
 import { generateUniqueAccessCode } from "@/lib/access-codes";
 import { normalizeSessionPurpose } from "@/lib/session-purpose";
 import type { CreateSessionRequest, CreateSessionResponse, ApiError } from "@/types";
+import { requireInstructor } from "@/lib/instructor-auth";
 
 export async function POST(request: Request) {
   try {
     await ensureDatabaseReady();
+    const identity = await requireInstructor();
+    if (!identity.ok) return identity.response;
 
     const body = (await request.json()) as CreateSessionRequest;
 
@@ -26,6 +29,7 @@ export async function POST(request: Request) {
         courseContext: body.courseContext?.trim() || null,
         learningGoal: body.learningGoal?.trim() || null,
         sessionPurpose: normalizeSessionPurpose(body.sessionPurpose),
+        ownerClerkUserId: identity.userId,
         accessCode,
       },
     });

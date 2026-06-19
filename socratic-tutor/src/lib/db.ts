@@ -3,9 +3,13 @@ import { PrismaClient } from "@prisma/client";
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
   tursoSchemaReady: Promise<void> | undefined;
+  legacyOwnerReady: Promise<void> | undefined;
 };
 
 function getRemoteDatabaseUrl(): string | undefined {
+  if (process.env.AI_THENA_USE_LOCAL_DATABASE === "1") {
+    return undefined;
+  }
   if (process.env.TURSO_DATABASE_URL) {
     return process.env.TURSO_DATABASE_URL;
   }
@@ -19,6 +23,15 @@ function getRemoteDatabaseUrl(): string | undefined {
 
 function isHostedProductionEnvironment() {
   return process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+}
+
+function getLocalDatabasePath() {
+  const configured =
+    process.env.LOCAL_DATABASE_URL ||
+    (process.env.DATABASE_URL?.startsWith("file:")
+      ? process.env.DATABASE_URL
+      : "file:./prisma/dev.db");
+  return configured.replace(/^file:/, "");
 }
 
 type LibsqlClient = {
@@ -41,7 +54,8 @@ CREATE TABLE IF NOT EXISTS "Session" (
   "closesAt" DATETIME,
   "maxExchanges" INTEGER NOT NULL DEFAULT 20,
   "stance" TEXT NOT NULL DEFAULT 'directed',
-  "sessionPurpose" TEXT NOT NULL DEFAULT 'pre_class'
+  "sessionPurpose" TEXT NOT NULL DEFAULT 'pre_class',
+  "ownerClerkUserId" TEXT
 );
 CREATE TABLE IF NOT EXISTS "Reading" (
   "id" TEXT NOT NULL PRIMARY KEY,
@@ -80,6 +94,7 @@ CREATE TABLE IF NOT EXISTS "StudentSession" (
   "startedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "endedAt" DATETIME,
   "sessionSummary" TEXT,
+  "accessTokenHash" TEXT,
   CONSTRAINT "StudentSession_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "Message" (
@@ -221,6 +236,164 @@ CREATE TABLE IF NOT EXISTS "DiagnosticLog" (
   "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT "DiagnosticLog_studentSessionId_fkey" FOREIGN KEY ("studentSessionId") REFERENCES "StudentSession" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
+CREATE TABLE IF NOT EXISTS "EvidenceSignal" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "sessionId" TEXT NOT NULL,
+  "studentSessionId" TEXT,
+  "misconceptionId" TEXT,
+  "signalType" TEXT NOT NULL,
+  "scopeType" TEXT NOT NULL,
+  "scopeId" TEXT NOT NULL,
+  "claim" TEXT NOT NULL,
+  "status" TEXT NOT NULL DEFAULT 'provisional',
+  "confidenceLevel" TEXT NOT NULL,
+  "confidenceRationale" TEXT NOT NULL,
+  "limitations" TEXT NOT NULL,
+  "missingEvidence" TEXT NOT NULL,
+  "contradictoryEvidence" TEXT NOT NULL,
+  "learningOutcomeIds" TEXT NOT NULL DEFAULT '[]',
+  "evidenceQuestionIds" TEXT NOT NULL DEFAULT '[]',
+  "opportunitySummary" TEXT NOT NULL,
+  "createdBy" TEXT NOT NULL,
+  "schemaVersion" TEXT NOT NULL,
+  "productPolicyVersion" TEXT NOT NULL,
+  "terminologyVersion" TEXT NOT NULL,
+  "evidencePolicyVersion" TEXT NOT NULL,
+  "governancePolicyVersion" TEXT NOT NULL,
+  "promptVersion" TEXT,
+  "modelProvider" TEXT,
+  "modelId" TEXT,
+  "modelConfigurationVersion" TEXT,
+  "parserVersion" TEXT,
+  "rubricVersion" TEXT,
+  "facilitationRuleVersion" TEXT,
+  "sourceSetVersion" TEXT,
+  "supersedesSignalId" TEXT,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "EvidenceSignal_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT "EvidenceSignal_studentSessionId_fkey" FOREIGN KEY ("studentSessionId") REFERENCES "StudentSession" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT "EvidenceSignal_misconceptionId_fkey" FOREIGN KEY ("misconceptionId") REFERENCES "Misconception" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT "EvidenceSignal_supersedesSignalId_fkey" FOREIGN KEY ("supersedesSignalId") REFERENCES "EvidenceSignal" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS "EvidenceCitation" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "signalId" TEXT NOT NULL,
+  "citationType" TEXT NOT NULL,
+  "recordId" TEXT NOT NULL,
+  "messageId" TEXT,
+  "readingId" TEXT,
+  "quotedText" TEXT NOT NULL,
+  "startOffset" INTEGER,
+  "endOffset" INTEGER,
+  "sourceFilename" TEXT,
+  "passageId" TEXT,
+  "relevanceRationale" TEXT NOT NULL,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "EvidenceCitation_signalId_fkey" FOREIGN KEY ("signalId") REFERENCES "EvidenceSignal" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT "EvidenceCitation_messageId_fkey" FOREIGN KEY ("messageId") REFERENCES "Message" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT "EvidenceCitation_readingId_fkey" FOREIGN KEY ("readingId") REFERENCES "Reading" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS "EvidenceReview" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "signalId" TEXT NOT NULL,
+  "action" TEXT NOT NULL,
+  "previousStatus" TEXT NOT NULL,
+  "newStatus" TEXT NOT NULL,
+  "previousClaim" TEXT NOT NULL,
+  "revisedClaim" TEXT,
+  "rationale" TEXT,
+  "contextualNote" TEXT,
+  "actorType" TEXT NOT NULL DEFAULT 'instructor',
+  "actorId" TEXT,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "EvidenceReview_signalId_fkey" FOREIGN KEY ("signalId") REFERENCES "EvidenceSignal" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS "FacilitationRecommendation" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "signalId" TEXT NOT NULL,
+  "mode" TEXT NOT NULL,
+  "scopeType" TEXT NOT NULL,
+  "scopeIds" TEXT NOT NULL,
+  "observedCondition" TEXT NOT NULL,
+  "diagnosisQuestion" TEXT,
+  "rationale" TEXT NOT NULL,
+  "suggestedMove" TEXT NOT NULL,
+  "suggestedPhrase" TEXT,
+  "confidenceLevel" TEXT NOT NULL,
+  "limitations" TEXT NOT NULL,
+  "escalationCondition" TEXT,
+  "releaseCondition" TEXT NOT NULL,
+  "ruleVersion" TEXT NOT NULL,
+  "createdBy" TEXT NOT NULL,
+  "reviewState" TEXT NOT NULL DEFAULT 'provisional',
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "FacilitationRecommendation_signalId_fkey" FOREIGN KEY ("signalId") REFERENCES "EvidenceSignal" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS "LearningOutcome" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "sessionId" TEXT NOT NULL,
+  "orderIndex" INTEGER NOT NULL,
+  "label" TEXT NOT NULL,
+  "normalizedKey" TEXT NOT NULL,
+  "active" BOOLEAN NOT NULL DEFAULT true,
+  "legacySource" TEXT NOT NULL DEFAULT 'session.learningOutcomes',
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "LearningOutcome_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS "EvidenceQuestion" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "sessionId" TEXT NOT NULL,
+  "checkpointId" TEXT,
+  "orderIndex" INTEGER NOT NULL,
+  "prompt" TEXT NOT NULL,
+  "processLevel" TEXT NOT NULL,
+  "active" BOOLEAN NOT NULL DEFAULT true,
+  "legacySource" TEXT NOT NULL DEFAULT 'checkpoint',
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "EvidenceQuestion_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT "EvidenceQuestion_checkpointId_fkey" FOREIGN KEY ("checkpointId") REFERENCES "Checkpoint" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS "EvidenceSignalLearningOutcome" (
+  "signalId" TEXT NOT NULL,
+  "learningOutcomeId" TEXT NOT NULL,
+  "relevanceRationale" TEXT,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("signalId", "learningOutcomeId"),
+  CONSTRAINT "EvidenceSignalLearningOutcome_signalId_fkey" FOREIGN KEY ("signalId") REFERENCES "EvidenceSignal" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT "EvidenceSignalLearningOutcome_learningOutcomeId_fkey" FOREIGN KEY ("learningOutcomeId") REFERENCES "LearningOutcome" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS "EvidenceSignalQuestion" (
+  "signalId" TEXT NOT NULL,
+  "evidenceQuestionId" TEXT NOT NULL,
+  "relevanceRationale" TEXT,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("signalId", "evidenceQuestionId"),
+  CONSTRAINT "EvidenceSignalQuestion_signalId_fkey" FOREIGN KEY ("signalId") REFERENCES "EvidenceSignal" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT "EvidenceSignalQuestion_evidenceQuestionId_fkey" FOREIGN KEY ("evidenceQuestionId") REFERENCES "EvidenceQuestion" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS "EvidenceQualification" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "signalId" TEXT NOT NULL,
+  "kind" TEXT NOT NULL,
+  "summary" TEXT NOT NULL,
+  "createdBy" TEXT NOT NULL,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "EvidenceQualification_signalId_fkey" FOREIGN KEY ("signalId") REFERENCES "EvidenceSignal" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS "SessionInstructor" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "sessionId" TEXT NOT NULL,
+  "clerkUserId" TEXT NOT NULL,
+  "role" TEXT NOT NULL DEFAULT 'viewer',
+  "grantedByUserId" TEXT NOT NULL,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "SessionInstructor_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
 CREATE UNIQUE INDEX IF NOT EXISTS "Session_accessCode_key" ON "Session"("accessCode");
 CREATE INDEX IF NOT EXISTS "Checkpoint_sessionId_idx" ON "Checkpoint"("sessionId");
 CREATE INDEX IF NOT EXISTS "StudentCheckpoint_studentSessionId_idx" ON "StudentCheckpoint"("studentSessionId");
@@ -231,6 +404,26 @@ CREATE UNIQUE INDEX IF NOT EXISTS "TopicMastery_studentSessionId_topicThread_key
 CREATE INDEX IF NOT EXISTS "MisconceptionOverride_sessionId_idx" ON "MisconceptionOverride"("sessionId");
 CREATE INDEX IF NOT EXISTS "TeachingRecommendation_sessionId_idx" ON "TeachingRecommendation"("sessionId");
 CREATE INDEX IF NOT EXISTS "DiagnosticLog_studentSessionId_idx" ON "DiagnosticLog"("studentSessionId");
+CREATE UNIQUE INDEX IF NOT EXISTS "EvidenceSignal_misconceptionId_key" ON "EvidenceSignal"("misconceptionId");
+CREATE INDEX IF NOT EXISTS "EvidenceSignal_sessionId_idx" ON "EvidenceSignal"("sessionId");
+CREATE INDEX IF NOT EXISTS "EvidenceSignal_studentSessionId_idx" ON "EvidenceSignal"("studentSessionId");
+CREATE INDEX IF NOT EXISTS "EvidenceSignal_status_idx" ON "EvidenceSignal"("status");
+CREATE INDEX IF NOT EXISTS "EvidenceSignal_signalType_idx" ON "EvidenceSignal"("signalType");
+CREATE INDEX IF NOT EXISTS "EvidenceCitation_signalId_idx" ON "EvidenceCitation"("signalId");
+CREATE INDEX IF NOT EXISTS "EvidenceCitation_messageId_idx" ON "EvidenceCitation"("messageId");
+CREATE INDEX IF NOT EXISTS "EvidenceCitation_readingId_idx" ON "EvidenceCitation"("readingId");
+CREATE INDEX IF NOT EXISTS "EvidenceReview_signalId_idx" ON "EvidenceReview"("signalId");
+CREATE UNIQUE INDEX IF NOT EXISTS "FacilitationRecommendation_signalId_key" ON "FacilitationRecommendation"("signalId");
+CREATE INDEX IF NOT EXISTS "EvidenceSignal_supersedesSignalId_idx" ON "EvidenceSignal"("supersedesSignalId");
+CREATE INDEX IF NOT EXISTS "LearningOutcome_sessionId_active_idx" ON "LearningOutcome"("sessionId", "active");
+CREATE UNIQUE INDEX IF NOT EXISTS "LearningOutcome_sessionId_normalizedKey_key" ON "LearningOutcome"("sessionId", "normalizedKey");
+CREATE UNIQUE INDEX IF NOT EXISTS "EvidenceQuestion_checkpointId_key" ON "EvidenceQuestion"("checkpointId");
+CREATE INDEX IF NOT EXISTS "EvidenceQuestion_sessionId_active_idx" ON "EvidenceQuestion"("sessionId", "active");
+CREATE INDEX IF NOT EXISTS "EvidenceSignalLearningOutcome_learningOutcomeId_idx" ON "EvidenceSignalLearningOutcome"("learningOutcomeId");
+CREATE INDEX IF NOT EXISTS "EvidenceSignalQuestion_evidenceQuestionId_idx" ON "EvidenceSignalQuestion"("evidenceQuestionId");
+CREATE INDEX IF NOT EXISTS "EvidenceQualification_signalId_kind_idx" ON "EvidenceQualification"("signalId", "kind");
+CREATE INDEX IF NOT EXISTS "SessionInstructor_clerkUserId_idx" ON "SessionInstructor"("clerkUserId");
+CREATE UNIQUE INDEX IF NOT EXISTS "SessionInstructor_sessionId_clerkUserId_key" ON "SessionInstructor"("sessionId", "clerkUserId");
 CREATE INDEX IF NOT EXISTS "Message_studentSessionId_idx" ON "Message"("studentSessionId");
 CREATE INDEX IF NOT EXISTS "Misconception_studentSessionId_idx" ON "Misconception"("studentSessionId");
 CREATE INDEX IF NOT EXISTS "ConfidenceCheck_studentSessionId_idx" ON "ConfidenceCheck"("studentSessionId");
@@ -259,10 +452,11 @@ async function getExistingColumns(
 }
 
 async function ensureTursoSchemaUpgrades(client: LibsqlClient) {
-  const [misconceptionCols, messageCols, sessionCols] = await Promise.all([
+  const [misconceptionCols, messageCols, sessionCols, studentSessionCols] = await Promise.all([
     getExistingColumns(client, "Misconception"),
     getExistingColumns(client, "Message"),
     getExistingColumns(client, "Session"),
+    getExistingColumns(client, "StudentSession"),
   ]);
 
   const alters: string[] = [];
@@ -279,6 +473,9 @@ async function ensureTursoSchemaUpgrades(client: LibsqlClient) {
     alters.push(
       `ALTER TABLE "Session" ADD COLUMN "sessionPurpose" TEXT NOT NULL DEFAULT 'pre_class'`
     );
+  }
+  if (!sessionCols.has("ownerClerkUserId")) {
+    alters.push('ALTER TABLE "Session" ADD COLUMN "ownerClerkUserId" TEXT');
   }
 
   const misconceptionNewCols: Array<[string, string]> = [
@@ -308,6 +505,9 @@ async function ensureTursoSchemaUpgrades(client: LibsqlClient) {
   if (!messageCols.has("engagementNote")) {
     alters.push('ALTER TABLE "Message" ADD COLUMN "engagementNote" TEXT');
   }
+  if (!studentSessionCols.has("accessTokenHash")) {
+    alters.push('ALTER TABLE "StudentSession" ADD COLUMN "accessTokenHash" TEXT');
+  }
 
   if (alters.length > 0) {
     await client.executeMultiple(`${alters.join(";\n")};`);
@@ -315,6 +515,9 @@ async function ensureTursoSchemaUpgrades(client: LibsqlClient) {
 
   await client.execute(
     `UPDATE "Misconception" SET "updatedAt" = COALESCE("updatedAt", "detectedAt", CURRENT_TIMESTAMP)`
+  );
+  await client.execute(
+    `CREATE UNIQUE INDEX IF NOT EXISTS "StudentSession_accessTokenHash_key" ON "StudentSession"("accessTokenHash")`
   );
 }
 
@@ -342,7 +545,7 @@ function createPrismaClient(): PrismaClient {
   // Local dev: better-sqlite3 (not loaded on Vercel)
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { PrismaBetterSqlite3 } = require("@prisma/adapter-better-sqlite3");
-  const adapter = new PrismaBetterSqlite3({ url: "file:./prisma/dev.db" });
+  const adapter = new PrismaBetterSqlite3({ url: getLocalDatabasePath() });
   return new PrismaClient({ adapter } as never);
 }
 
@@ -352,9 +555,7 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 export async function ensureDatabaseReady() {
   const remoteDatabaseUrl = getRemoteDatabaseUrl();
-  if (!remoteDatabaseUrl) return;
-
-  if (!globalForPrisma.tursoSchemaReady) {
+  if (remoteDatabaseUrl && !globalForPrisma.tursoSchemaReady) {
     globalForPrisma.tursoSchemaReady = (async () => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { createClient } = require("@libsql/client");
@@ -368,5 +569,20 @@ export async function ensureDatabaseReady() {
     })();
   }
 
-  await globalForPrisma.tursoSchemaReady;
+  if (globalForPrisma.tursoSchemaReady) {
+    await globalForPrisma.tursoSchemaReady;
+  }
+
+  const legacyOwner = process.env.LEGACY_SESSION_OWNER_CLERK_USER_ID?.trim();
+  if (legacyOwner && !globalForPrisma.legacyOwnerReady) {
+    globalForPrisma.legacyOwnerReady = prisma.session
+      .updateMany({
+        where: { ownerClerkUserId: null },
+        data: { ownerClerkUserId: legacyOwner },
+      })
+      .then(() => undefined);
+  }
+  if (globalForPrisma.legacyOwnerReady) {
+    await globalForPrisma.legacyOwnerReady;
+  }
 }

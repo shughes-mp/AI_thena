@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import type { ApiError } from "@/types";
+import { createLearnerCapability } from "@/lib/learner-capability";
 
 export async function POST(request: Request) {
   try {
@@ -34,10 +35,12 @@ export async function POST(request: Request) {
       );
     }
 
+    const capability = createLearnerCapability();
     const studentSession = await prisma.studentSession.create({
       data: {
         sessionId,
         studentName: studentName.trim(),
+        accessTokenHash: capability.tokenHash,
       },
     });
 
@@ -46,6 +49,7 @@ export async function POST(request: Request) {
         id: studentSession.id,
         sessionId: studentSession.sessionId,
         studentName: studentSession.studentName,
+        capabilityToken: capability.token,
       },
       { status: 201 }
     );

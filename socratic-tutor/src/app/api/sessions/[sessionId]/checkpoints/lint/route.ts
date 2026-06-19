@@ -3,6 +3,7 @@ import { anthropic } from "@/lib/anthropic";
 import { prisma } from "@/lib/db";
 import type { ApiError, CheckpointLintResult } from "@/types";
 import { MODEL_FAST } from "@/lib/models";
+import { requireSessionAccess } from "@/lib/instructor-auth";
 
 export async function POST(
   request: Request,
@@ -10,6 +11,8 @@ export async function POST(
 ) {
   try {
     const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "editor");
+    if (!access.ok) return access.response;
     const body = (await request.json()) as { prompt?: string };
     const prompt = body.prompt?.trim();
 

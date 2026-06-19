@@ -9,6 +9,7 @@ import type {
   MisconceptionDashboardStats,
   MisconceptionOverrideRecord,
 } from "@/types";
+import { requireSessionAccess } from "@/lib/instructor-auth";
 
 type MisconceptionRecord = {
   id: string;
@@ -245,6 +246,8 @@ export async function GET(
     await ensureDatabaseReady();
 
     const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "viewer");
+    if (!access.ok) return access.response;
 
     const session = await prisma.session.findUnique({
       where: { id: sessionId },

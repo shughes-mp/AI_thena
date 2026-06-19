@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { ensureDatabaseReady, prisma } from "@/lib/db";
 import type { ApiError } from "@/types";
+import {
+  ensureNormalizedEvidenceDefinitions,
+  syncEvidenceQuestions,
+} from "@/lib/evidence-definitions";
+import { requireSessionAccess } from "@/lib/instructor-auth";
 
 export async function GET(
   _request: Request,
@@ -9,6 +14,8 @@ export async function GET(
   try {
     await ensureDatabaseReady();
     const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "viewer");
+    if (!access.ok) return access.response;
 
     const session = await prisma.session.findUnique({
       where: { id: sessionId },
@@ -22,8 +29,10 @@ export async function GET(
       );
     }
 
+    await ensureNormalizedEvidenceDefinitions(sessionId);
     const checkpoints = await prisma.checkpoint.findMany({
       where: { sessionId },
+      include: { evidenceQuestion: true },
       orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }],
     });
 
@@ -44,6 +53,8 @@ export async function POST(
   try {
     await ensureDatabaseReady();
     const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "editor");
+    if (!access.ok) return access.response;
     const body = (await request.json()) as {
       prompt?: string;
       processLevel?: string;
@@ -71,12 +82,6 @@ export async function POST(
       );
     }
 
-    const maxCheckpoint = await prisma.checkpoint.findFirst({
-      where: { sessionId },
-      orderBy: { orderIndex: "desc" },
-      select: { orderIndex: true },
-    });
-
     const processLevel =
       body.processLevel === "retrieve" ||
       body.processLevel === "infer" ||
@@ -85,21 +90,30 @@ export async function POST(
         ? body.processLevel
         : "infer";
 
-    const checkpoint = await prisma.checkpoint.create({
-      data: {
-        sessionId,
-        orderIndex: (maxCheckpoint?.orderIndex ?? -1) + 1,
-        prompt,
-        processLevel,
-        expectations:
-          Array.isArray(body.expectations) && body.expectations.length > 0
-            ? JSON.stringify(body.expectations)
-            : null,
-        misconceptionSeeds:
-          Array.isArray(body.misconceptionSeeds) && body.misconceptionSeeds.length > 0
-            ? JSON.stringify(body.misconceptionSeeds)
-            : null,
-      },
+    const checkpoint = await prisma.$transaction(async (tx) => {
+      const maxCheckpoint = await tx.checkpoint.findFirst({
+        where: { sessionId },
+        orderBy: { orderIndex: "desc" },
+        select: { orderIndex: true },
+      });
+      const created = await tx.checkpoint.create({
+        data: {
+          sessionId,
+          orderIndex: (maxCheckpoint?.orderIndex ?? -1) + 1,
+          prompt,
+          processLevel,
+          expectations:
+            Array.isArray(body.expectations) && body.expectations.length > 0
+              ? JSON.stringify(body.expectations)
+              : null,
+          misconceptionSeeds:
+            Array.isArray(body.misconceptionSeeds) && body.misconceptionSeeds.length > 0
+              ? JSON.stringify(body.misconceptionSeeds)
+              : null,
+        },
+      });
+      await syncEvidenceQuestions(tx, sessionId);
+      return created;
     });
 
     return NextResponse.json({ checkpoint }, { status: 201 });
@@ -119,6 +133,8 @@ export async function DELETE(
   try {
     await ensureDatabaseReady();
     const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "editor");
+    if (!access.ok) return access.response;
     const body = (await request.json()) as { checkpointId?: string };
 
     const checkpointId = body.checkpointId?.trim();
@@ -141,8 +157,12 @@ export async function DELETE(
       );
     }
 
-    await prisma.checkpoint.delete({
-      where: { id: checkpointId },
+    await prisma.$transaction(async (tx) => {
+      await tx.evidenceQuestion.updateMany({
+        where: { checkpointId },
+        data: { active: false, checkpointId: null },
+      });
+      await tx.checkpoint.delete({ where: { id: checkpointId } });
     });
 
     return NextResponse.json({ success: true });

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ensureDatabaseReady, prisma } from "@/lib/db";
 import type { ApiError, TeachingRecommendationAction } from "@/types";
+import { requireSessionAccess } from "@/lib/instructor-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,8 @@ export async function PATCH(
   try {
     await ensureDatabaseReady();
     const { sessionId, recId } = await params;
+    const access = await requireSessionAccess(sessionId, "editor");
+    if (!access.ok) return access.response;
     const body = (await request.json()) as {
       instructorAction?: string | null;
       instructorNote?: string | null;

@@ -288,11 +288,15 @@ Gate result: **Passed at contract level.** Phase 2 must implement these contract
 
 ## Phase 2: Build Evidence Provenance And Instructor Review Foundations
 
+Status: **Complete (2026-06-19).** The traceable misunderstanding vertical slice, normalized outcome/question links, structured evidence qualifications, isolated migration contracts, legacy labeling, atomic supersession, Clerk authentication, session-scoped role authorization, and account-free learner capabilities are implemented. Verification and operational notes are recorded in `docs/phase-2/README.md`.
+
 ### Objective
 
 Make every significant AI-generated signal traceable and reviewable.
 
 ### 2.1 Data Model
+
+Foundation implemented: additive evidence signal, citation, review-history, facilitation-recommendation, normalized learning-outcome, normalized evidence-question, and explicit link entities; version metadata; legacy misconception compatibility; stable dialogue/source references; source-set hashes; and self-referential supersession chains.
 
 Add or normalize entities for:
 
@@ -314,6 +318,8 @@ Avoid destructive renames of legacy database fields until migration and compatib
 
 ### 2.2 API Contracts
 
+Implemented: typed signal listing, review mutation, and atomic supersession APIs return citations, confidence explanation, review history, normalized outcomes/questions, related dialogue/source passages, legacy provenance labels, and the initial Guide recommendation. Clerk identity and session-scoped owner, editor, and viewer authorization protect every instructor session API.
+
 Create typed APIs that return:
 
 - Signal plus citations
@@ -327,6 +333,8 @@ Create typed APIs that return:
 
 ### 2.3 Review Workflow
 
+First-slice controls implemented: approve, revise, reject, mark acceptable, flag for discussion, add context, and undo, with append-only history.
+
 Implement instructor controls:
 
 - Approve
@@ -338,6 +346,8 @@ Implement instructor controls:
 - Record why the AI signal was changed
 
 ### 2.4 First Vertical Slice
+
+Implemented for newly detected, exactly source-cited possible misunderstandings. Diagnostics that cannot validate a source quote remain available only through the legacy misconception path and are not exposed as consequential evidence signals.
 
 Implement one complete misunderstanding pathway:
 
@@ -362,6 +372,8 @@ Implement one complete misunderstanding pathway:
 ### Acceptance Gate
 
 An instructor can trace, understand, correct, and audit the first complete AI signal pathway.
+
+Gate result: **Passed.** The complete pathway is citation-gated, versioned, reviewable, append-only, authenticated, session-authorized, and covered by migration, contract, authorization, UI-action, build, and browser verification.
 
 ---
 

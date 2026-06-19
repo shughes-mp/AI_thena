@@ -8,65 +8,86 @@ datasource db {
 }
 
 model Session {
-  id              String    @id @default(cuid())
-  name            String
-  description     String?
-  courseContext   String?
-  learningGoal    String?
-  learningOutcomes String?
-  prerequisiteMap String?
-  accessCode      String    @unique
-  createdAt       DateTime  @default(now())
-  opensAt         DateTime?
-  closesAt        DateTime?
-  maxExchanges    Int       @default(20)
-  stance          String    @default("directed")
-  sessionPurpose  String    @default("pre_class")
-  readings        Reading[]
-  assessments     Assessment[]
-  checkpoints     Checkpoint[]
-  studentSessions StudentSession[]
-  reports         Report[]
-  suggestedQuestions SuggestedQuestion[]
+  id                     String                   @id @default(cuid())
+  name                   String
+  description            String?
+  courseContext          String?
+  learningGoal           String?
+  learningOutcomes       String?
+  prerequisiteMap        String?
+  accessCode             String                   @unique
+  createdAt              DateTime                 @default(now())
+  opensAt                DateTime?
+  closesAt               DateTime?
+  maxExchanges           Int                      @default(20)
+  stance                 String                   @default("directed")
+  sessionPurpose         String                   @default("pre_class")
+  ownerClerkUserId       String?
+  readings               Reading[]
+  assessments            Assessment[]
+  checkpoints            Checkpoint[]
+  studentSessions        StudentSession[]
+  reports                Report[]
+  suggestedQuestions     SuggestedQuestion[]
   misconceptionOverrides MisconceptionOverride[]
-  recommendations TeachingRecommendation[]
+  recommendations        TeachingRecommendation[]
+  evidenceSignals        EvidenceSignal[]
+  normalizedOutcomes     LearningOutcome[]
+  evidenceQuestions      EvidenceQuestion[]
+  instructorAccess       SessionInstructor[]
+}
+
+model SessionInstructor {
+  id              String   @id @default(cuid())
+  sessionId       String
+  session         Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  clerkUserId     String
+  role            String   @default("viewer")
+  grantedByUserId String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([sessionId, clerkUserId])
+  @@index([clerkUserId])
 }
 
 model Reading {
-  id        String   @id @default(cuid())
-  sessionId String
-  filename  String
-  content   String
-  uploadedAt DateTime @default(now())
-  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  id                String             @id @default(cuid())
+  sessionId         String
+  filename          String
+  content           String
+  uploadedAt        DateTime           @default(now())
+  session           Session            @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  evidenceCitations EvidenceCitation[]
 
   @@index([sessionId])
 }
 
 model Assessment {
-  id        String   @id @default(cuid())
-  sessionId String
-  filename  String
-  content   String
+  id         String   @id @default(cuid())
+  sessionId  String
+  filename   String
+  content    String
   uploadedAt DateTime @default(now())
-  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  session    Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId])
 }
 
 model Checkpoint {
-  id                 String   @id @default(cuid())
+  id                 String              @id @default(cuid())
   sessionId          String
-  session            Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  session            Session             @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   orderIndex         Int
   prompt             String
   processLevel       String
   passageAnchors     String?
   expectations       String?
   misconceptionSeeds String?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
   studentCheckpoints StudentCheckpoint[]
+  evidenceQuestion   EvidenceQuestion?
 
   @@index([sessionId])
 }
@@ -87,21 +108,23 @@ model StudentCheckpoint {
 }
 
 model StudentSession {
-  id             String    @id @default(cuid())
-  sessionId      String
-  studentName    String
-  softRevisitQueue String  @default("[]")
-  startedAt      DateTime  @default(now())
-  endedAt        DateTime?
-  sessionSummary String?
-  messages       Message[]
-  misconceptions Misconception[]
-  confidenceChecks ConfidenceCheck[]
-  topicMastery   TopicMastery[]
+  id                 String              @id @default(cuid())
+  sessionId          String
+  studentName        String
+  softRevisitQueue   String              @default("[]")
+  startedAt          DateTime            @default(now())
+  endedAt            DateTime?
+  sessionSummary     String?
+  accessTokenHash    String?             @unique
+  messages           Message[]
+  misconceptions     Misconception[]
+  confidenceChecks   ConfidenceCheck[]
+  topicMastery       TopicMastery[]
   studentCheckpoints StudentCheckpoint[]
-  loAssessments  LOAssessment[]
-  diagnosticLogs DiagnosticLog[]
-  session        Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  loAssessments      LOAssessment[]
+  diagnosticLogs     DiagnosticLog[]
+  evidenceSignals    EvidenceSignal[]
+  session            Session             @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId])
 }
@@ -118,56 +141,247 @@ model LOAssessment {
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
-  @@index([studentSessionId])
   @@unique([studentSessionId, learningOutcome])
+  @@index([studentSessionId])
 }
 
 model Message {
-  id               String   @id @default(cuid())
-  studentSessionId String
-  role             String   // "user" | "assistant"
-  content          String
-  topicThread      String?  // AI-classified topic label
-  attemptNumber    Int?     // null for assistant messages
-  isGenuineAttempt Boolean? // null for assistant or comprehension
-  mode             String?  // "comprehension" | "socratic" | null
-  questionType     String?
-  feedbackType     String?
-  expertModelType  String?
-  selfExplainPrompted Boolean @default(false)
+  id                     String             @id @default(cuid())
+  studentSessionId       String
+  role                   String // "user" | "assistant"
+  content                String
+  topicThread            String? // AI-classified topic label
+  attemptNumber          Int? // null for assistant messages
+  isGenuineAttempt       Boolean? // null for assistant or comprehension
+  mode                   String? // "comprehension" | "socratic" | null
+  questionType           String?
+  feedbackType           String?
+  expertModelType        String?
+  selfExplainPrompted    Boolean            @default(false)
   cognitiveConflictStage String?
-  misconceptionResolved Boolean @default(false)
-  isRevisitProbe   Boolean @default(false)
-  engagementFlag   String?
-  engagementNote   String?
-  createdAt        DateTime @default(now())
-  studentSession   StudentSession @relation(fields: [studentSessionId], references: [id], onDelete: Cascade)
+  misconceptionResolved  Boolean            @default(false)
+  isRevisitProbe         Boolean            @default(false)
+  engagementFlag         String?
+  engagementNote         String?
+  createdAt              DateTime           @default(now())
+  studentSession         StudentSession     @relation(fields: [studentSessionId], references: [id], onDelete: Cascade)
+  evidenceCitations      EvidenceCitation[]
 
   @@index([studentSessionId])
 }
 
 model Misconception {
-  id               String   @id @default(cuid())
-  studentSessionId String
-  topicThread      String
-  description      String
-  studentMessage   String
-  resolved         Boolean  @default(false)
-  persistentlyUnresolved Boolean @default(false)
-  canonicalClaim   String?
-  passageAnchor    String?
-  misconceptionType String?
-  severity         String   @default("medium")
-  confidence       String   @default("medium")
-  detectedAtTurn   Int?
-  resolvedAtTurn   Int?
-  resolutionConfidence String?
-  resolutionEvidence String?
-  detectedAt       DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  studentSession   StudentSession @relation(fields: [studentSessionId], references: [id], onDelete: Cascade)
+  id                     String          @id @default(cuid())
+  studentSessionId       String
+  topicThread            String
+  description            String
+  studentMessage         String
+  resolved               Boolean         @default(false)
+  persistentlyUnresolved Boolean         @default(false)
+  canonicalClaim         String?
+  passageAnchor          String?
+  misconceptionType      String?
+  severity               String          @default("medium")
+  confidence             String          @default("medium")
+  detectedAtTurn         Int?
+  resolvedAtTurn         Int?
+  resolutionConfidence   String?
+  resolutionEvidence     String?
+  detectedAt             DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+  studentSession         StudentSession  @relation(fields: [studentSessionId], references: [id], onDelete: Cascade)
+  evidenceSignal         EvidenceSignal?
 
   @@index([studentSessionId])
+}
+
+model EvidenceSignal {
+  id                        String                          @id @default(cuid())
+  sessionId                 String
+  session                   Session                         @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  studentSessionId          String?
+  studentSession            StudentSession?                 @relation(fields: [studentSessionId], references: [id], onDelete: Cascade)
+  misconceptionId           String?                         @unique
+  misconception             Misconception?                  @relation(fields: [misconceptionId], references: [id], onDelete: SetNull)
+  signalType                String
+  scopeType                 String
+  scopeId                   String
+  claim                     String
+  status                    String                          @default("provisional")
+  confidenceLevel           String
+  confidenceRationale       String
+  limitations               String
+  missingEvidence           String
+  contradictoryEvidence     String
+  learningOutcomeIds        String                          @default("[]")
+  evidenceQuestionIds       String                          @default("[]")
+  opportunitySummary        String
+  createdBy                 String
+  schemaVersion             String
+  productPolicyVersion      String
+  terminologyVersion        String
+  evidencePolicyVersion     String
+  governancePolicyVersion   String
+  promptVersion             String?
+  modelProvider             String?
+  modelId                   String?
+  modelConfigurationVersion String?
+  parserVersion             String?
+  rubricVersion             String?
+  facilitationRuleVersion   String?
+  sourceSetVersion          String?
+  supersedesSignalId        String?
+  supersedesSignal          EvidenceSignal?                 @relation("SignalSupersession", fields: [supersedesSignalId], references: [id], onDelete: SetNull)
+  supersededBy              EvidenceSignal[]                @relation("SignalSupersession")
+  createdAt                 DateTime                        @default(now())
+  updatedAt                 DateTime                        @updatedAt
+  citations                 EvidenceCitation[]
+  reviews                   EvidenceReview[]
+  recommendation            FacilitationRecommendation?
+  learningOutcomeLinks      EvidenceSignalLearningOutcome[]
+  evidenceQuestionLinks     EvidenceSignalQuestion[]
+  qualifications            EvidenceQualification[]
+
+  @@index([sessionId])
+  @@index([studentSessionId])
+  @@index([status])
+  @@index([signalType])
+  @@index([supersedesSignalId])
+}
+
+model LearningOutcome {
+  id            String                          @id @default(cuid())
+  sessionId     String
+  session       Session                         @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  orderIndex    Int
+  label         String
+  normalizedKey String
+  active        Boolean                         @default(true)
+  legacySource  String                          @default("session.learningOutcomes")
+  createdAt     DateTime                        @default(now())
+  updatedAt     DateTime                        @updatedAt
+  signalLinks   EvidenceSignalLearningOutcome[]
+
+  @@unique([sessionId, normalizedKey])
+  @@index([sessionId, active])
+}
+
+model EvidenceQuestion {
+  id           String                   @id @default(cuid())
+  sessionId    String
+  session      Session                  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  checkpointId String?                  @unique
+  checkpoint   Checkpoint?              @relation(fields: [checkpointId], references: [id], onDelete: SetNull)
+  orderIndex   Int
+  prompt       String
+  processLevel String
+  active       Boolean                  @default(true)
+  legacySource String                   @default("checkpoint")
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+  signalLinks  EvidenceSignalQuestion[]
+
+  @@index([sessionId, active])
+}
+
+model EvidenceSignalLearningOutcome {
+  signalId           String
+  signal             EvidenceSignal  @relation(fields: [signalId], references: [id], onDelete: Cascade)
+  learningOutcomeId  String
+  learningOutcome    LearningOutcome @relation(fields: [learningOutcomeId], references: [id], onDelete: Restrict)
+  relevanceRationale String?
+  createdAt          DateTime        @default(now())
+
+  @@id([signalId, learningOutcomeId])
+  @@index([learningOutcomeId])
+}
+
+model EvidenceSignalQuestion {
+  signalId           String
+  signal             EvidenceSignal   @relation(fields: [signalId], references: [id], onDelete: Cascade)
+  evidenceQuestionId String
+  evidenceQuestion   EvidenceQuestion @relation(fields: [evidenceQuestionId], references: [id], onDelete: Restrict)
+  relevanceRationale String?
+  createdAt          DateTime         @default(now())
+
+  @@id([signalId, evidenceQuestionId])
+  @@index([evidenceQuestionId])
+}
+
+model EvidenceQualification {
+  id        String         @id @default(cuid())
+  signalId  String
+  signal    EvidenceSignal @relation(fields: [signalId], references: [id], onDelete: Cascade)
+  kind      String
+  summary   String
+  createdBy String
+  createdAt DateTime       @default(now())
+
+  @@index([signalId, kind])
+}
+
+model EvidenceCitation {
+  id                 String         @id @default(cuid())
+  signalId           String
+  signal             EvidenceSignal @relation(fields: [signalId], references: [id], onDelete: Cascade)
+  citationType       String
+  recordId           String
+  messageId          String?
+  message            Message?       @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  readingId          String?
+  reading            Reading?       @relation(fields: [readingId], references: [id], onDelete: SetNull)
+  quotedText         String
+  startOffset        Int?
+  endOffset          Int?
+  sourceFilename     String?
+  passageId          String?
+  relevanceRationale String
+  createdAt          DateTime       @default(now())
+
+  @@index([signalId])
+  @@index([messageId])
+  @@index([readingId])
+}
+
+model EvidenceReview {
+  id             String         @id @default(cuid())
+  signalId       String
+  signal         EvidenceSignal @relation(fields: [signalId], references: [id], onDelete: Cascade)
+  action         String
+  previousStatus String
+  newStatus      String
+  previousClaim  String
+  revisedClaim   String?
+  rationale      String?
+  contextualNote String?
+  actorType      String         @default("instructor")
+  actorId        String?
+  createdAt      DateTime       @default(now())
+
+  @@index([signalId])
+}
+
+model FacilitationRecommendation {
+  id                  String         @id @default(cuid())
+  signalId            String         @unique
+  signal              EvidenceSignal @relation(fields: [signalId], references: [id], onDelete: Cascade)
+  mode                String
+  scopeType           String
+  scopeIds            String
+  observedCondition   String
+  diagnosisQuestion   String?
+  rationale           String
+  suggestedMove       String
+  suggestedPhrase     String?
+  confidenceLevel     String
+  limitations         String
+  escalationCondition String?
+  releaseCondition    String
+  ruleVersion         String
+  createdBy           String
+  reviewState         String         @default("provisional")
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
 }
 
 model DiagnosticLog {
@@ -218,13 +432,13 @@ model TeachingRecommendation {
 }
 
 model ConfidenceCheck {
-  id               String   @id @default(cuid())
+  id               String         @id @default(cuid())
   studentSessionId String
   topicThread      String
-  rating           String   // "very_confident" | "somewhat_confident" | "uncertain"
-  probeAsked       Boolean  @default(false)
+  rating           String // "very_confident" | "somewhat_confident" | "uncertain"
+  probeAsked       Boolean        @default(false)
   probeResult      String?
-  createdAt        DateTime @default(now())
+  createdAt        DateTime       @default(now())
   studentSession   StudentSession @relation(fields: [studentSessionId], references: [id], onDelete: Cascade)
 
   @@index([studentSessionId])
@@ -233,29 +447,29 @@ model ConfidenceCheck {
 model Report {
   id          String   @id @default(cuid())
   sessionId   String
-  content     String   // Full generated report text
-  stats       String   // JSON: { exchanges, misconceptions, directAnswers, studentsCount }
+  content     String // Full generated report text
+  stats       String // JSON: { exchanges, misconceptions, directAnswers, studentsCount }
   generatedAt DateTime @default(now())
   session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
 
 model SuggestedQuestion {
-  id          String   @id @default(cuid())
-  sessionId   String
-  question    String
-  approved    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  sessionId String
+  question  String
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
 
 model TopicMastery {
-  id               String   @id @default(cuid())
+  id               String         @id @default(cuid())
   studentSessionId String
   topicThread      String
   status           String
-  criteriamet      String   @default("[]")
-  hintLadderRung   Int      @default(0)
-  updatedAt        DateTime @updatedAt
+  criteriamet      String         @default("[]")
+  hintLadderRung   Int            @default(0)
+  updatedAt        DateTime       @updatedAt
   studentSession   StudentSession @relation(fields: [studentSessionId], references: [id], onDelete: Cascade)
 
   @@unique([studentSessionId, topicThread])

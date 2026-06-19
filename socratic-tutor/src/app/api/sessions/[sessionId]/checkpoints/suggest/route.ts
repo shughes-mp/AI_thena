@@ -3,6 +3,7 @@ import { anthropic } from "@/lib/anthropic";
 import { ensureDatabaseReady, prisma } from "@/lib/db";
 import type { ApiError } from "@/types";
 import { MODEL_FAST } from "@/lib/models";
+import { requireSessionAccess } from "@/lib/instructor-auth";
 
 type ProcessLevel = "retrieve" | "infer" | "integrate" | "evaluate";
 
@@ -280,6 +281,8 @@ export async function POST(
   try {
     await ensureDatabaseReady();
     const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "editor");
+    if (!access.ok) return access.response;
 
     const session = await prisma.session.findUnique({
       where: { id: sessionId },

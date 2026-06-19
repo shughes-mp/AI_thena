@@ -107,6 +107,7 @@ These outputs are formative teaching aids. They are designed to help instructors
 - Node.js
 - npm
 - An Anthropic API key
+- A Clerk application for instructor sign-in
 
 ### Environment Variables
 
@@ -119,13 +120,24 @@ ANTHROPIC_API_KEY=your_anthropic_api_key
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 LOCAL_DATABASE_URL=file:./prisma/dev.db
 DATABASE_URL=file:./prisma/dev.db
+# Set to 1 to force local SQLite when Turso variables are also present.
+AI_THENA_USE_LOCAL_DATABASE=0
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_publishable_key
+CLERK_SECRET_KEY=sk_test_your_secret_key
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 ```
+
+Clerk keyless mode can bootstrap local development, but deployed environments must use keys from their Clerk application. Instructor routes and session APIs require Clerk authentication. Learners do not need accounts; the app issues a private capability token when they join and stores only its hash.
 
 Optional production variables:
 
 ```bash
 TURSO_DATABASE_URL=libsql://your-production-database.turso.io
 TURSO_AUTH_TOKEN=your_turso_auth_token
+# During the first authenticated deployment, assign any pre-existing sessions
+# to a known Clerk user. Remove this after verifying the assignment.
+LEGACY_SESSION_OWNER_CLERK_USER_ID=user_your_clerk_user_id
 ```
 
 Optional model overrides:
@@ -163,8 +175,8 @@ Current status:
 
 - `npm run build` succeeds.
 - `npx tsc --noEmit` succeeds.
-- `npm run lint` currently reports existing lint issues, including source lint errors and the untracked local `scratch/` helper folder if it is present.
-- There is currently no `npm test` script.
+- `npm run lint` succeeds.
+- `npm test` succeeds and covers model-alias hygiene, Phase 2 evidence logic, authorization and cross-session isolation, learner capabilities, UI-action contracts, and fresh migrated-database contracts.
 
 ## Database and Deployment
 
@@ -193,6 +205,12 @@ For Vercel, configure:
 - `TURSO_DATABASE_URL`
 - `TURSO_AUTH_TOKEN`
 - `NEXT_PUBLIC_APP_URL`
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- `CLERK_SECRET_KEY`
+- `NEXT_PUBLIC_CLERK_SIGN_IN_URL`
+- `NEXT_PUBLIC_CLERK_SIGN_UP_URL`
+
+For a deployment containing sessions created before Clerk authentication was added, also set `LEGACY_SESSION_OWNER_CLERK_USER_ID` to the Clerk user who should initially own those sessions. Verify the assignments before removing it. New sessions automatically belong to their authenticated creator, and owners can delegate editor or viewer access.
 
 Do not rely on `prisma db push` during the Vercel build for Turso schema creation. Use `npx prisma migrate dev` for local schema work and handle Turso schema rollout as a separate operational step.
 

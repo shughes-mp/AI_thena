@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureDatabaseReady, prisma } from "@/lib/db";
+import { requireSessionAccess } from "@/lib/instructor-auth";
 
 export async function GET(
   _req: Request,
@@ -8,6 +9,8 @@ export async function GET(
   try {
     await ensureDatabaseReady();
     const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "viewer");
+    if (!access.ok) return access.response;
 
     const studentSessions = await prisma.studentSession.findMany({
       where: { sessionId },

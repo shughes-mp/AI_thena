@@ -9,6 +9,7 @@ import type {
   TeachingRecommendationConfidence,
   TeachingRecommendationRecord,
 } from "@/types";
+import { requireSessionAccess } from "@/lib/instructor-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -260,12 +261,17 @@ function serializeRecommendation(
   };
 }
 
-async function fetchClusters(origin: string, sessionId: string) {
+async function fetchClusters(
+  origin: string,
+  sessionId: string,
+  cookieHeader: string | null
+) {
   const response = await fetch(
     `${origin}/api/sessions/${sessionId}/misconceptions/aggregate`,
     {
       method: "GET",
       cache: "no-store",
+      headers: cookieHeader ? { cookie: cookieHeader } : undefined,
     }
   );
 
@@ -291,6 +297,8 @@ export async function GET(
   try {
     await ensureDatabaseReady();
     const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "viewer");
+    if (!access.ok) return access.response;
 
     const recommendations = await prisma.teachingRecommendation.findMany({
       where: { sessionId },
@@ -319,6 +327,8 @@ export async function POST(
   try {
     await ensureDatabaseReady();
     const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "editor");
+    if (!access.ok) return access.response;
 
     const session = await prisma.session.findUnique({
       where: { id: sessionId },
@@ -342,7 +352,11 @@ export async function POST(
     }
 
     const origin = new URL(request.url).origin;
-    const clusters = await fetchClusters(origin, sessionId);
+    const clusters = await fetchClusters(
+      origin,
+      sessionId,
+      request.headers.get("cookie")
+    );
 
     const relevantClusters = clusters.slice(0, 8);
     if (relevantClusters.length === 0) {

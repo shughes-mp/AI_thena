@@ -231,3 +231,111 @@ export interface StudentSessionInfo {
   misconceptionCount: number;
   lastActive: string;
 }
+
+export type EvidenceSignalStatus =
+  | "provisional"
+  | "approved"
+  | "revised"
+  | "rejected"
+  | "superseded";
+
+export type EvidenceReviewAction =
+  | "approve"
+  | "revise"
+  | "reject"
+  | "mark_acceptable"
+  | "flag_for_discussion"
+  | "add_context"
+  | "supersede"
+  | "undo";
+
+export interface EvidenceCitationRecord {
+  id: string;
+  citationType: "learner_message" | "assistant_message" | "source_passage" | "process_event";
+  recordId: string;
+  quotedText: string;
+  startOffset: number | null;
+  endOffset: number | null;
+  sourceFilename: string | null;
+  passageId: string | null;
+  relevanceRationale: string;
+}
+
+export interface EvidenceReviewRecord {
+  id: string;
+  action: EvidenceReviewAction;
+  previousStatus: EvidenceSignalStatus;
+  newStatus: EvidenceSignalStatus;
+  previousClaim: string;
+  revisedClaim: string | null;
+  rationale: string | null;
+  contextualNote: string | null;
+  actorType: string;
+  actorId: string | null;
+  createdAt: string;
+}
+
+export interface FacilitationRecommendationRecord {
+  id: string;
+  mode: "observer" | "guide" | "conductor";
+  observedCondition: string;
+  diagnosisQuestion: string | null;
+  rationale: string;
+  suggestedMove: string;
+  suggestedPhrase: string | null;
+  confidenceLevel: "low" | "medium" | "high";
+  limitations: string;
+  escalationCondition: string | null;
+  releaseCondition: string;
+  ruleVersion: string;
+  reviewState: string;
+}
+
+export interface EvidenceSignalRecord {
+  id: string;
+  sessionId: string;
+  studentSessionId: string | null;
+  learnerName: string | null;
+  signalType: string;
+  scopeType: "learner" | "group" | "class";
+  scopeId: string;
+  claim: string;
+  status: EvidenceSignalStatus;
+  confidenceLevel: "low" | "medium" | "high";
+  confidenceRationale: string;
+  limitations: string;
+  missingEvidence: string;
+  contradictoryEvidence: string;
+  opportunitySummary: string;
+  learningOutcomes: Array<{ id: string; label: string }>;
+  evidenceQuestions: Array<{ id: string; prompt: string; processLevel: string }>;
+  qualifications: Array<{
+    id: string;
+    kind: "contradictory_evidence" | "missing_evidence" | "alternative_interpretation";
+    summary: string;
+    createdBy: string;
+  }>;
+  createdBy: string;
+  modelId: string | null;
+  promptVersion: string | null;
+  parserVersion: string | null;
+  evidencePolicyVersion: string;
+  sourceSetVersion: string | null;
+  supersedesSignalId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  citations: EvidenceCitationRecord[];
+  reviews: EvidenceReviewRecord[];
+  recommendation: FacilitationRecommendationRecord | null;
+}
+
+export interface LegacyUnversionedSignalRecord {
+  id: string;
+  learnerName: string;
+  claim: string;
+  description: string;
+  confidence: string;
+  passageAnchor: string | null;
+  createdAt: string;
+  provenanceLabel: "legacy-unversioned";
+}

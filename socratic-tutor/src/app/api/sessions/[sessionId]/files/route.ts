@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import type { ApiError, FileInfo } from "@/types";
+import { requireSessionAccess } from "@/lib/instructor-auth";
 
 export async function GET(
   _request: Request,
@@ -8,6 +9,8 @@ export async function GET(
 ) {
   try {
     const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "viewer");
+    if (!access.ok) return access.response;
 
     const session = await prisma.session.findUnique({
       where: { id: sessionId },
@@ -63,6 +66,8 @@ export async function DELETE(
 ) {
   try {
     const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "editor");
+    if (!access.ok) return access.response;
     const { searchParams } = new URL(request.url);
     const fileId = searchParams.get("fileId");
     const category = searchParams.get("category");

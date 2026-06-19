@@ -48,6 +48,7 @@ export function ClientChat({
 }: ClientChatProps) {
   const router = useRouter();
   const [studentSessionId, setStudentSessionId] = useState<string | null>(null);
+  const [capabilityToken, setCapabilityToken] = useState<string | null>(null);
   const [studentName, setStudentName] = useState<string | null>(null);
   const [isEnded, setIsEnded] = useState(false);
   const [summary, setSummary] = useState<string | null>(null);
@@ -86,14 +87,16 @@ export function ClientChat({
 
   useEffect(() => {
     const sid = sessionStorage.getItem("studentSessionId");
+    const token = sessionStorage.getItem("studentCapabilityToken");
     const sname = sessionStorage.getItem("studentName");
 
-    if (!sid) {
+    if (!sid || !token) {
       router.push(`/s/${accessCode}`);
       return;
     }
 
     setStudentSessionId(sid);
+    setCapabilityToken(token);
     setStudentName(sname);
 
     if (!initialized.current && messages.length === 0) {
@@ -107,7 +110,8 @@ OPENING SEQUENCE INSTRUCTION: This is the opening exchange.
 4. Wait for my response before bridging to the reading and asking the first Socratic question.
 If course context is available, use it naturally in the first three exchanges.`,
         sid,
-        true
+        true,
+        token
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -120,7 +124,7 @@ If course context is available, use it naturally in the first three exchanges.`,
       const res = await fetch("/api/end-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentSessionId: sid }),
+        body: JSON.stringify({ studentSessionId: sid, capabilityToken }),
       });
       const data = await res.json();
       if (data.summary) {
@@ -132,6 +136,7 @@ If course context is available, use it naturally in the first three exchanges.`,
       setIsEnded(true);
       setIsEnding(false);
       sessionStorage.removeItem("studentSessionId");
+      sessionStorage.removeItem("studentCapabilityToken");
       sessionStorage.removeItem("studentName");
     }
   };
@@ -139,7 +144,8 @@ If course context is available, use it naturally in the first three exchanges.`,
   const sendMessage = async (
     contentToSend: string,
     sid: string | null = studentSessionId,
-    hidden = false
+    hidden = false,
+    token: string | null = capabilityToken
   ) => {
     if (!sid || !contentToSend.trim() || isLoading) return;
 
@@ -159,7 +165,11 @@ If course context is available, use it naturally in the first three exchanges.`,
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentSessionId: sid, messages: newMessages }),
+        body: JSON.stringify({
+          studentSessionId: sid,
+          capabilityToken: token,
+          messages: newMessages,
+        }),
       });
 
       if (!res.ok) {

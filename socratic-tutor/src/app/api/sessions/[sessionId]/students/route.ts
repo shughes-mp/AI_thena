@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { ensureDatabaseReady, prisma } from "@/lib/db";
+import { requireSessionAccess } from "@/lib/instructor-auth";
 
 export async function GET(req: Request, { params }: { params: Promise<{ sessionId: string }> }) {
   try {
     await ensureDatabaseReady();
     const p = await params;
     const { sessionId } = p;
+    const access = await requireSessionAccess(sessionId, "viewer");
+    if (!access.ok) return access.response;
     const url = new URL(req.url);
     const studentSessionIdFilter = url.searchParams.get("studentSessionId");
 

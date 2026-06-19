@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { ensureDatabaseReady, prisma } from "@/lib/db";
+import { syncEvidenceQuestions } from "@/lib/evidence-definitions";
+import { requireSessionAccess } from "@/lib/instructor-auth";
 import type { ApiError } from "@/types";
 
 export async function PATCH(
@@ -9,7 +11,10 @@ export async function PATCH(
   }: { params: Promise<{ sessionId: string; checkpointId: string }> }
 ) {
   try {
+    await ensureDatabaseReady();
     const { sessionId, checkpointId } = await params;
+    const access = await requireSessionAccess(sessionId, "editor");
+    if (!access.ok) return access.response;
     const body = (await request.json()) as {
       prompt?: string;
       expectations?: string[] | null;
@@ -60,9 +65,13 @@ export async function PATCH(
       updateData.orderIndex = Math.max(0, Math.floor(body.orderIndex));
     }
 
-    const updated = await prisma.checkpoint.update({
-      where: { id: checkpointId },
-      data: updateData,
+    const updated = await prisma.$transaction(async (tx) => {
+      const next = await tx.checkpoint.update({
+        where: { id: checkpointId },
+        data: updateData,
+      });
+      await syncEvidenceQuestions(tx, sessionId);
+      return next;
     });
 
     return NextResponse.json({ checkpoint: updated });

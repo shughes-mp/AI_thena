@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import type { ApiError, MisconceptionOverrideRecord } from "@/types";
+import { requireSessionAccess } from "@/lib/instructor-auth";
 
 const VALID_OVERRIDE_TYPES = [
   "acceptable_interpretation",
@@ -36,6 +37,8 @@ export async function GET(
 ) {
   try {
     const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "viewer");
+    if (!access.ok) return access.response;
 
     const overrides = await prisma.misconceptionOverride.findMany({
       where: { sessionId },
@@ -63,6 +66,8 @@ export async function POST(
 ) {
   try {
     const { sessionId } = await params;
+    const access = await requireSessionAccess(sessionId, "editor");
+    if (!access.ok) return access.response;
     const body = (await request.json()) as {
       clusterLabel?: string;
       overrideType?: string;

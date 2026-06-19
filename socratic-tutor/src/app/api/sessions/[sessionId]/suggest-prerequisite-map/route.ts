@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { anthropic } from "@/lib/anthropic";
 import { ensureDatabaseReady, prisma } from "@/lib/db";
 import { MODEL_FAST } from "@/lib/models";
+import { requireSessionAccess } from "@/lib/instructor-auth";
 
 function hasCycle(mapValue: { concepts: Array<{ id: string; prerequisites: string[] }> }): boolean {
   const visiting = new Set<string>();
@@ -128,6 +129,8 @@ export async function POST(
 ) {
   await ensureDatabaseReady();
   const { sessionId } = await params;
+  const access = await requireSessionAccess(sessionId, "editor");
+  if (!access.ok) return access.response;
 
   const session = await prisma.session.findUnique({
     where: { id: sessionId },
