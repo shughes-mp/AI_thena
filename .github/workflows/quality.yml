@@ -49,6 +49,9 @@ jobs:
       - name: Audit dependencies
         run: pnpm audit --audit-level high
 
+      - name: Generate Prisma client
+        run: pnpm exec prisma generate
+
       - name: Run tests
         run: pnpm test
 
