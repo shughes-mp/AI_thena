@@ -1,0 +1,62 @@
+{
+  "name": "ai_thena",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.33.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "db:push": "prisma db push",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.ts",
+    "check": "pnpm audit --audit-level high && pnpm test && pnpm lint && pnpm typecheck && pnpm build"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.85",
+    "@ai-sdk/react": "^3.0.210",
+    "@anthropic-ai/sdk": "^0.105.0",
+    "@clerk/nextjs": "^7.5.7",
+    "@libsql/client": "^0.17.4",
+    "@prisma/adapter-better-sqlite3": "^7.8.0",
+    "@prisma/adapter-libsql": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "@sparticuz/chromium": "^149.0.0",
+    "@tailwindcss/typography": "^0.5.20",
+    "ai": "^6.0.208",
+    "better-sqlite3": "^12.11.1",
+    "dotenv": "^17.4.2",
+    "mammoth": "^1.12.0",
+    "marked": "^18.0.5",
+    "next": "16.2.9",
+    "pdf-parse": "^2.4.5",
+    "prisma": "^7.8.0",
+    "puppeteer": "^25.1.0",
+    "puppeteer-core": "^25.1.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "react-markdown": "^10.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.9",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "pnpm": {
+    "overrides": {
+      "@hono/node-server": ">=1.19.13",
+      "@xmldom/xmldom": ">=0.8.13",
+      "js-yaml": ">=4.2.0",
+      "postcss": ">=8.5.10"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+
+> ai_thena@0.1.0 dev C:\Users\seanh\Desktop\Sean\Claude Cowork Projects (MP)\Art Learning Tutor\socratic-tutor
+> next dev
+
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.178.29:3000
+- Environments: .env.local
+✓ Ready in 1535ms
+
+Environment validation passed: No retired Anthropic models configured.
+
+[35m
+[Clerk]:[0m You are running in keyless mode.
+You can [35mclaim your keys[0m by visiting https://dashboard.clerk.com/apps/claim?framework=nextjs&token=wvip6h0obn2fmroefookoeg4r6f842odtmp7k6jb&return_url=http%3A%2F%2Flocalhost%3A3000%2F
+
+ GET / 200 in 2.4s (next.js: 447ms, proxy.ts: 760ms, application-code: 1189ms)
+ POST / 200 in 145ms (next.js: 60ms, proxy.ts: 38ms, application-code: 46ms)
+  └─ ƒ syncKeylessConfigAction({"apiKeysUrl":"https://dashboard.clerk.com/apps/app_3FLZmJSRESoMEl47eQIdZ07J1eV/instances/ins_3FLZmNY1XSeLqh8wca7r3WhMrHm/api-keys","claimUrl":"https://dashboard.clerk.com/apps/claim?framework=nextjs&token=wvip6h0obn2fmroefookoeg4r6f842odtmp7k6jb","...":"3 items not stringified"}) in 8ms node_modules/.pnpm/@clerk+nextjs@7.5.7_next@16_aeaef22b574f34998980398a1eb13890/node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js
+ GET / 200 in 261ms (next.js: 18ms, proxy.ts: 30ms, application-code: 213ms)
+ POST / 200 in 93ms (next.js: 19ms, proxy.ts: 28ms, application-code: 46ms)
+  └─ ƒ syncKeylessConfigAction({"apiKeysUrl":"https://dashboard.clerk.com/apps/app_3FLZmJSRESoMEl47eQIdZ07J1eV/instances/ins_3FLZmNY1XSeLqh8wca7r3WhMrHm/api-keys","claimUrl":"https://dashboard.clerk.com/apps/claim?framework=nextjs&token=wvip6h0obn2fmroefookoeg4r6f842odtmp7k6jb","...":"3 items not stringified"}) in 4ms node_modules/.pnpm/@clerk+nextjs@7.5.7_next@16_aeaef22b574f34998980398a1eb13890/node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js
+[?25h
+ ELIFECYCLE  Command failed with exit code 4294967295.
