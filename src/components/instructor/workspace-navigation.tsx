@@ -103,8 +103,8 @@ export function InstructorWorkspaceNavigation({
               aria-selected={selected}
               className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
                 selected
-                  ? "border-[var(--charcoal)] bg-[var(--charcoal)] text-white"
-                  : "border-[var(--rule)] bg-white text-[var(--dim-grey)] hover:text-[var(--charcoal)]"
+                  ? "border-[var(--teal)] bg-[var(--teal)] text-white shadow-[0_10px_24px_rgba(17,120,144,0.18)]"
+                  : "border-[var(--rule)] bg-white text-[var(--dim-grey)] hover:border-[rgba(17,120,144,0.28)] hover:text-[var(--charcoal)]"
               }`}
             >
               {phase.label}

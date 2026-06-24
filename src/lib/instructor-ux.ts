@@ -55,7 +55,7 @@ export function getInstructorWorkspacePhases(sessionId: string): InstructorWorks
   return [
     {
       key: "prepare",
-      label: "Prepare",
+      label: "Setup",
       href: `/instructor/${sessionId}`,
       description: "Design the learner task before sharing it.",
       items: [

@@ -1039,7 +1039,7 @@ export function GoalsSection({
   };
 
   return (
-    <div id="learning-purpose" className="section-rule scroll-mt-24 border-t border-[var(--rule)]">
+    <div id="learning-purpose" className="minerva-card scroll-mt-24 overflow-hidden">
       <button
         onClick={onToggle}
         className="flex w-full items-center justify-between px-4 py-5 transition-colors hover:bg-[rgba(34,34,34,0.02)] md:px-8"
@@ -1062,7 +1062,7 @@ export function GoalsSection({
       </button>
 
       {open && (
-        <div className="border-t border-[var(--rule)] bg-[rgba(34,34,34,0.01)] px-4 py-8 md:px-14 md:py-10 space-y-8">
+        <div className="border-t border-[var(--rule)] bg-white px-4 py-8 md:px-14 md:py-10 space-y-8">
           <div className="space-y-3">
             <label className="minerva-label">Where are you in the learning cycle?</label>
             <p className="text-xs text-[var(--dim-grey)]">

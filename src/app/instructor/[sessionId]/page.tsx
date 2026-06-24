@@ -134,10 +134,12 @@ export default function SessionManagementPage() {
   const [draggedCheckpointId, setDraggedCheckpointId] = useState<string | null>(null);
   const [dragTargetCheckpointId, setDragTargetCheckpointId] = useState<string | null>(null);
   const [showGoals, setShowGoals] = useState(true);
+  const [showPreviewShare, setShowPreviewShare] = useState(true);
   const [showConfig, setShowConfig] = useState(false);
   const [showQuestions, setShowQuestions] = useState(false);
   const [showReadings, setShowReadings] = useState(false);
   const [showAssessments, setShowAssessments] = useState(false);
+  const [showOptionalPlanning, setShowOptionalPlanning] = useState(false);
   const [showSourceUseDetails, setShowSourceUseDetails] = useState(false);
   const [showDangerZone, setShowDangerZone] = useState(false);
   const [previewChecked, setPreviewChecked] = useState(false);
@@ -674,9 +676,19 @@ export default function SessionManagementPage() {
     if (section === "task") setShowGoals(true);
     if (section === "materials") setShowReadings(true);
     if (section === "questions") setShowQuestions(true);
-    if (section === "context") setShowConfig(true);
-    if (section === "safeguards") setShowSourceUseDetails(true);
-    if (section === "assessments") setShowAssessments(true);
+    if (section === "preview") setShowPreviewShare(true);
+    if (section === "context") {
+      setShowOptionalPlanning(true);
+      setShowConfig(true);
+    }
+    if (section === "safeguards") {
+      setShowOptionalPlanning(true);
+      setShowSourceUseDetails(true);
+    }
+    if (section === "assessments") {
+      setShowOptionalPlanning(true);
+      setShowAssessments(true);
+    }
 
     const idMap = {
       task: "learning-purpose",
@@ -807,20 +819,6 @@ export default function SessionManagementPage() {
           </div>
         </section>
 
-        <section className="minerva-card p-6 md:p-8" aria-labelledby="required-setup-heading">
-          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="eyebrow eyebrow-teal">Required setup</p>
-              <h2 id="required-setup-heading" className="mt-3 font-serif text-4xl text-[var(--charcoal)]">
-                Create the learner task
-              </h2>
-            </div>
-            <p className="max-w-xl text-sm leading-6 text-[var(--dim-grey)]">
-              Complete these four steps before sharing the learner link.
-            </p>
-          </div>
-        </section>
-
         {error ? (
           <div className="border border-[rgba(223,47,38,0.24)] bg-[rgba(223,47,38,0.08)] px-4 py-3 text-sm text-[var(--signal)]">
             {error}
@@ -898,152 +896,186 @@ export default function SessionManagementPage() {
           />
         </div>
 
-        <section id="preview-share" className="minerva-card p-6 md:p-8" aria-labelledby="preview-share-heading">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-            <div>
-              <p className="eyebrow eyebrow-teal">Step 4 of 4</p>
-              <h2 id="preview-share-heading" className="mt-3 font-serif text-4xl text-[var(--charcoal)]">
-                Preview and share
+        <section id="preview-share" className="minerva-card overflow-hidden scroll-mt-24">
+          <button
+            type="button"
+            onClick={() => setShowPreviewShare((value) => !value)}
+            className="flex w-full items-center justify-between px-4 py-5 transition-colors hover:bg-[rgba(34,34,34,0.02)] md:px-8"
+            aria-expanded={showPreviewShare}
+            aria-controls="preview-share-panel"
+          >
+            <div className="flex items-center gap-4">
+              <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full border text-[11px] font-semibold ${previewChecked ? "border-[var(--teal)] bg-[var(--teal)] text-white" : "border-[var(--rule)] text-[var(--dim-grey)]"}`}>
+                {previewChecked ? "✓" : "4"}
+              </span>
+              <h2 id="preview-share-heading" className="text-base font-medium tracking-[-0.01em] text-[var(--charcoal)]">
+                Step 4: Preview & share
               </h2>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--dim-grey)]">
-                Open the learner preview before sharing. Once you&apos;ve checked the experience, the learner link appears here for copying.
-              </p>
             </div>
-            <Link
-              href={`/instructor/${sessionId}/planning`}
-              className={`minerva-button ${previewReady ? "" : "pointer-events-none opacity-50"}`}
-              aria-disabled={!previewReady}
-            >
-              {previewChecked ? "Preview checked - open again" : "Preview learner experience"}
-            </Link>
-          </div>
+            <div className="flex items-center gap-3">
+              <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${previewChecked ? "text-[var(--teal)]" : previewReady ? "text-[var(--charcoal)]" : "text-[var(--dim-grey)]"}`}>
+                {previewChecked ? "Complete" : previewReady ? "Ready" : "Locked"}
+              </span>
+              <span className={`inline-block transition-transform ${showPreviewShare ? "rotate-180" : ""}`}>⌄</span>
+            </div>
+          </button>
 
-          <div className="mt-6 border-t border-[var(--rule)] pt-6">
-            {!previewReady ? (
-              <p className="text-sm leading-6 text-[var(--dim-grey)]">
-                Complete Steps 1-3 to preview and share.
-              </p>
-            ) : !previewChecked ? (
-              <p className="text-sm leading-6 text-[var(--dim-grey)]">
-                Preview is ready. Open it once, save it there, then return here to copy the learner link.
-              </p>
-            ) : (
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="min-w-0">
-                  <p className="eyebrow eyebrow-teal">Learner link</p>
-                  <p className="mt-3 break-all font-mono text-sm text-[var(--charcoal)]">{learnerUrl}</p>
+          {showPreviewShare ? (
+            <div id="preview-share-panel" className="border-t border-[var(--rule)] bg-white px-4 py-8 md:px-14 md:py-10">
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <p className="max-w-3xl text-sm leading-6 text-[var(--dim-grey)]">
+                    Open the learner preview before sharing. Once you&apos;ve checked the experience, the learner link appears here for copying.
+                  </p>
                 </div>
-                <button type="button" onClick={() => void copyLink()} className="minerva-button shrink-0">
-                  {copied ? "Copied" : "Copy link"}
-                </button>
+                <Link
+                  href={`/instructor/${sessionId}/planning`}
+                  className={`minerva-button ${previewReady ? "" : "pointer-events-none opacity-50"}`}
+                  aria-disabled={!previewReady}
+                >
+                  {previewChecked ? "Preview checked - open again" : "Preview learner experience"}
+                </Link>
               </div>
-            )}
-          </div>
+
+              <div className="mt-6 border-t border-[var(--rule)] pt-6">
+                {!previewReady ? (
+                  <p className="text-sm leading-6 text-[var(--dim-grey)]">
+                    Complete Steps 1-3 to unlock preview and sharing.
+                  </p>
+                ) : !previewChecked ? (
+                  <p className="text-sm leading-6 text-[var(--dim-grey)]">
+                    Preview is ready. Open it once, save it there, then return here to reveal the learner link.
+                  </p>
+                ) : (
+                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div className="min-w-0">
+                      <p className="eyebrow eyebrow-teal">Learner link</p>
+                      <p className="mt-3 break-all font-mono text-sm text-[var(--charcoal)]">{learnerUrl}</p>
+                    </div>
+                    <button type="button" onClick={() => void copyLink()} className="minerva-button shrink-0">
+                      {copied ? "Copied" : "Copy link"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : null}
         </section>
 
-        <section className="minerva-card p-6 md:p-8" aria-labelledby="optional-planning-heading">
-          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+        <section className="minerva-card overflow-hidden" aria-labelledby="optional-planning-heading">
+          <button
+            type="button"
+            onClick={() => setShowOptionalPlanning((value) => !value)}
+            className="flex w-full items-center justify-between p-6 text-left md:p-8"
+            aria-expanded={showOptionalPlanning}
+            aria-controls="optional-planning-panel"
+          >
             <div>
               <p className="eyebrow eyebrow-teal">Optional planning & safeguards</p>
               <h2 id="optional-planning-heading" className="mt-3 font-serif text-4xl text-[var(--charcoal)]">
                 Add context when you want more control
               </h2>
-            </div>
-            <p className="max-w-2xl text-sm leading-6 text-[var(--dim-grey)]">
-              These sections are not required before sharing. Open them when you want to shape the learner framing, inspect source-use safeguards, or protect assessment files.
-            </p>
-          </div>
-        </section>
-
-        <div id="teaching-context">
-          <TeachingContextSection
-            open={showConfig}
-            onToggle={() => setShowConfig((value) => !value)}
-            session={session}
-            setSession={setSession}
-            setShowAdvanced={setShowAdvanced}
-            readingsCount={readings.length}
-            uiState={{
-              showAdvanced,
-              generatingMap,
-              savingConfig,
-              showSavedState,
-              configSavedAt,
-            }}
-            actions={{
-              onGenerateSuggestedMap: generateSuggestedMap,
-              onSaveTeachingContext: saveTeachingContext,
-            }}
-            recommendedCheckpoints={getRecommendedCheckpoints(session.maxExchanges)}
-            formatSavedTime={formatSavedTime}
-          />
-        </div>
-
-        <section id="source-use-safeguards" className="minerva-card p-6 md:p-8" aria-labelledby="source-use-summary-heading">
-          <button
-            type="button"
-            onClick={() => setShowSourceUseDetails((value) => !value)}
-            className="flex w-full items-start justify-between gap-4 text-left"
-            aria-expanded={showSourceUseDetails}
-            aria-controls="source-use-details"
-          >
-            <div>
-              <p className="eyebrow eyebrow-teal">Optional trust check</p>
-              <h2 id="source-use-summary-heading" className="mt-3 font-serif text-4xl text-[var(--charcoal)]">
-                Source use safeguards
-              </h2>
-              <p className="mt-3 max-w-4xl text-sm leading-6 text-[var(--dim-grey)]">
-                Your readings remain the tutor&apos;s primary reference. Broader explanations, examples, and connections are allowed, but they are distinguished from course-reading claims.
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--dim-grey)]">
+                These sections are not required before sharing. Open them when you want to shape the learner framing, inspect source-use safeguards, or protect assessment files.
               </p>
             </div>
-            <span className="minerva-button minerva-button-secondary shrink-0 text-sm">
-              {showSourceUseDetails ? "Hide details" : "Show details"}
-            </span>
+            <span className={`inline-block shrink-0 text-[var(--dim-grey)] transition-transform ${showOptionalPlanning ? "rotate-180" : ""}`}>⌄</span>
           </button>
-          {showSourceUseDetails ? (
-            <div id="source-use-details" className="mt-6 grid gap-5 border-t border-[var(--rule)] pt-6 text-sm md:grid-cols-2">
-              <div>
-                <p className="eyebrow eyebrow-teal">Source use</p>
-                <p className="mt-2 leading-6 text-[var(--dim-grey)]">
-                  {hasReadings
-                    ? "Claims about the reading are passage-checked. AI_thena may add helpful background, analogies, or examples, but it should not present those as if they came from the uploaded course material."
-                    : "Upload at least one source material to make it the tutor&apos;s primary reference. General background can still be offered, but it will not be presented as course-reading content."}
-                </p>
+
+          {showOptionalPlanning ? (
+            <div id="optional-planning-panel" className="space-y-6 border-t border-[var(--rule)] bg-[rgba(34,34,34,0.01)] px-4 py-8 md:px-8 md:py-10">
+              <div id="teaching-context">
+                <TeachingContextSection
+                  open={showConfig}
+                  onToggle={() => setShowConfig((value) => !value)}
+                  session={session}
+                  setSession={setSession}
+                  setShowAdvanced={setShowAdvanced}
+                  readingsCount={readings.length}
+                  uiState={{
+                    showAdvanced,
+                    generatingMap,
+                    savingConfig,
+                    showSavedState,
+                    configSavedAt,
+                  }}
+                  actions={{
+                    onGenerateSuggestedMap: generateSuggestedMap,
+                    onSaveTeachingContext: saveTeachingContext,
+                  }}
+                  recommendedCheckpoints={getRecommendedCheckpoints(session.maxExchanges)}
+                  formatSavedTime={formatSavedTime}
+                />
               </div>
-              <div>
-                <p className="eyebrow eyebrow-rose">Protected assessment files</p>
-                <p className="mt-2 leading-6 text-[var(--dim-grey)]">
-                  Protected files are excluded from the normal tutor prompt. Answer-extraction attempts receive reasoning coaching and create an instructor audit record.
-                </p>
+
+              <section id="source-use-safeguards" className="minerva-card p-6 md:p-8" aria-labelledby="source-use-summary-heading">
+                <button
+                  type="button"
+                  onClick={() => setShowSourceUseDetails((value) => !value)}
+                  className="flex w-full items-start justify-between gap-4 text-left"
+                  aria-expanded={showSourceUseDetails}
+                  aria-controls="source-use-details"
+                >
+                  <div>
+                    <p className="eyebrow eyebrow-teal">Optional trust check</p>
+                    <h2 id="source-use-summary-heading" className="mt-3 font-serif text-[34px] leading-[1] tracking-[-0.03em] text-[var(--charcoal)]">
+                      Source use safeguards
+                    </h2>
+                    <p className="mt-3 max-w-4xl text-sm leading-6 text-[var(--dim-grey)]">
+                      Your readings remain the tutor&apos;s primary reference. Broader explanations, examples, and connections are allowed, but they are distinguished from course-reading claims.
+                    </p>
+                  </div>
+                  <span className="minerva-button minerva-button-secondary shrink-0 text-sm">
+                    {showSourceUseDetails ? "Hide details" : "Show details"}
+                  </span>
+                </button>
+                {showSourceUseDetails ? (
+                  <div id="source-use-details" className="mt-6 grid gap-5 border-t border-[var(--rule)] pt-6 text-sm md:grid-cols-2">
+                    <div>
+                      <p className="eyebrow eyebrow-teal">Source use</p>
+                      <p className="mt-2 leading-6 text-[var(--dim-grey)]">
+                        {hasReadings
+                          ? "Claims about the reading are passage-checked. AI_thena may add helpful background, analogies, or examples, but it should not present those as if they came from the uploaded course material."
+                          : "Upload at least one source material to make it the tutor&apos;s primary reference. General background can still be offered, but it will not be presented as course-reading content."}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="eyebrow eyebrow-rose">Protected assessment files</p>
+                      <p className="mt-2 leading-6 text-[var(--dim-grey)]">
+                        Protected files are excluded from the normal tutor prompt. Answer-extraction attempts receive reasoning coaching and create an instructor audit record.
+                      </p>
+                    </div>
+                    <Link href={`/instructor/${sessionId}/grounding`} className="minerva-button minerva-button-secondary w-max text-sm">
+                      Open source-use check
+                    </Link>
+                  </div>
+                ) : null}
+              </section>
+
+              <div id="protected-assessment-materials">
+                <AssessmentsSection
+                  open={showAssessments}
+                  onToggle={() => setShowAssessments((value) => !value)}
+                  assessments={assessments}
+                  uiState={{
+                    dragActive,
+                    uploadingCategory,
+                    recentUploadCategory,
+                    recentUploadName,
+                  }}
+                  assessmentInputRef={assessmentInputRef}
+                  handlers={{
+                    onDrop: handleDrop,
+                    onDragOver: handleDragOver,
+                    onDragLeave: handleDragLeave,
+                    onFileChange: handleFileChange,
+                    onRemoveFile: handleRemoveFile,
+                  }}
+                />
               </div>
-              <Link href={`/instructor/${sessionId}/grounding`} className="minerva-button minerva-button-secondary w-max text-sm">
-                Open source-use check
-              </Link>
             </div>
           ) : null}
         </section>
-
-        <div id="protected-assessment-materials">
-          <AssessmentsSection
-            open={showAssessments}
-            onToggle={() => setShowAssessments((value) => !value)}
-            assessments={assessments}
-            uiState={{
-              dragActive,
-              uploadingCategory,
-              recentUploadCategory,
-              recentUploadName,
-            }}
-            assessmentInputRef={assessmentInputRef}
-            handlers={{
-              onDrop: handleDrop,
-              onDragOver: handleDragOver,
-              onDragLeave: handleDragLeave,
-              onFileChange: handleFileChange,
-              onRemoveFile: handleRemoveFile,
-            }}
-          />
-        </div>
 
         {session.instructorRole === "owner" ? (
           <section className="minerva-card p-6 md:p-8">
