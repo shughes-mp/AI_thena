@@ -769,9 +769,7 @@ export default function SessionManagementPage() {
         ) : null}
 
         <WorkspaceHeader
-          sessionId={sessionId}
           session={session}
-          isActive={isActive}
           setupStep={setupStep}
         />
 

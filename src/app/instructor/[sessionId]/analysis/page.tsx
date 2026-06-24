@@ -6,6 +6,7 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { ReadinessHeatmap } from "@/components/instructor/readiness-heatmap";
 import { TeachingBriefFacilitationPivots } from "@/components/instructor/teaching-brief-facilitation-pivots";
+import { InstructorWorkspaceNavigation } from "@/components/instructor/workspace-navigation";
 import { LoadingState } from "@/components/ui/loading-state";
 import { LOAssessmentCard } from "@/components/LOAssessmentCard";
 import {
@@ -730,6 +731,9 @@ export default function SessionAnalysisPage() {
                 </button>
               )}
             </div>
+          </div>
+          <div className="mt-6">
+            <InstructorWorkspaceNavigation sessionId={sessionId} />
           </div>
         </div>
 

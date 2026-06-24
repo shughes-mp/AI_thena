@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EvidenceReviewPanel } from "@/components/instructor/evidence-review-panel";
+import { InstructorWorkspaceNavigation } from "@/components/instructor/workspace-navigation";
 import { INSTRUCTOR_LABELS } from "@/lib/instructor-ux";
 
 export default async function EvidenceReviewPage({
@@ -22,6 +23,9 @@ export default async function EvidenceReviewPage({
           <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--dim-grey)]">
             Start with learner claims that may need your judgment. Open the evidence and technical details only when you want to inspect how AI_thena reached the signal. These signals are not grades or final judgments.
           </p>
+          <div className="mt-6">
+            <InstructorWorkspaceNavigation sessionId={sessionId} />
+          </div>
         </header>
         <EvidenceReviewPanel sessionId={sessionId} />
       </div>

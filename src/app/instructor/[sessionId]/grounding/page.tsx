@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { GroundingAuditPanel } from "@/components/instructor/grounding-audit-panel";
+import { InstructorWorkspaceNavigation } from "@/components/instructor/workspace-navigation";
 import { INSTRUCTOR_LABELS } from "@/lib/instructor-ux";
 
 export default async function GroundingAuditPage({
@@ -23,6 +24,9 @@ export default async function GroundingAuditPage({
           <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--dim-grey)]">
             Check whether AI_thena used the assigned reading responsibly, where it added broader explanation, and when protected assessment material changed the coaching path.
           </p>
+          <div className="mt-6">
+            <InstructorWorkspaceNavigation sessionId={sessionId} />
+          </div>
         </header>
         <GroundingAuditPanel sessionId={sessionId} />
       </div>

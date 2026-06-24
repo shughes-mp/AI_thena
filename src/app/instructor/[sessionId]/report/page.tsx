@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { ReadinessHeatmap } from "@/components/instructor/readiness-heatmap";
+import { InstructorWorkspaceNavigation } from "@/components/instructor/workspace-navigation";
 import { LoadingState } from "@/components/ui/loading-state";
 import { LOAssessmentCard } from "@/components/LOAssessmentCard";
 import { TeachingBriefEvidenceMap } from "@/components/instructor/teaching-brief-evidence-map";
@@ -372,6 +373,9 @@ export default function ReportPage() {
                 {isExporting ? "Preparing PDF..." : "Export PDF"}
               </button>
             </div>
+          </div>
+          <div className="mt-6">
+            <InstructorWorkspaceNavigation sessionId={params.sessionId} />
           </div>
         </div>
 

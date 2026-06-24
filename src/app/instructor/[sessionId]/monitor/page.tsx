@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ExchangeReplay } from "@/components/instructor/exchange-replay";
 import { FacilitationPivotPanel } from "@/components/instructor/facilitation-pivot-panel";
+import { InstructorWorkspaceNavigation } from "@/components/instructor/workspace-navigation";
 import { LoadingState } from "@/components/ui/loading-state";
 import { getSessionPurposeBadgeClasses, getSessionPurposeOption } from "@/lib/session-purpose";
 import { INSTRUCTOR_LABELS } from "@/lib/instructor-ux";
@@ -53,7 +54,13 @@ interface StudentSessionData {
 
 export default function StudentMonitorPage() {
   const params = useParams() as { sessionId: string };
-  const [mode, setMode] = useState<"snapshot" | "live">("snapshot");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialMode = useMemo<"snapshot" | "live">(
+    () => (searchParams.get("view") === "live" ? "live" : "snapshot"),
+    [searchParams]
+  );
+  const [mode, setMode] = useState<"snapshot" | "live">(initialMode);
   const [students, setStudents] = useState<StudentSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -82,6 +89,10 @@ export default function StudentMonitorPage() {
       .then((data) => { if (data?.sessionPurpose) setSessionPurpose(data.sessionPurpose); })
       .catch(() => {});
   }, [fetchStudents, params.sessionId]);
+
+  useEffect(() => {
+    setMode(initialMode);
+  }, [initialMode]);
 
   useEffect(() => {
     if (mode !== "live") return;
@@ -113,6 +124,16 @@ export default function StudentMonitorPage() {
     } finally {
       setLoadingDetail(false);
     }
+  };
+
+  const setMonitorView = (nextMode: "snapshot" | "live", hash?: string) => {
+    const nextUrl =
+      nextMode === "live"
+        ? `/instructor/${params.sessionId}/monitor?view=live${hash ? `#${hash}` : ""}`
+        : `/instructor/${params.sessionId}/monitor?view=snapshot`;
+
+    setMode(nextMode);
+    router.push(nextUrl);
   };
 
   if (isLoading) {
@@ -162,7 +183,7 @@ export default function StudentMonitorPage() {
               </Link>
               <button
                 type="button"
-                onClick={() => setMode("snapshot")}
+                onClick={() => setMonitorView("snapshot")}
                 className={`minerva-button ${
                   mode === "snapshot" ? "" : "minerva-button-secondary"
                 }`}
@@ -171,7 +192,7 @@ export default function StudentMonitorPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setMode("live")}
+                onClick={() => setMonitorView("live", "review-signals")}
                 className={`minerva-button ${
                   mode === "live" ? "" : "minerva-button-secondary"
                 }`}
@@ -180,10 +201,15 @@ export default function StudentMonitorPage() {
               </button>
             </div>
           </div>
+          <div className="mt-6">
+            <InstructorWorkspaceNavigation sessionId={params.sessionId} />
+          </div>
         </div>
 
         {mode === "live" ? (
-          <FacilitationPivotPanel sessionId={params.sessionId} live />
+          <div id="suggested-moves">
+            <FacilitationPivotPanel sessionId={params.sessionId} live />
+          </div>
         ) : null}
 
         {students.length === 0 ? (
@@ -211,7 +237,7 @@ export default function StudentMonitorPage() {
 
                 if (concernCount === 0 && waitingLong === 0) {
                   return (
-                    <div className="minerva-card flex items-center gap-3 p-4">
+                    <div id="review-signals" className="minerva-card flex items-center gap-3 p-4">
                       <span className="h-3 w-3 rounded-full bg-[var(--teal)]" />
                       <p className="text-sm text-[var(--charcoal)]">
                         No current review signals detected. Next: wait for learner responses or open a learner conversation.
@@ -221,7 +247,7 @@ export default function StudentMonitorPage() {
                 }
 
                 return (
-                  <div className="minerva-card flex items-center gap-3 border-l-4 border-[#906f12] p-4">
+                  <div id="review-signals" className="minerva-card flex items-center gap-3 border-l-4 border-[#906f12] p-4">
                     <p className="text-sm text-[var(--charcoal)]">
                       {concernCount > 0 && (
                         <span className="font-medium text-[#906f12]">

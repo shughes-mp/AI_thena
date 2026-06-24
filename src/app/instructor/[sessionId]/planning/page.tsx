@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { InstructorWorkspaceNavigation } from "@/components/instructor/workspace-navigation";
 import { LoadingState } from "@/components/ui/loading-state";
 import { INSTRUCTOR_LABELS } from "@/lib/instructor-ux";
 import type {
@@ -267,6 +268,9 @@ export default function SessionPlanningPage() {
                 </button>
               ) : null}
             </div>
+          </div>
+          <div className="mt-7">
+            <InstructorWorkspaceNavigation sessionId={sessionId} />
           </div>
           <div className="mt-7 grid grid-cols-3 gap-3 border-t border-[var(--rule)] pt-5 sm:max-w-xl">
             <div><p className="font-serif text-3xl">{data.summary.ready}</p><p className="text-xs text-[var(--dim-grey)]">ready</p></div>

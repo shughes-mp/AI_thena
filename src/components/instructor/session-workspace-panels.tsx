@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { InstructorWorkspaceNavigation } from "@/components/instructor/workspace-navigation";
 import { LoadingState } from "@/components/ui/loading-state";
 import {
   getSessionPurposeBadgeClasses,
@@ -10,8 +11,8 @@ import {
 } from "@/lib/session-purpose";
 import {
   INSTRUCTOR_LABELS,
-  INSTRUCTOR_SESSION_STEPS,
   INSTRUCTOR_WORKFLOW_STEPS,
+  getInstructorWorkspacePhases,
 } from "@/lib/instructor-ux";
 import type { CheckpointRecord, FileInfo, SessionDetails } from "@/types";
 
@@ -33,6 +34,42 @@ function QuestionQualityHint({ prompt }: { prompt: string }) {
       This may be recall-only. Stronger evidence questions usually ask learners to explain, compare, apply, or point to evidence.
     </p>
   );
+}
+
+function looksRecallOnlyOutcome(outcomes: string) {
+  return outcomes
+    .split(/\r?\n/)
+    .map((line) => line.trim().replace(/^[-*#\d.\s]+/, ""))
+    .filter(Boolean)
+    .some((line) => looksRecallOnlyQuestion(line));
+}
+
+function LearningOutcomeQualityHint({ outcomes }: { outcomes: string }) {
+  if (!looksRecallOnlyOutcome(outcomes)) return null;
+
+  return (
+    <p className="mt-2 rounded-lg border border-[rgba(144,111,18,0.22)] bg-[rgba(144,111,18,0.07)] px-3 py-2 text-xs leading-5 text-[#80620f]">
+      This may be recall-only. Stronger learning outcomes usually ask learners to explain, compare, apply, or point to evidence.
+    </p>
+  );
+}
+
+function getPurposeLinks(sessionId: string, purpose: string) {
+  const phases = getInstructorWorkspacePhases(sessionId);
+  const runPhase = phases.find((phase) => phase.key === "run");
+  const reviewPhase = phases.find((phase) => phase.key === "review");
+
+  if (!runPhase || !reviewPhase) return [];
+
+  if (purpose === "during_class_prep" || purpose === "during_class_reflection") {
+    return runPhase.items;
+  }
+
+  return [
+    reviewPhase.items[0],
+    reviewPhase.items[1],
+    runPhase.items[0],
+  ];
 }
 
 // ─── Shared helpers ────────────────────────────────────────────────────────────
@@ -61,33 +98,12 @@ function FileIcon() {
 // ─── WorkspaceHeader ───────────────────────────────────────────────────────────
 
 interface WorkspaceHeaderProps {
-  sessionId: string;
   session: SessionDetails;
-  isActive: boolean;
   setupStep: 2 | 3 | 4 | null;
 }
 
-function getPurposeLinks(sessionId: string, purpose: string) {
-  const planning = { href: `/instructor/${sessionId}/planning`, label: INSTRUCTOR_LABELS.planning };
-  const monitor = { href: `/instructor/${sessionId}/monitor`, label: INSTRUCTOR_LABELS.monitor };
-  const analysis = { href: `/instructor/${sessionId}/analysis`, label: INSTRUCTOR_LABELS.brief };
-  const evidence = { href: `/instructor/${sessionId}/evidence`, label: INSTRUCTOR_LABELS.evidence };
-  const grounding = { href: `/instructor/${sessionId}/grounding`, label: INSTRUCTOR_LABELS.grounding };
-
-  switch (purpose) {
-    case "during_class_prep":
-    case "during_class_reflection":
-      return [planning, monitor, evidence, grounding, analysis];
-    case "after_class":
-    case "pre_class":
-    default:
-      return [planning, analysis, evidence, grounding, monitor];
-  }
-}
-
-export function WorkspaceHeader({ session, isActive, setupStep }: WorkspaceHeaderProps) {
+export function WorkspaceHeader({ session, setupStep }: WorkspaceHeaderProps) {
   const purposeOption = getSessionPurposeOption(session.sessionPurpose);
-  const currentStepIndex = setupStep !== null ? 0 : isActive ? 2 : 0;
 
   return (
     <div className="minerva-card p-6 md:p-8">
@@ -117,39 +133,7 @@ export function WorkspaceHeader({ session, isActive, setupStep }: WorkspaceHeade
             )}
           </div>
         </div>
-
-        <ol className="grid gap-2 text-xs sm:grid-cols-2 lg:grid-cols-6" aria-label="Instructor workflow">
-          {INSTRUCTOR_SESSION_STEPS.map((step, index) => {
-            const isCurrent = index === currentStepIndex;
-            const isFuture = index > currentStepIndex;
-            return (
-              <li
-                key={step.label}
-                className={`border p-3 ${
-                  isCurrent
-                    ? "border-[var(--teal)] bg-[rgba(17,120,144,0.06)]"
-                    : "border-[var(--rule)] bg-white"
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold ${
-                      isCurrent
-                        ? "bg-[var(--teal)] text-white"
-                        : isFuture
-                          ? "border border-[var(--rule)] text-[var(--dim-grey)]"
-                          : "bg-[rgba(17,120,144,0.10)] text-[var(--teal)]"
-                    }`}
-                  >
-                    {index + 1}
-                  </span>
-                  <span className="font-semibold text-[var(--charcoal)]">{step.label}</span>
-                </div>
-                <p className="mt-2 leading-5 text-[var(--dim-grey)]">{step.description}</p>
-              </li>
-            );
-          })}
-        </ol>
+        <InstructorWorkspaceNavigation sessionId={session.id} />
       </div>
     </div>
   );
@@ -1135,6 +1119,7 @@ export function GoalsSection({
               rows={4}
               className="minerva-input w-full resize-none text-sm"
             />
+            <LearningOutcomeQualityHint outcomes={session.learningOutcomes ?? ""} />
           </div>
 
           <div className="space-y-2">
