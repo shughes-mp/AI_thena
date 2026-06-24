@@ -4,7 +4,7 @@ AI_thena helps instructors turn reading-based learner dialogue into usable forma
 
 It is built for courses where interpretation, reasoning, and application matter. Instructors upload course readings, define learning goals, preview what learners will experience, share a link, and then review source-linked evidence, learner activity, and teaching briefs after students work with the tutor.
 
-The current application covers the roadmap through Phase 8.5: instructor setup, learner dialogue, evidence provenance and review, source-use checks, assessment protection, learner reflection, exportable teaching briefs, instructor-controlled teaching moves, pre-session planning with a faithful learner preview, and a calmer instructor workflow that separates required setup from recommended planning and optional audit details.
+The current application covers the roadmap through Phase 8.5: instructor setup, learner dialogue, evidence provenance and review, source-use checks, assessment protection, learner reflection, exportable teaching briefs, instructor-controlled teaching moves, pre-session planning with a faithful learner preview, and a calmer instructor workflow built around four required setup cards, one merged preview-and-share launch step, and collapsed optional planning and safeguard sections.
 
 [Open the live prototype](https://aithena-learning.vercel.app/)
 
@@ -24,14 +24,15 @@ It is not just a chatbot or an automated grader. It is a learning conversation f
 
 AI_thena is organized around the natural teaching timeline:
 
-1. **Set up the session**: name the session, add outcomes, upload readings, and create evidence questions.
-2. **Preview learner experience**: check what learners will see before sharing the link.
-3. **Share with learners**: give learners the access link or code.
-4. **Watch learner activity**: see who joined, who may need attention, and what happened in the conversation.
-5. **Review learner evidence**: inspect claims that may need instructor judgment, with source passages available behind “Show evidence.”
-6. **Prepare teaching brief**: use the evidence to decide what to do next before, during, or after class.
+1. **Task**: choose where the session sits in the learning cycle and define the learning outcomes you want to assess.
+2. **Materials**: upload the reading or source material learners should use as their primary reference.
+3. **Questions**: add the core evidence questions AI_thena should listen for.
+4. **Preview & share**: preview the learner experience, then reveal and copy the learner link only when setup is ready.
+5. **Watch learner activity**: see who joined, who may need attention, and what happened in the conversation.
+6. **Review learner evidence**: inspect claims that may need instructor judgment, with source passages available behind "Show evidence."
+7. **Prepare teaching brief**: use the evidence to decide what to do next before, during, or after class.
 
-Required setup stays visible; advanced source-use, audit, and provenance details remain available when instructors want to inspect them.
+Required setup stays visible through the top progress cards. Teaching context, source-use safeguards, and protected assessment controls remain available as optional collapsed sections when instructors want more control without extra setup noise.
 
 ## How It Works
 
@@ -132,7 +133,7 @@ Consequential signals retain learner-message and source-passage provenance. AI-g
 
 ## Instructor Surfaces
 
-- `Session workspace`: guided hub for required setup, recommended preparation, optional checks, access-code sharing, readings, key questions, teaching context, and assessments.
+- `Session workspace`: guided hub with four required setup cards (`Task`, `Materials`, `Questions`, `Preview & share`), followed by optional teaching context, source-use safeguards, and assessment controls.
 - `Preview learner experience`: learner-experience preview, design checks, participation plan, and likely stuck points prepared before launch.
 - `Source use check`: passage-level tutor citations, unsupported-source events, broader-context use, and protected-material interventions.
 - `Review learner evidence`: qualified signals with citations, confidence rationale, review state, and instructor actions.
@@ -271,8 +272,8 @@ Do not rely on `prisma db push` during the Vercel build for Turso schema creatio
 2. Choose the session purpose and add at least one learning outcome.
 3. Upload a reading.
 4. Add at least one evidence question manually or generate suggestions from the reading.
-5. Open **Preview learner experience**, save the preview, and return to the learner link.
-6. Copy the learner link and open it in another browser window.
+5. Open **Preview learner experience**, save the preview, and return to the merged **Preview & share** step.
+6. Copy the learner link from Step 4 and open it in another browser window.
 7. Enter a learner name and begin the chat.
 8. Have a short tutoring conversation.
 9. End the learner session and review the learner summary.
@@ -282,7 +283,7 @@ Do not rely on `prisma db push` during the Vercel build for Turso schema creatio
 
 ## Implementation Status
 
-The implementation roadmap is deployed and operationally verified through Phase 8, with Phase 8.5 complete and locally verified as a UX coherence pass:
+The implementation roadmap is deployed and operationally verified through Phase 8, with Phase 8.5 complete as a UX coherence pass:
 
 - **Phase 0:** architecture, terminology, risk, and test baseline.
 - **Phase 1:** product, evidence, facilitation, governance, and versioning contracts.
@@ -294,7 +295,7 @@ The implementation roadmap is deployed and operationally verified through Phase 
 - **Phase 6:** versioned teaching briefs, evidence-linked purpose maps, explicit formative-use boundaries, review-state visibility, and provenance-rich PDF exports.
 - **Phase 7:** deterministic Observer/Guide/Conductor recommendations, evidence and release conditions, live and report integration, and instructor-controlled decisions and outcome recording.
 - **Phase 8:** faithful learner preview, deterministic session-design warnings, participation planning, and editable Guide-first anticipated pivots delivered into the real learner flow.
-- **Phase 8.5:** instructor workflow, progressive disclosure, clearer labels, calmer empty states, required/recommended/optional setup separation, preview-before-share gating, recall-only question cautions, hidden optional trust checks, and accessibility-oriented UI cleanup.
+- **Phase 8.5:** instructor workflow, progressive disclosure, clearer labels, calmer empty states, four-card required setup architecture, merged preview/share launch step, required/recommended/optional setup separation, preview-before-share gating, recall-only question cautions, hidden optional trust checks, and accessibility-oriented UI cleanup.
 
 See the [implementation roadmap](AI_thena_implementation_roadmap.md) and [phase documentation](docs/README.md) for acceptance gates, limitations, and verification details.
 

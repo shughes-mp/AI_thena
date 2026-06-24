@@ -99,10 +99,10 @@ function FileIcon() {
 
 interface WorkspaceHeaderProps {
   session: SessionDetails;
-  setupStep: 2 | 3 | 4 | null;
+  subtitle?: string;
 }
 
-export function WorkspaceHeader({ session, setupStep }: WorkspaceHeaderProps) {
+export function WorkspaceHeader({ session, subtitle }: WorkspaceHeaderProps) {
   const purposeOption = getSessionPurposeOption(session.sessionPurpose);
 
   return (
@@ -125,13 +125,12 @@ export function WorkspaceHeader({ session, setupStep }: WorkspaceHeaderProps) {
             >
               {purposeOption.shortLabel}
             </span>
-            {setupStep !== null && (
-              <span className="text-xs text-[var(--dim-grey)]">
-                Step {setupStep} of 4 —{" "}
-                {setupStep === 2 ? "Add source materials" : setupStep === 3 ? "Define evidence goals" : "Share with learners"}
-              </span>
-            )}
           </div>
+          {subtitle ? (
+            <p className="mt-4 max-w-3xl text-sm leading-6 text-[var(--dim-grey)]">
+              {subtitle}
+            </p>
+          ) : null}
         </div>
         <InstructorWorkspaceNavigation sessionId={session.id} />
       </div>
@@ -597,9 +596,7 @@ export function ReadingsSection({
         className="flex w-full items-center justify-between p-6 text-left md:p-8"
       >
         <div>
-          <h2 className="font-serif text-[34px] leading-[1] tracking-[-0.03em] text-[var(--charcoal)]">
-            Source materials
-          </h2>
+          <h2 className="font-serif text-[34px] leading-[1] tracking-[-0.03em] text-[var(--charcoal)]">Step 2: Learning materials</h2>
           {!open && readings.length > 0 && (
             <p className="mt-2 text-sm text-[var(--dim-grey)]">
               {readings.length} source file{readings.length !== 1 ? "s" : ""} uploaded
@@ -767,9 +764,7 @@ export function QuestionsSection({
         className="flex w-full items-center justify-between p-6 text-left md:p-8"
       >
         <div>
-          <h2 className="font-serif text-[34px] leading-[1] tracking-[-0.03em] text-[var(--charcoal)]">
-            Evidence questions
-          </h2>
+          <h2 className="font-serif text-[34px] leading-[1] tracking-[-0.03em] text-[var(--charcoal)]">Step 3: Core questions</h2>
           {!open && checkpoints.length > 0 && (
             <p className="mt-2 text-sm text-[var(--dim-grey)]">
               {checkpoints.length} question{checkpoints.length !== 1 ? "s" : ""}
@@ -1052,7 +1047,7 @@ export function GoalsSection({
         <div className="flex items-center gap-4">
           <ChevronIcon open={open} />
           <h2 className="text-base font-medium text-[var(--charcoal)] tracking-[-0.01em]">
-            Step 1: Learning purpose & outcomes
+            Step 1: Task & learning outcomes
           </h2>
         </div>
         {session.learningOutcomes && session.learningOutcomes.trim().length > 0 ? (
@@ -1069,7 +1064,7 @@ export function GoalsSection({
       {open && (
         <div className="border-t border-[var(--rule)] bg-[rgba(34,34,34,0.01)] px-4 py-8 md:px-14 md:py-10 space-y-8">
           <div className="space-y-3">
-            <label className="minerva-label">Learning cycle purpose</label>
+            <label className="minerva-label">Where are you in the learning cycle?</label>
             <p className="text-xs text-[var(--dim-grey)]">
               When in the learning cycle will learners use this session? This shapes how AI_thena questions learners and what the teaching brief treats as evidence.
             </p>
@@ -1106,7 +1101,7 @@ export function GoalsSection({
 
           <div className="space-y-2">
             <label className="minerva-label" htmlFor="learningOutcomes">
-              Learning outcomes for formative evidence
+              What learning outcomes do you want to assess?
             </label>
             <p className="text-xs text-[var(--dim-grey)]">
               The specific skills or understandings you want to track. AI_thena will look for evidence in each learner&apos;s reasoning and include reviewable formative signals in the teaching brief.
@@ -1120,23 +1115,6 @@ export function GoalsSection({
               className="minerva-input w-full resize-none text-sm"
             />
             <LearningOutcomeQualityHint outcomes={session.learningOutcomes ?? ""} />
-          </div>
-
-          <div className="space-y-2">
-            <label className="minerva-label" htmlFor="sessionDescription">
-              Opening message for students
-            </label>
-            <p className="text-xs text-[var(--dim-grey)]">
-              Optional. Shown to learners before the conversation begins. Use it to set the stage or provide context.
-            </p>
-            <textarea
-              id="sessionDescription"
-              value={session.description ?? ""}
-              onChange={(e) => updateSession({ description: e.target.value || null })}
-              placeholder="e.g. Explain how the author's definition of X conflicts with Y. AI_thena will push you on your reasoning."
-              rows={3}
-              className="minerva-input w-full resize-none text-sm"
-            />
           </div>
 
           <div className="flex items-center gap-4 border-t border-[var(--rule)] pt-6">
@@ -1211,9 +1189,7 @@ export function TeachingContextSection({
         className="flex w-full items-center justify-between p-6 text-left md:p-8"
       >
         <div>
-          <h2 className="font-serif text-[34px] leading-[1] tracking-[-0.03em] text-[var(--charcoal)]">
-            Teaching context
-          </h2>
+          <h2 className="font-serif text-[34px] leading-[1] tracking-[-0.03em] text-[var(--charcoal)]">Teaching context & learner message</h2>
           {!open && isConfigured && (
             <p className="mt-2 text-sm text-[var(--dim-grey)]">Configured</p>
           )}
@@ -1256,7 +1232,24 @@ export function TeachingContextSection({
               id="learningGoal"
               value={session.learningGoal ?? ""}
               onChange={(e) => updateSession({ learningGoal: e.target.value || null })}
-              placeholder="e.g. Understand how system structure drives behavior — not external events."
+              placeholder="e.g. Understand how system structure drives behavior - not external events."
+              rows={3}
+              className="minerva-input w-full resize-none text-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="minerva-label" htmlFor="sessionDescription">
+              Opening message for students
+            </label>
+            <p className="text-xs text-[var(--dim-grey)]">
+              Optional. Shown before the conversation begins. Use it to set the stage or clarify what kind of reasoning you want learners to do.
+            </p>
+            <textarea
+              id="sessionDescription"
+              value={session.description ?? ""}
+              onChange={(e) => updateSession({ description: e.target.value || null })}
+              placeholder="e.g. Explain how the author's definition of X conflicts with Y. AI_thena will push you on your reasoning."
               rows={3}
               className="minerva-input w-full resize-none text-sm"
             />
@@ -1535,3 +1528,4 @@ export function AssessmentsSection({
     </div>
   );
 }
+

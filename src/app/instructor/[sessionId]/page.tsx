@@ -6,13 +6,9 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  AccessCodeCard,
-  GuidedWorkflowHub,
-  SessionInsightsCard,
   AssessmentsSection,
   QuestionsSection,
   ReadingsSection,
-  StatusBar,
   TeachingContextSection,
   GoalsSection,
   WorkspaceHeader,
@@ -22,7 +18,6 @@ import type {
   FileInfo,
   SessionDetails,
 } from "@/types";
-import { getSessionPurposeOption } from "@/lib/session-purpose";
 
 function getRecommendedCheckpoints(maxExchanges: number): number {
   if (maxExchanges < 8) {
@@ -36,6 +31,64 @@ function formatSavedTime(date: Date) {
     hour: "numeric",
     minute: "2-digit",
   });
+}
+
+type SetupCardStatus = "complete" | "attention" | "ready" | "locked";
+
+function SetupStepCard({
+  step,
+  title,
+  description,
+  status,
+  onClick,
+}: {
+  step: number;
+  title: string;
+  description: string;
+  status: SetupCardStatus;
+  onClick: () => void;
+}) {
+  const statusCopy = {
+    complete: "Complete",
+    attention: "Needs setup",
+    ready: "Ready",
+    locked: "Locked",
+  } as const;
+
+  const statusStyles = {
+    complete: "border-[rgba(17,120,144,0.28)] bg-[rgba(17,120,144,0.05)]",
+    attention: "border-[rgba(223,47,38,0.2)] bg-white",
+    ready: "border-[rgba(17,120,144,0.18)] bg-white",
+    locked: "border-[var(--rule)] bg-[rgba(34,34,34,0.02)]",
+  } as const;
+
+  const badgeStyles = {
+    complete: "border-[rgba(17,120,144,0.24)] bg-[rgba(17,120,144,0.08)] text-[var(--teal)]",
+    attention: "border-[rgba(223,47,38,0.22)] bg-[rgba(223,47,38,0.08)] text-[var(--signal)]",
+    ready: "border-[var(--rule)] bg-white text-[var(--charcoal)]",
+    locked: "border-[var(--rule)] bg-[rgba(34,34,34,0.02)] text-[var(--dim-grey)]",
+  } as const;
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`block w-full rounded-xl border p-4 text-left transition-colors hover:border-[rgba(17,120,144,0.28)] ${statusStyles[status]}`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <span
+          className={`inline-flex min-w-[2rem] items-center justify-center rounded-full border px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] ${badgeStyles[status]}`}
+        >
+          {status === "complete" ? "Done" : step}
+        </span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--dim-grey)]">
+          {statusCopy[status]}
+        </span>
+      </div>
+      <h2 className="mt-4 text-base font-medium tracking-[-0.01em] text-[var(--charcoal)]">{title}</h2>
+      <p className="mt-2 text-sm leading-6 text-[var(--dim-grey)]">{description}</p>
+    </button>
+  );
 }
 
 
@@ -58,18 +111,6 @@ export default function SessionManagementPage() {
   const [configSavedAt, setConfigSavedAt] = useState<Date | null>(null);
   const [showSavedState, setShowSavedState] = useState(false);
   const [dragActive, setDragActive] = useState<"reading" | "assessment" | null>(null);
-  const [learnerCount, setLearnerCount] = useState(0);
-  const [liveStatus, setLiveStatus] = useState<
-    Array<{
-      id: string;
-      studentName: string;
-      hasRecentEngagementConcern: boolean;
-      latestEngagementFlag: string | null;
-      isWaitingForStudentReply: boolean;
-      secondsSinceLastMessage: number | null;
-      endedAt: string | Date | null;
-    }>
-  >([]);
   const [checkpoints, setCheckpoints] = useState<CheckpointRecord[]>([]);
   const [loadingCheckpoints, setLoadingCheckpoints] = useState(true);
   const [savingCheckpoint, setSavingCheckpoint] = useState(false);
@@ -95,12 +136,11 @@ export default function SessionManagementPage() {
   const [showGoals, setShowGoals] = useState(true);
   const [showConfig, setShowConfig] = useState(false);
   const [showQuestions, setShowQuestions] = useState(false);
-  const [showReadings, setShowReadings] = useState(true);
+  const [showReadings, setShowReadings] = useState(false);
   const [showAssessments, setShowAssessments] = useState(false);
   const [showSourceUseDetails, setShowSourceUseDetails] = useState(false);
   const [showDangerZone, setShowDangerZone] = useState(false);
   const [previewChecked, setPreviewChecked] = useState(false);
-  const [sectionsInitialized, setSectionsInitialized] = useState(false);
   const readingInputRef = useRef<HTMLInputElement>(null);
   const assessmentInputRef = useRef<HTMLInputElement>(null);
 
@@ -120,29 +160,6 @@ export default function SessionManagementPage() {
       setError(message);
     } finally {
       setLoadingCheckpoints(false);
-    }
-  }, [sessionId]);
-
-  const fetchLearnerCount = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/sessions/${sessionId}/students/summary`);
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        throw new Error(data?.error || "Failed to load learners.");
-      }
-
-      if (Array.isArray(data)) {
-        setLearnerCount(data.length);
-        setLiveStatus(data);
-      } else {
-        setLearnerCount(0);
-        setLiveStatus([]);
-      }
-    } catch (err) {
-      console.error("Failed to load learners:", err);
-      setLearnerCount(0);
-      setLiveStatus([]);
     }
   }, [sessionId]);
 
@@ -195,7 +212,7 @@ export default function SessionManagementPage() {
         }
       }
 
-      await Promise.all([fetchCheckpoints(), fetchLearnerCount()]);
+      await fetchCheckpoints();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to load session.";
       if (message.includes("<!DOCTYPE") || message.includes("Unexpected token")) {
@@ -208,7 +225,7 @@ export default function SessionManagementPage() {
     } finally {
       setLoading(false);
     }
-  }, [fetchCheckpoints, fetchLearnerCount, sessionId]);
+  }, [fetchCheckpoints, sessionId]);
 
   useEffect(() => {
     fetchSession();
@@ -244,40 +261,6 @@ export default function SessionManagementPage() {
     const timeout = window.setTimeout(() => setShowQuestionSavedState(false), 2400);
     return () => window.clearTimeout(timeout);
   }, [showQuestionSavedState]);
-
-  // Auto-poll learner status for in-class (live) modes
-  useEffect(() => {
-    if (!session) return;
-    const isLive =
-      session.sessionPurpose === "during_class_prep" ||
-      session.sessionPurpose === "during_class_reflection";
-    if (!isLive || learnerCount === 0) return;
-    const interval = window.setInterval(fetchLearnerCount, 15000);
-    return () => window.clearInterval(interval);
-  }, [session, learnerCount, fetchLearnerCount]);
-
-  useEffect(() => {
-    if (!loading && !sectionsInitialized) {
-      const hasActiveStudents = learnerCount > 0;
-      if (hasActiveStudents) {
-        setShowGoals(false);
-        setShowConfig(false);
-        setShowQuestions(false);
-        setShowReadings(false);
-        setShowAssessments(false);
-      } else {
-        const needsReadings = files.filter((file) => file.category === "reading").length === 0;
-        const needsQuestion = checkpoints.length === 0;
-        const needsPurpose = !session?.learningOutcomes?.trim();
-        setShowGoals(needsPurpose || (!needsReadings && !needsQuestion));
-        setShowReadings(needsReadings);
-        setShowQuestions(!needsReadings && needsQuestion);
-        setShowConfig(false);
-        setShowAssessments(false);
-      }
-      setSectionsInitialized(true);
-    }
-  }, [checkpoints.length, files, learnerCount, loading, sectionsInitialized, session?.learningOutcomes]);
 
   async function handleUpload(file: File, category: "reading" | "assessment") {
     setUploadingCategory(category);
@@ -687,9 +670,32 @@ export default function SessionManagementPage() {
     setDragTargetCheckpointId(null);
   }
 
+  function openSetupSection(section: "task" | "materials" | "questions" | "preview" | "context" | "safeguards" | "assessments") {
+    if (section === "task") setShowGoals(true);
+    if (section === "materials") setShowReadings(true);
+    if (section === "questions") setShowQuestions(true);
+    if (section === "context") setShowConfig(true);
+    if (section === "safeguards") setShowSourceUseDetails(true);
+    if (section === "assessments") setShowAssessments(true);
+
+    const idMap = {
+      task: "learning-purpose",
+      materials: "source-materials",
+      questions: "core-questions",
+      preview: "preview-share",
+      context: "teaching-context",
+      safeguards: "source-use-safeguards",
+      assessments: "protected-assessment-materials",
+    } as const;
+
+    window.setTimeout(() => {
+      document.getElementById(idMap[section])?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 20);
+  }
+
   async function deleteSession() {
     const confirmed = window.confirm(
-      `Delete “${session?.name ?? "this session"}” and all of its learner conversations, evidence, and reports? This cannot be undone.`
+      `Delete "${session?.name ?? "this session"}" and all of its learner conversations, evidence, and reports? This cannot be undone.`
     );
     if (!confirmed) return;
 
@@ -716,20 +722,14 @@ export default function SessionManagementPage() {
 
   const readings = files.filter((f) => f.category === "reading");
   const assessments = files.filter((f) => f.category === "assessment");
-  const isActive = readings.length > 0 && Boolean(session?.learningOutcomes?.trim());
-  const isReadyToShare = isActive && checkpoints.length > 0 && previewChecked;
   const hasLearningOutcome = Boolean(session?.learningOutcomes?.trim());
-  const setupStep: 2 | 3 | 4 | null =
-    readings.length === 0
-      ? 2
-      : (checkpoints.length === 0 || !hasLearningOutcome)
-        ? 3
-        : learnerCount === 0
-          ? 4
-          : null;
+  const hasReadings = readings.length > 0;
+  const hasQuestions = checkpoints.length > 0;
+  const previewReady = hasLearningOutcome && hasReadings && hasQuestions;
+  const learnerUrl = session ? `${typeof window !== "undefined" ? window.location.origin : ""}/s/${session.accessCode}` : "";
 
   if (loading) {
-    return <LoadingState variant="page" message="Loading session…" />;
+    return <LoadingState variant="page" message="Loading session..." />;
   }
 
   if (!session) {
@@ -770,25 +770,42 @@ export default function SessionManagementPage() {
 
         <WorkspaceHeader
           session={session}
-          setupStep={setupStep}
+          subtitle="Set up the learner task, preview the learner experience, and share when ready."
         />
 
-        <StatusBar
-          learnerCount={learnerCount}
-          readingsCount={readings.length}
-          assessmentsCount={assessments.length}
-          checkpointsCount={checkpoints.length}
-          purposeLabel={getSessionPurposeOption(session.sessionPurpose).shortLabel}
-        />
-
-        <GuidedWorkflowHub
-          sessionId={sessionId}
-          hasPurpose={hasLearningOutcome}
-          hasReadings={readings.length > 0}
-          hasEvidenceQuestion={checkpoints.length > 0}
-          hasPreviewChecked={previewChecked}
-          learnerCount={learnerCount}
-        />
+        <section className="minerva-card p-4 md:p-5" aria-labelledby="setup-map-heading">
+          <h2 id="setup-map-heading" className="sr-only">Setup progress</h2>
+          <div className="grid gap-3 lg:grid-cols-4">
+            <SetupStepCard
+              step={1}
+              title="Task"
+              description="Choose the learning-cycle purpose and define the outcomes you want to assess."
+              status={hasLearningOutcome ? "complete" : "attention"}
+              onClick={() => openSetupSection("task")}
+            />
+            <SetupStepCard
+              step={2}
+              title="Materials"
+              description="Upload the reading or source material learners should use as their primary reference."
+              status={hasReadings ? "complete" : "attention"}
+              onClick={() => openSetupSection("materials")}
+            />
+            <SetupStepCard
+              step={3}
+              title="Questions"
+              description="Add one or more core questions so AI_thena knows what evidence to listen for."
+              status={hasQuestions ? "complete" : "attention"}
+              onClick={() => openSetupSection("questions")}
+            />
+            <SetupStepCard
+              step={4}
+              title="Preview & share"
+              description="Check the learner experience, then reveal and copy the learner link when the session is ready."
+              status={!previewReady ? "locked" : previewChecked ? "complete" : "ready"}
+              onClick={() => openSetupSection("preview")}
+            />
+          </div>
+        </section>
 
         <section className="minerva-card p-6 md:p-8" aria-labelledby="required-setup-heading">
           <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
@@ -799,7 +816,7 @@ export default function SessionManagementPage() {
               </h2>
             </div>
             <p className="max-w-xl text-sm leading-6 text-[var(--dim-grey)]">
-              These are the only steps required before sharing: purpose, source material, evidence question, and learner preview.
+              Complete these four steps before sharing the learner link.
             </p>
           </div>
         </section>
@@ -808,15 +825,6 @@ export default function SessionManagementPage() {
           <div className="border border-[rgba(223,47,38,0.24)] bg-[rgba(223,47,38,0.08)] px-4 py-3 text-sm text-[var(--signal)]">
             {error}
           </div>
-        ) : null}
-
-        {learnerCount > 0 && session ? (
-          <SessionInsightsCard
-            sessionId={sessionId}
-            sessionPurpose={session.sessionPurpose}
-            learnerCount={learnerCount}
-            liveStatus={liveStatus}
-          />
         ) : null}
 
         <GoalsSection 
@@ -829,106 +837,149 @@ export default function SessionManagementPage() {
           formatSavedTime={formatSavedTime}
         />
 
-        <ReadingsSection
-          open={showReadings}
-          onToggle={() => setShowReadings((value) => !value)}
-          readings={readings}
-          uiState={{
-            dragActive,
-            uploadingCategory,
-            recentUploadCategory,
-            recentUploadName,
-          }}
-          readingInputRef={readingInputRef}
-          handlers={{
-            onDrop: handleDrop,
-            onDragOver: handleDragOver,
-            onDragLeave: handleDragLeave,
-            onFileChange: handleFileChange,
-            onRemoveFile: handleRemoveFile,
-          }}
-        />
+        <div id="source-materials">
+          <ReadingsSection
+            open={showReadings}
+            onToggle={() => setShowReadings((value) => !value)}
+            readings={readings}
+            uiState={{
+              dragActive,
+              uploadingCategory,
+              recentUploadCategory,
+              recentUploadName,
+            }}
+            readingInputRef={readingInputRef}
+            handlers={{
+              onDrop: handleDrop,
+              onDragOver: handleDragOver,
+              onDragLeave: handleDragLeave,
+              onFileChange: handleFileChange,
+              onRemoveFile: handleRemoveFile,
+            }}
+          />
+        </div>
 
-        <QuestionsSection
-          open={showQuestions}
-          onToggle={() => setShowQuestions((value) => !value)}
-          session={session}
-          readingsCount={readings.length}
-          checkpoints={checkpoints}
-          uiState={{
-            loadingCheckpoints,
-            savingCheckpoint,
-            generatingSuggestions,
-            suggestions,
-            acceptingSuggestionIndex,
-            editingCheckpointId,
-            editingCheckpointPrompt,
-            draggedCheckpointId,
-            dragTargetCheckpointId,
-            showQuestionSavedState,
-            newCheckpointPrompt,
-          }}
-          setEditingCheckpointPrompt={setEditingCheckpointPrompt}
-          setNewCheckpointPrompt={setNewCheckpointPrompt}
-          actions={{
-            onGenerateSuggestions: generateSuggestions,
-            onAcceptSuggestion: acceptSuggestion,
-            onDismissSuggestion: dismissSuggestion,
-            onCreateCheckpoint: createCheckpoint,
-            onDragStartCheckpoint: startDraggingCheckpoint,
-            onDragOverCheckpoint: dragOverCheckpoint,
-            onDropCheckpoint: dropCheckpoint,
-            onEndDragCheckpoint: endDraggingCheckpoint,
-            onStartEditingCheckpoint: startEditingCheckpoint,
-            onCancelEditingCheckpoint: cancelEditingCheckpoint,
-            onSaveCheckpointEdit: saveCheckpointEdit,
-            onRemoveCheckpoint: removeCheckpoint,
-          }}
-        />
+        <div id="core-questions">
+          <QuestionsSection
+            open={showQuestions}
+            onToggle={() => setShowQuestions((value) => !value)}
+            session={session}
+            readingsCount={readings.length}
+            checkpoints={checkpoints}
+            uiState={{
+              loadingCheckpoints,
+              savingCheckpoint,
+              generatingSuggestions,
+              suggestions,
+              acceptingSuggestionIndex,
+              editingCheckpointId,
+              editingCheckpointPrompt,
+              draggedCheckpointId,
+              dragTargetCheckpointId,
+              showQuestionSavedState,
+              newCheckpointPrompt,
+            }}
+            setEditingCheckpointPrompt={setEditingCheckpointPrompt}
+            setNewCheckpointPrompt={setNewCheckpointPrompt}
+            actions={{
+              onGenerateSuggestions: generateSuggestions,
+              onAcceptSuggestion: acceptSuggestion,
+              onDismissSuggestion: dismissSuggestion,
+              onCreateCheckpoint: createCheckpoint,
+              onDragStartCheckpoint: startDraggingCheckpoint,
+              onDragOverCheckpoint: dragOverCheckpoint,
+              onDropCheckpoint: dropCheckpoint,
+              onEndDragCheckpoint: endDraggingCheckpoint,
+              onStartEditingCheckpoint: startEditingCheckpoint,
+              onCancelEditingCheckpoint: cancelEditingCheckpoint,
+              onSaveCheckpointEdit: saveCheckpointEdit,
+              onRemoveCheckpoint: removeCheckpoint,
+            }}
+          />
+        </div>
 
-        <section className="minerva-card p-6 md:p-8" aria-labelledby="recommended-prep-heading">
+        <section id="preview-share" className="minerva-card p-6 md:p-8" aria-labelledby="preview-share-heading">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <p className="eyebrow eyebrow-teal">Recommended, not required</p>
-              <h2 id="recommended-prep-heading" className="mt-3 font-serif text-4xl text-[var(--charcoal)]">
-                Preview before you share
+              <p className="eyebrow eyebrow-teal">Step 4 of 4</p>
+              <h2 id="preview-share-heading" className="mt-3 font-serif text-4xl text-[var(--charcoal)]">
+                Preview and share
               </h2>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--dim-grey)]">
-                Check the learner-facing experience, fix any design risks, and prepare a small number of possible teaching moves. You can skip the deeper planning fields when you just need a quick session.
+                Open the learner preview before sharing. Once you&apos;ve checked the experience, the learner link appears here for copying.
               </p>
             </div>
-            <Link href={`/instructor/${sessionId}/planning`} className="minerva-button">
-              {previewChecked ? "Preview checked — open again" : "Preview learner experience"}
+            <Link
+              href={`/instructor/${sessionId}/planning`}
+              className={`minerva-button ${previewReady ? "" : "pointer-events-none opacity-50"}`}
+              aria-disabled={!previewReady}
+            >
+              {previewChecked ? "Preview checked - open again" : "Preview learner experience"}
             </Link>
           </div>
-          <p className="mt-5 border-t border-[var(--rule)] pt-4 text-sm text-[var(--dim-grey)]">
-            <strong className="text-[var(--charcoal)]">Next:</strong> save the preview, return here, then share the learner link.
-          </p>
+
+          <div className="mt-6 border-t border-[var(--rule)] pt-6">
+            {!previewReady ? (
+              <p className="text-sm leading-6 text-[var(--dim-grey)]">
+                Complete Steps 1-3 to preview and share.
+              </p>
+            ) : !previewChecked ? (
+              <p className="text-sm leading-6 text-[var(--dim-grey)]">
+                Preview is ready. Open it once, save it there, then return here to copy the learner link.
+              </p>
+            ) : (
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="min-w-0">
+                  <p className="eyebrow eyebrow-teal">Learner link</p>
+                  <p className="mt-3 break-all font-mono text-sm text-[var(--charcoal)]">{learnerUrl}</p>
+                </div>
+                <button type="button" onClick={() => void copyLink()} className="minerva-button shrink-0">
+                  {copied ? "Copied" : "Copy link"}
+                </button>
+              </div>
+            )}
+          </div>
         </section>
 
-        <TeachingContextSection
-          open={showConfig}
-          onToggle={() => setShowConfig((value) => !value)}
-          session={session}
-          setSession={setSession}
-          setShowAdvanced={setShowAdvanced}
-          readingsCount={readings.length}
-          uiState={{
-            showAdvanced,
-            generatingMap,
-            savingConfig,
-            showSavedState,
-            configSavedAt,
-          }}
-          actions={{
-            onGenerateSuggestedMap: generateSuggestedMap,
-            onSaveTeachingContext: saveTeachingContext,
-          }}
-          recommendedCheckpoints={getRecommendedCheckpoints(session.maxExchanges)}
-          formatSavedTime={formatSavedTime}
-        />
+        <section className="minerva-card p-6 md:p-8" aria-labelledby="optional-planning-heading">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="eyebrow eyebrow-teal">Optional planning & safeguards</p>
+              <h2 id="optional-planning-heading" className="mt-3 font-serif text-4xl text-[var(--charcoal)]">
+                Add context when you want more control
+              </h2>
+            </div>
+            <p className="max-w-2xl text-sm leading-6 text-[var(--dim-grey)]">
+              These sections are not required before sharing. Open them when you want to shape the learner framing, inspect source-use safeguards, or protect assessment files.
+            </p>
+          </div>
+        </section>
 
-        <section className="minerva-card p-6 md:p-8" aria-labelledby="source-use-summary-heading">
+        <div id="teaching-context">
+          <TeachingContextSection
+            open={showConfig}
+            onToggle={() => setShowConfig((value) => !value)}
+            session={session}
+            setSession={setSession}
+            setShowAdvanced={setShowAdvanced}
+            readingsCount={readings.length}
+            uiState={{
+              showAdvanced,
+              generatingMap,
+              savingConfig,
+              showSavedState,
+              configSavedAt,
+            }}
+            actions={{
+              onGenerateSuggestedMap: generateSuggestedMap,
+              onSaveTeachingContext: saveTeachingContext,
+            }}
+            recommendedCheckpoints={getRecommendedCheckpoints(session.maxExchanges)}
+            formatSavedTime={formatSavedTime}
+          />
+        </div>
+
+        <section id="source-use-safeguards" className="minerva-card p-6 md:p-8" aria-labelledby="source-use-summary-heading">
           <button
             type="button"
             onClick={() => setShowSourceUseDetails((value) => !value)}
@@ -954,9 +1005,9 @@ export default function SessionManagementPage() {
               <div>
                 <p className="eyebrow eyebrow-teal">Source use</p>
                 <p className="mt-2 leading-6 text-[var(--dim-grey)]">
-                  {readings.length > 0
+                  {hasReadings
                     ? "Claims about the reading are passage-checked. AI_thena may add helpful background, analogies, or examples, but it should not present those as if they came from the uploaded course material."
-                    : "Upload at least one source material to make it the tutor's primary reference. General background can still be offered, but it will not be presented as course-reading content."}
+                    : "Upload at least one source material to make it the tutor&apos;s primary reference. General background can still be offered, but it will not be presented as course-reading content."}
                 </p>
               </div>
               <div>
@@ -972,35 +1023,27 @@ export default function SessionManagementPage() {
           ) : null}
         </section>
 
-        <AssessmentsSection
-          open={showAssessments}
-          onToggle={() => setShowAssessments((value) => !value)}
-          assessments={assessments}
-          uiState={{
-            dragActive,
-            uploadingCategory,
-            recentUploadCategory,
-            recentUploadName,
-          }}
-          assessmentInputRef={assessmentInputRef}
-          handlers={{
-            onDrop: handleDrop,
-            onDragOver: handleDragOver,
-            onDragLeave: handleDragLeave,
-            onFileChange: handleFileChange,
-            onRemoveFile: handleRemoveFile,
-          }}
-        />
-
-        <AccessCodeCard
-          session={session}
-          isActive={isReadyToShare}
-          copied={copied}
-          hasReadings={readings.length > 0}
-          hasEvidenceQuestion={checkpoints.length > 0}
-          hasPreviewChecked={previewChecked}
-          onCopyLink={copyLink}
-        />
+        <div id="protected-assessment-materials">
+          <AssessmentsSection
+            open={showAssessments}
+            onToggle={() => setShowAssessments((value) => !value)}
+            assessments={assessments}
+            uiState={{
+              dragActive,
+              uploadingCategory,
+              recentUploadCategory,
+              recentUploadName,
+            }}
+            assessmentInputRef={assessmentInputRef}
+            handlers={{
+              onDrop: handleDrop,
+              onDragOver: handleDragOver,
+              onDragLeave: handleDragLeave,
+              onFileChange: handleFileChange,
+              onRemoveFile: handleRemoveFile,
+            }}
+          />
+        </div>
 
         {session.instructorRole === "owner" ? (
           <section className="minerva-card p-6 md:p-8">
