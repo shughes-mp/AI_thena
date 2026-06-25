@@ -76,7 +76,7 @@ export default function InstructorCreatePage() {
                     id="session-name"
                     type="text"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e: any) => setName(e.target.value)}
                     placeholder="e.g. Week 3: Systems Thinking"
                     className="minerva-input"
                     autoFocus

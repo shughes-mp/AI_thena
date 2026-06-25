@@ -241,7 +241,7 @@ export async function POST(req: Request) {
     const activeSoftRevisit =
       exchangeCount >= revisitTriggerAt && softRevisitQueue.length > 0 ? softRevisitQueue[0] : null;
 
-    const sourceDocuments = studentSession.session.readings.map((reading) => ({
+    const sourceDocuments = studentSession.session.readings.map((reading: any) => ({
       id: reading.id,
       filename: reading.filename,
       content: reading.content,
@@ -253,7 +253,7 @@ export async function POST(req: Request) {
         studentSession.session.courseContext,
         studentSession.session.learningGoal,
         studentSession.session.learningOutcomes,
-        ...checkpoints.map((checkpoint) => checkpoint.prompt),
+        ...checkpoints.map((checkpoint: any) => checkpoint.prompt),
       ]
         .filter(Boolean)
         .join("\n"),
@@ -518,22 +518,22 @@ export async function POST(req: Request) {
             assistantMessage: finalCleanedText,
             topicThread: normalizedTopicThread,
             exchangeIndex: exchangeCount + 1,
-            readings: studentSession.session.readings.map((reading) => ({
+            readings: studentSession.session.readings.map((reading: any) => ({
               id: reading.id,
               filename: reading.filename,
               content: reading.content,
             })),
-            checkpoints: checkpoints.map((checkpoint) => ({
+            checkpoints: checkpoints.map((checkpoint: any) => ({
               id: checkpoint.id,
               prompt: checkpoint.prompt,
               evidenceQuestionId: checkpoint.evidenceQuestion?.id ?? null,
             })),
-            learningOutcomes: normalizedOutcomes.map((outcome) => ({
+            learningOutcomes: normalizedOutcomes.map((outcome: any) => ({
               id: outcome.id,
               label: outcome.label,
             })),
             unresolvedMisconceptionIds: unresolvedMisconceptions.map(
-              (misconception) => misconception.id
+              (misconception: any) => misconception.id
             ),
             conversationHistory: incomingMessages.map((message) => ({
               role: message.role as "user" | "assistant",
@@ -545,7 +545,7 @@ export async function POST(req: Request) {
 
           if (checkpointStatusMatches.length > 0) {
             const studentCheckpointMap = new Map(
-              studentCheckpoints.map((item) => [item.checkpointId, item])
+              studentCheckpoints.map((item: any) => [item.checkpointId, item])
             );
 
             for (const match of checkpointStatusMatches) {
@@ -561,10 +561,10 @@ export async function POST(req: Request) {
                 continue;
               }
 
-              const checkpoint = checkpoints.find((item) => item.id === checkpointId);
+              const checkpoint = checkpoints.find((item: any) => item.id === checkpointId);
               if (!checkpoint) continue;
 
-              const existing = studentCheckpointMap.get(checkpointId);
+              const existing = studentCheckpointMap.get(checkpointId) as { id: string; turnsSpent: number } | undefined;
               if (existing) {
                 const updated = await prisma.studentCheckpoint.update({
                   where: { id: existing.id },
@@ -653,7 +653,7 @@ export async function POST(req: Request) {
           }
 
           if (
-            unresolvedMisconceptions.some((item) => item.persistentlyUnresolved) ||
+            unresolvedMisconceptions.some((item: any) => item.persistentlyUnresolved) ||
             (unresolvedMisconceptions.length > 0 &&
               normalizedTopicThread !== currentTopicThread &&
               !tags.cognitiveConflictStage)

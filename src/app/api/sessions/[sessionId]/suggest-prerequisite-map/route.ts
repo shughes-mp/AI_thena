@@ -158,7 +158,7 @@ Avoid circular prerequisites.
 Reading titles and excerpts:
 <untrusted_readings>
 ${session.readings
-  .map((reading) => `${reading.filename}: ${reading.content.slice(0, 500)}`)
+  .map((reading: any) => `${reading.filename}: ${reading.content.slice(0, 500)}`)
   .join("\n\n")}
 </untrusted_readings>`;
 

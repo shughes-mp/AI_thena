@@ -196,7 +196,7 @@ export async function refreshFacilitationRecommendations(sessionId: string) {
 
   const candidates = deriveFacilitationPivots({
     totalLearners,
-    signals: signals.map((signal) => ({
+    signals: signals.map((signal: any) => ({
       id: signal.id,
       studentSessionId: signal.studentSessionId,
       learnerName: signal.studentSession?.studentName ?? null,
@@ -206,7 +206,7 @@ export async function refreshFacilitationRecommendations(sessionId: string) {
       resolved: signal.misconception?.resolved ?? false,
     })),
   }).map((candidate) => {
-    const representative = signals.find((signal) => signal.id === candidate.signalId);
+    const representative = signals.find((signal: any) => signal.id === candidate.signalId);
     if (
       candidate.mode !== "conductor" ||
       !representative?.recommendation ||
@@ -216,14 +216,14 @@ export async function refreshFacilitationRecommendations(sessionId: string) {
     }
 
     const eligibleTrigger = candidate.triggerSignalIds.find((signalId) => {
-      const trigger = signals.find((signal) => signal.id === signalId);
+      const trigger = signals.find((signal: any) => signal.id === signalId);
       return !trigger?.recommendation || trigger.recommendation.reviewState === "provisional";
     });
     return eligibleTrigger ? { ...candidate, signalId: eligibleTrigger } : candidate;
   });
   const currentSignalIds = candidates.map((candidate) => candidate.signalId);
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: any) => {
     await tx.facilitationRecommendation.deleteMany({
       where: {
         sessionId,

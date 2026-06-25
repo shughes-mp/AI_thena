@@ -86,7 +86,7 @@ export function InstructorWorkspaceNavigation({
     searchParams.get("view")
   );
   const activePhase = getActivePhase(activeItemKey);
-  const activePhaseConfig = phases.find((phase) => phase.key === activePhase) ?? phases[0];
+  const activePhaseConfig = phases.find((phase: any) => phase.key === activePhase) ?? phases[0];
 
   return (
     <div className="space-y-4 border-t border-[var(--rule)] pt-6">
@@ -95,7 +95,7 @@ export function InstructorWorkspaceNavigation({
         role="tablist"
         aria-label="Instructor workspace phases"
       >
-        {phases.map((phase) => {
+        {phases.map((phase: any) => {
           const selected = phase.key === activePhase;
           return (
             <Link
@@ -117,7 +117,7 @@ export function InstructorWorkspaceNavigation({
 
       {showItems ? (
         <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-5">
-          {activePhaseConfig.items.map((item) => {
+          {activePhaseConfig.items.map((item: any) => {
             const selected = item.key === activeItemKey;
             return (
               <Link

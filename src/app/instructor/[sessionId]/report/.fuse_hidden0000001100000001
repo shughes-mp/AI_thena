@@ -550,7 +550,7 @@ export default function ReportPage() {
                         key={assessment.id}
                         assessment={assessment}
                         reviewContext={brief?.learningOutcomeEvidence.find(
-                          (item: any) =>
+                          (item) =>
                             normalizeOutcomeLabel(item.label) ===
                             normalizeOutcomeLabel(assessment.learningOutcome)
                         )}

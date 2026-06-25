@@ -41,6 +41,7 @@ const confidenceDotColor: Record<string, string> = {
 };
 
 interface LOAssessmentCardProps {
+  key?: string | number | null;
   assessment: LOAssessmentRecord;
   reviewContext?: TeachingBriefEvidenceMapItem;
 }
@@ -94,7 +95,7 @@ export function LOAssessmentCard({
           </div>
         </div>
         <button
-          onClick={() => setExpanded((value) => !value)}
+          onClick={() => setExpanded((value: any) => !value)}
           className="rounded-md p-1 transition hover:bg-[rgba(34,34,34,0.05)]"
           aria-label="Expand evidence"
         >

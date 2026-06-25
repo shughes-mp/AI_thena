@@ -37,12 +37,12 @@ test("source matching returns stable exact offsets and passage IDs", () => {
   );
 
   assert.ok(match);
-  assert.equal(match.quotedText, "distinguishes efficiency from effectiveness");
+  assert.equal(match!.quotedText, "distinguishes efficiency from effectiveness");
   assert.equal(
-    sources[0].content.slice(match.startOffset, match.endOffset),
-    match.quotedText
+    sources[0].content.slice(match!.startOffset, match!.endOffset),
+    match!.quotedText
   );
-  assert.equal(match.passageId.length, 20);
+  assert.equal(match!.passageId.length, 20);
   assert.equal(buildSourceSetVersion(sources), buildSourceSetVersion([...sources]));
 });
 

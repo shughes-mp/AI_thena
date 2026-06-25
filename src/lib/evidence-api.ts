@@ -69,18 +69,18 @@ export function serializeEvidenceSignal(
     contradictoryEvidence: signal.contradictoryEvidence,
     opportunitySummary: signal.opportunitySummary,
     misunderstandingResolved: signal.misconception?.resolved ?? null,
-    learningOutcomes: signal.learningOutcomeLinks.map(({ learningOutcome }) => ({
+    learningOutcomes: signal.learningOutcomeLinks.map(({ learningOutcome }: any) => ({
       id: learningOutcome.id,
       label: learningOutcome.label,
     })),
     evidenceQuestions: signal.evidenceQuestionLinks.map(
-      ({ evidenceQuestion }) => ({
+      ({ evidenceQuestion }: any) => ({
         id: evidenceQuestion.id,
         prompt: evidenceQuestion.prompt,
         processLevel: evidenceQuestion.processLevel,
       })
     ),
-    qualifications: signal.qualifications.map((qualification) => ({
+    qualifications: signal.qualifications.map((qualification: any) => ({
       id: qualification.id,
       kind: qualification.kind as EvidenceSignalRecord["qualifications"][number]["kind"],
       summary: qualification.summary,
@@ -95,7 +95,7 @@ export function serializeEvidenceSignal(
     supersedesSignalId: signal.supersedesSignalId,
     createdAt: signal.createdAt.toISOString(),
     updatedAt: signal.updatedAt.toISOString(),
-    citations: signal.citations.map((citation) => ({
+    citations: signal.citations.map((citation: any) => ({
       id: citation.id,
       citationType:
         citation.citationType as EvidenceSignalRecord["citations"][number]["citationType"],
@@ -107,7 +107,7 @@ export function serializeEvidenceSignal(
       passageId: citation.passageId,
       relevanceRationale: citation.relevanceRationale,
     })),
-    reviews: signal.reviews.map((review) => ({
+    reviews: signal.reviews.map((review: any) => ({
       id: review.id,
       action:
         review.action as EvidenceSignalRecord["reviews"][number]["action"],

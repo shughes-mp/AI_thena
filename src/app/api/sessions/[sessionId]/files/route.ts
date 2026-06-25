@@ -34,14 +34,14 @@ export async function GET(
     }
 
     const files: FileInfo[] = [
-      ...session.readings.map((r) => ({
+      ...session.readings.map((r: any) => ({
         id: r.id,
         filename: r.filename,
         category: "reading" as const,
         preview: r.content.substring(0, 100),
         uploadedAt: r.uploadedAt.toISOString(),
       })),
-      ...session.assessments.map((a) => ({
+      ...session.assessments.map((a: any) => ({
         id: a.id,
         filename: a.filename,
         category: "assessment" as const,

@@ -85,7 +85,7 @@ export function GroundingAuditPanel({ sessionId }: { sessionId: string }) {
       <section>
         <h2 className="font-serif text-3xl text-[var(--charcoal)]">Source-use details</h2>
         <div className="mt-4 space-y-4">
-          {data.groundings.length === 0 ? <Empty text="No source-use details yet. Tutor responses will appear here after learners interact with the session and AI_thena can inspect whether responses used the reading, broader context, or neither." /> : data.groundings.map((item) => (
+          {data.groundings.length === 0 ? <Empty text="No source-use details yet. Tutor responses will appear here after learners interact with the session and AI_thena can inspect whether responses used the reading, broader context, or neither." /> : data.groundings.map((item: any) => (
             <article key={item.id} className="minerva-card p-6">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold text-[var(--charcoal)]">{item.learnerName}</p>
@@ -93,7 +93,7 @@ export function GroundingAuditPanel({ sessionId }: { sessionId: string }) {
               </div>
               <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[var(--dim-grey)]">{item.response}</p>
               {item.unsupportedReason ? <p className="mt-3 text-xs text-[#906f12]">{item.unsupportedReason}</p> : null}
-              {item.citations.map((citation) => (
+              {item.citations.map((citation: any) => (
                 <blockquote key={citation.id} className="mt-4 border-l-2 border-[var(--teal)] pl-4 text-sm text-[var(--charcoal)]">
                   “{citation.quotedText}”
                   <footer className="mt-2 text-xs text-[var(--dim-grey)]">{citation.filename} · passage {citation.passageId}</footer>
@@ -107,7 +107,7 @@ export function GroundingAuditPanel({ sessionId }: { sessionId: string }) {
       <section>
         <h2 className="font-serif text-3xl text-[var(--charcoal)]">Protected-material interventions</h2>
         <div className="mt-4 space-y-4">
-          {data.protectionEvents.length === 0 ? <Empty text="No protected-answer attempts have influenced coaching. If a learner asks for or repeats protected answer material, the event will appear here for instructor review." /> : data.protectionEvents.map((item) => (
+          {data.protectionEvents.length === 0 ? <Empty text="No protected-answer attempts have influenced coaching. If a learner asks for or repeats protected answer material, the event will appear here for instructor review." /> : data.protectionEvents.map((item: any) => (
             <article key={item.id} className="minerva-card p-6">
               <p className="text-sm font-semibold text-[var(--charcoal)]">{item.learnerName} · {item.triggerType.replace(/_/g, " ")}</p>
               <p className="mt-2 text-sm text-[var(--dim-grey)]">{item.detail}</p>

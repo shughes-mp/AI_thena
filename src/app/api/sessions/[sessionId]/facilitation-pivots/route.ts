@@ -30,16 +30,16 @@ async function loadPivots(sessionId: string) {
         where: { id: { in: triggerIds }, sessionId },
         include: { studentSession: { select: { studentName: true } } },
       })
-    : [];
-  const signalMap = new Map(signals.map((signal) => [signal.id, signal]));
+    : ([] as any[]);
+  const signalMap = new Map(signals.map((signal: any) => [signal.id, signal]));
 
-  return pivots.map((pivot) =>
+  return pivots.map((pivot: any) =>
     serializeFacilitationRecommendation(
       pivot,
       getTriggerSignalIds(pivot)
         .map((signalId) => signalMap.get(signalId))
         .filter((signal): signal is NonNullable<typeof signal> => Boolean(signal))
-        .map((signal) => ({
+        .map((signal: any) => ({
           signalId: signal.id,
           claim: signal.claim,
           learnerName: signal.studentSession?.studentName ?? null,

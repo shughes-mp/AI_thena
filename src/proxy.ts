@@ -2,7 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isInstructorPage = createRouteMatcher(["/instructor(.*)"]);
 
-export default clerkMiddleware(async (auth, request) => {
+export default clerkMiddleware(async (auth: any, request: any) => {
   if (isInstructorPage(request)) {
     await auth.protect();
   }

@@ -58,15 +58,15 @@ export async function POST(req: Request) {
 
     // Format transcripts
     const transcript = studentSession.messages
-      .map((m) => `${m.role === "user" ? "Student" : "Tutor"}: ${m.content}`)
+      .map((m: any) => `${m.role === "user" ? "Student" : "Tutor"}: ${m.content}`)
       .join("\n\n");
     const unresolvedMisconceptions = studentSession.misconceptions.filter(
-      (item) => !item.resolved || item.persistentlyUnresolved
+      (item: any) => !item.resolved || item.persistentlyUnresolved
     );
 
     const prompt = buildLearnerSummaryPrompt({
       transcript,
-      unresolvedMisconceptions: unresolvedMisconceptions.map((item) => ({
+      unresolvedMisconceptions: unresolvedMisconceptions.map((item: any) => ({
         topicThread: item.topicThread,
         description: item.description,
       })),

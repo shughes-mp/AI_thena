@@ -306,16 +306,16 @@ export async function buildStructuredTeachingBrief(
   });
 
   const activeSignals = session.evidenceSignals.filter(
-    (signal) => signal.status !== "superseded" && signal.status !== "rejected"
+    (signal: any) => signal.status !== "superseded" && signal.status !== "rejected"
   );
   const reviewCounts = session.evidenceSignals.reduce<Record<string, number>>(
-    (counts, signal) => {
+    (counts: any, signal: any) => {
       counts[signal.status] = (counts[signal.status] ?? 0) + 1;
       return counts;
     },
     {}
   );
-  const overallReviewState = reviewState(activeSignals.map((signal) => signal.status));
+  const overallReviewState = reviewState(activeSignals.map((signal: any) => signal.status));
 
   const toReference = (
     signal: (typeof activeSignals)[number],
@@ -331,35 +331,35 @@ export async function buildStructuredTeachingBrief(
     relevanceRationale: citation.relevanceRationale,
   });
 
-  const evidenceMapItems = session.normalizedOutcomes.map((outcome) => {
-    const outcomeAssessments = session.studentSessions.flatMap((student) =>
+  const evidenceMapItems = session.normalizedOutcomes.map((outcome: any) => {
+    const outcomeAssessments = session.studentSessions.flatMap((student: any) =>
       student.loAssessments
-        .filter((assessment) => normalize(assessment.learningOutcome) === normalize(outcome.label))
-        .map((assessment) => ({ assessment, student }))
+        .filter((assessment: any) => normalize(assessment.learningOutcome) === normalize(outcome.label))
+        .map((assessment: any) => ({ assessment, student }))
     );
-    const linkedSignals = activeSignals.filter((signal) =>
-      signal.learningOutcomeLinks.some((link) => link.learningOutcomeId === outcome.id)
+    const linkedSignals = activeSignals.filter((signal: any) =>
+      signal.learningOutcomeLinks.some((link: any) => link.learningOutcomeId === outcome.id)
     );
     const learnerSessionIds = Array.from(
       new Set([
-        ...outcomeAssessments.map(({ student }) => student.id),
-        ...linkedSignals.flatMap((signal) =>
+        ...outcomeAssessments.map(({ student }: any) => student.id),
+        ...linkedSignals.flatMap((signal: any) =>
           signal.studentSessionId ? [signal.studentSessionId] : []
         ),
       ])
     );
     const scores = outcomeAssessments
-      .map(({ assessment }) => statusScore(assessment.status))
-      .filter((score): score is number => score !== null);
+      .map(({ assessment }: any) => statusScore(assessment.status))
+      .filter((score: any): score is number => score !== null);
     const unresolved = linkedSignals.some(
-      (signal) =>
+      (signal: any) =>
         signal.signalType === "possible_misunderstanding" &&
         signal.status !== "rejected" &&
         !signal.misconception?.resolved
     );
     const averageScore =
       scores.length > 0
-        ? scores.reduce((total, score) => total + score, 0) / scores.length
+        ? scores.reduce((total: any, score: any) => total + score, 0) / scores.length
         : null;
     const classification: EvidenceMapClassification =
       averageScore === null || (averageScore < 2 && unresolved)
@@ -368,8 +368,8 @@ export async function buildStructuredTeachingBrief(
           ? "evidence_suggests_ready"
           : "evidence_suggests_gaps";
     const confidenceValues = [
-      ...outcomeAssessments.map(({ assessment }) => assessment.confidence),
-      ...linkedSignals.map((signal) => signal.confidenceLevel),
+      ...outcomeAssessments.map(({ assessment }: any) => assessment.confidence),
+      ...linkedSignals.map((signal: any) => signal.confidenceLevel),
     ];
     const confidenceLevel: "low" | "medium" | "high" =
       confidenceValues.length === 0
@@ -382,29 +382,29 @@ export async function buildStructuredTeachingBrief(
             ? "low"
             : "medium";
     const linkedQuestionIds = new Set(
-      linkedSignals.flatMap((signal) =>
-        signal.evidenceQuestionLinks.map((link) => link.evidenceQuestionId)
+      linkedSignals.flatMap((signal: any) =>
+        signal.evidenceQuestionLinks.map((link: any) => link.evidenceQuestionId)
       )
     );
     const contradictions = uniqueNormalizedStrings(
-      linkedSignals.flatMap((signal) => [
+      linkedSignals.flatMap((signal: any) => [
         ...signal.qualifications
-          .filter((qualification) => qualification.kind === "contradictory_evidence")
-          .map((qualification) => qualification.summary),
+          .filter((qualification: any) => qualification.kind === "contradictory_evidence")
+          .map((qualification: any) => qualification.summary),
         ...safeParseArray(signal.contradictoryEvidence),
       ])
     );
     const missing = uniqueNormalizedStrings(
-      linkedSignals.flatMap((signal) => [
+      linkedSignals.flatMap((signal: any) => [
         ...signal.qualifications
-          .filter((qualification) => qualification.kind === "missing_evidence")
-          .map((qualification) => qualification.summary),
+          .filter((qualification: any) => qualification.kind === "missing_evidence")
+          .map((qualification: any) => qualification.summary),
         ...safeParseArray(signal.missingEvidence),
       ])
     );
-    const itemReviewState = reviewState(linkedSignals.map((signal) => signal.status));
-    const references = linkedSignals.flatMap((signal) =>
-      signal.citations.map((citation) => toReference(signal, citation))
+    const itemReviewState = reviewState(linkedSignals.map((signal: any) => signal.status));
+    const references = linkedSignals.flatMap((signal: any) =>
+      signal.citations.map((citation: any) => toReference(signal, citation))
     );
 
     return {
@@ -431,16 +431,16 @@ export async function buildStructuredTeachingBrief(
       missingEvidence: missing,
       reviewState: itemReviewState,
       reviewSummary: reviewSummary(itemReviewState, linkedSignals.length),
-      signalIds: linkedSignals.map((signal) => signal.id),
+      signalIds: linkedSignals.map((signal: any) => signal.id),
       evidenceReferences: references,
     } satisfies TeachingBriefEvidenceMapItem;
   });
 
   const misunderstandingSignals = activeSignals.filter(
-    (signal) =>
+    (signal: any) =>
       signal.signalType === "possible_misunderstanding" && signal.status !== "rejected"
   );
-  const misunderstandingPatterns = misunderstandingSignals.map((signal) => ({
+  const misunderstandingPatterns = misunderstandingSignals.map((signal: any) => ({
     id: signal.id,
     claim: signal.claim,
     learnerCount: signal.studentSessionId ? 1 : 0,
@@ -449,14 +449,14 @@ export async function buildStructuredTeachingBrief(
     reviewState: signal.status,
     resolved: signal.misconception?.resolved ?? false,
     signalIds: [signal.id],
-    evidenceReferences: signal.citations.map((citation) => toReference(signal, citation)),
+    evidenceReferences: signal.citations.map((citation: any) => toReference(signal, citation)),
   }));
 
   const evidenceAppendix = Array.from(
     new Map(
       activeSignals
-        .flatMap((signal) => signal.citations.map((citation) => toReference(signal, citation)))
-        .map((reference) => [reference.id, reference])
+        .flatMap((signal: any) => signal.citations.map((citation: any) => toReference(signal, citation)))
+        .map((reference: any) => [reference.id, reference])
     ).values()
   );
 
@@ -529,7 +529,7 @@ export async function buildStructuredTeachingBrief(
       title: getHeatmapTitle(session.sessionPurpose),
       items: evidenceMapItems,
     },
-    suggestedTeachingMoves: session.recommendations.slice(0, 8).map((recommendation) => ({
+    suggestedTeachingMoves: session.recommendations.slice(0, 8).map((recommendation: any) => ({
       id: recommendation.id,
       whatToAddress: recommendation.whatToAddress,
       whyItMatters: recommendation.whyItMatters,
@@ -537,7 +537,7 @@ export async function buildStructuredTeachingBrief(
       confidence: recommendation.confidence,
       instructorAction: recommendation.instructorAction,
     })),
-    facilitationPivots: session.facilitationRecommendations.map((pivot) => {
+    facilitationPivots: session.facilitationRecommendations.map((pivot: any) => {
       const scopeIds = safeParseArray(pivot.scopeIds);
       const storedTriggerSignalIds = safeParseArray(pivot.triggerSignalIds);
       const triggerSignalIds =
@@ -568,16 +568,16 @@ export async function buildStructuredTeachingBrief(
       };
     }),
     strengths: evidenceMapItems.filter(
-      (item) => item.classification === "evidence_suggests_ready"
+      (item: any) => item.classification === "evidence_suggests_ready"
     ),
     followUps: evidenceMapItems.filter(
-      (item) => item.classification !== "evidence_suggests_ready"
+      (item: any) => item.classification !== "evidence_suggests_ready"
     ),
     misunderstandingPatterns,
-    perLearnerNotes: session.studentSessions.map((student) => {
-      const unresolved = student.misconceptions.filter((item) => !item.resolved).length;
+    perLearnerNotes: session.studentSessions.map((student: any) => {
+      const unresolved = student.misconceptions.filter((item: any) => !item.resolved).length;
       const observedOutcomes = student.loAssessments.filter(
-        (assessment) => statusScore(assessment.status) !== null
+        (assessment: any) => statusScore(assessment.status) !== null
       ).length;
       return {
         studentSessionId: student.id,
@@ -589,6 +589,6 @@ export async function buildStructuredTeachingBrief(
       };
     }),
     learningOutcomeEvidence: evidenceMapItems,
-    evidenceAppendix,
+    evidenceAppendix: evidenceAppendix as TeachingBriefEvidenceReference[],
   };
 }

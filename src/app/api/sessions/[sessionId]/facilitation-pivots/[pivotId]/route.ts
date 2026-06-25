@@ -77,14 +77,14 @@ export async function PATCH(
       where: { id: { in: triggerIds }, sessionId },
       include: { studentSession: { select: { studentName: true } } },
     });
-    const signalMap = new Map(signals.map((signal) => [signal.id, signal]));
+    const signalMap = new Map(signals.map((signal: any) => [signal.id, signal]));
     return NextResponse.json({
       pivot: serializeFacilitationRecommendation(
         updated,
         triggerIds
           .map((id) => signalMap.get(id))
           .filter((signal): signal is NonNullable<typeof signal> => Boolean(signal))
-          .map((signal) => ({
+          .map((signal: any) => ({
             signalId: signal.id,
             claim: signal.claim,
             learnerName: signal.studentSession?.studentName ?? null,

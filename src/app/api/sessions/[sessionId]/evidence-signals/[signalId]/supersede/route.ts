@@ -61,10 +61,10 @@ export async function POST(
       );
     }
     const hasLearnerCitation = replacement.citations.some(
-      (citation) => citation.citationType === "learner_message"
+      (citation: any) => citation.citationType === "learner_message"
     );
     const hasSourceCitation = replacement.citations.some(
-      (citation) => citation.citationType === "source_passage"
+      (citation: any) => citation.citationType === "source_passage"
     );
     if (!hasLearnerCitation || !hasSourceCitation) {
       return NextResponse.json(

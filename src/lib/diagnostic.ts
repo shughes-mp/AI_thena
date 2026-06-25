@@ -310,7 +310,7 @@ export async function runDiagnostic(input: DiagnosticInput): Promise<void> {
       messages: [{ role: "user", content: prompt }],
     });
 
-    const textBlock = response.content.find((block) => block.type === "text");
+    const textBlock = response.content.find((block: any) => block.type === "text");
     if (!textBlock || textBlock.type !== "text") {
       console.error("Diagnostic model returned no text content");
       return;

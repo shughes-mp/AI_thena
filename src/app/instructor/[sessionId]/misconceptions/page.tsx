@@ -481,7 +481,7 @@ export default function MisconceptionDashboardPage() {
                   </p>
                 </div>
 
-                {clusters.slice(0, 3).map((cluster) => (
+                {clusters.slice(0, 3).map((cluster: any) => (
                   <div key={cluster.id} className="minerva-card p-5">
                     <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                       <div className="space-y-2">
@@ -527,7 +527,7 @@ export default function MisconceptionDashboardPage() {
                       may indicate content areas that need more support.
                     </p>
                     <div className="mt-6 space-y-3">
-                      {checkpointDifficulty.map((checkpoint) => (
+                      {checkpointDifficulty.map((checkpoint: any) => (
                         <div
                           key={checkpoint.checkpointId}
                           className="flex items-start gap-4 rounded-lg border border-[var(--rule)] p-4"
@@ -588,7 +588,7 @@ export default function MisconceptionDashboardPage() {
                     No misunderstanding signals have been logged for this session yet.
                   </div>
                 ) : (
-                  topClusters.map((cluster) => (
+                  topClusters.map((cluster: any) => (
                     <div key={cluster.id} className="minerva-card p-6">
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div className="min-w-0 flex-1">
@@ -674,7 +674,7 @@ export default function MisconceptionDashboardPage() {
                             <button
                               type="button"
                               onClick={() =>
-                                setExpandedClusterId((current) =>
+                                setExpandedClusterId((current: any) =>
                                   current === cluster.id ? null : cluster.id
                                 )
                               }
@@ -694,7 +694,7 @@ export default function MisconceptionDashboardPage() {
                             Examples in this cluster
                           </p>
                           <ul className="mt-3 space-y-3 text-sm text-[var(--dim-grey)]">
-                            {cluster.records.map((record) => (
+                            {cluster.records.map((record: any) => (
                               <li
                                 key={record.id}
                                 className="rounded-md bg-[rgba(34,34,34,0.03)] px-4 py-3"
@@ -718,7 +718,7 @@ export default function MisconceptionDashboardPage() {
                                     Resolution evidence: {record.resolutionEvidence}
                                   </p>
                                 ) : null}
-                                {record.sourceCitations.map((citation) => (
+                                {record.sourceCitations.map((citation: any) => (
                                   <blockquote
                                     key={citation.id}
                                     className="mt-3 border-l-2 border-[var(--teal)] pl-3 text-xs text-[var(--charcoal)]"
@@ -755,7 +755,7 @@ export default function MisconceptionDashboardPage() {
                   <div className="minerva-card p-6">
                     <button
                       type="button"
-                      onClick={() => setShowAllClusters((current) => !current)}
+                      onClick={() => setShowAllClusters((current: any) => !current)}
                       className="minerva-button minerva-button-secondary"
                     >
                       {showAllClusters
@@ -765,7 +765,7 @@ export default function MisconceptionDashboardPage() {
 
                     {showAllClusters && (
                       <div className="mt-5 space-y-3">
-                        {remainingClusters.map((cluster) => (
+                        {remainingClusters.map((cluster: any) => (
                           <div
                             key={cluster.id}
                             className="rounded-lg border border-[var(--rule)] px-4 py-3"
@@ -811,7 +811,7 @@ export default function MisconceptionDashboardPage() {
                         <input
                           type="checkbox"
                           checked={detailedView}
-                          onChange={(event) => setDetailedView(event.target.checked)}
+                          onChange={(event: any) => setDetailedView(event.target.checked)}
                           className="mr-2"
                         />
                         Detailed view
@@ -842,7 +842,7 @@ export default function MisconceptionDashboardPage() {
                     </div>
                   ) : (
                     <div className="space-y-6">
-                      {recommendations.map((recommendation) => (
+                      {recommendations.map((recommendation: any) => (
                         <div key={recommendation.id} className="minerva-card p-6">
                           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                             <div className="min-w-0 flex-1">
@@ -867,7 +867,7 @@ export default function MisconceptionDashboardPage() {
                               Evidence
                             </p>
                             <ul className="mt-3 space-y-2 text-sm text-[var(--charcoal)]">
-                              {recommendation.evidence.map((item, index) => (
+                              {recommendation.evidence.map((item: any, index: any) => (
                                 <li key={`${recommendation.id}-evidence-${index}`}>
                                   • {item}
                                 </li>
@@ -889,7 +889,7 @@ export default function MisconceptionDashboardPage() {
                                       key={tabId}
                                       type="button"
                                       onClick={() =>
-                                        setExpandedRecommendationId((current) =>
+                                        setExpandedRecommendationId((current: any) =>
                                           current === tabId ? null : tabId
                                         )
                                       }

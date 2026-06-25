@@ -52,15 +52,15 @@ export async function GET(
     });
 
     return NextResponse.json(
-      studentSessions.map((studentSession) => {
+      studentSessions.map((studentSession: any) => {
         const latestFlaggedMessage = studentSession.messages.find(
-          (message) =>
+          (message: any) =>
             message.role === "user" &&
             message.engagementFlag &&
             message.engagementFlag !== "on_task"
         );
         const latestEngagement = studentSession.messages.find(
-          (message) => message.role === "user" && message.engagementFlag
+          (message: any) => message.role === "user" && message.engagementFlag
         );
         const lastMessage = studentSession.messages[0];
         const isWaitingForStudentReply = lastMessage?.role === "assistant";

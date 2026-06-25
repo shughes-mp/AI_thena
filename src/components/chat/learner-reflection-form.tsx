@@ -108,7 +108,7 @@ export function LearnerReflectionForm({
           <input
             type="checkbox"
             checked={summaryContested}
-            onChange={(event) => setSummaryContested(event.target.checked)}
+            onChange={(event: any) => setSummaryContested(event.target.checked)}
             className="mt-1 h-4 w-4 accent-[var(--teal)]"
           />
           Mark the AI summary as inaccurate or incomplete for instructor review.
@@ -153,7 +153,7 @@ function ReflectionField({
       <textarea
         id={id}
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={(event: any) => onChange(event.target.value)}
         rows={rows}
         maxLength={2000}
         className="minerva-input mt-2 min-h-28 resize-y"

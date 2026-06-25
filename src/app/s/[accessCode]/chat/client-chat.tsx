@@ -71,7 +71,7 @@ export function ClientChat({
   const initialized = useRef(false);
 
   const exchangeCount = Math.ceil(
-    messages.filter((message) => message.role === "user" && !message.hidden).length
+    messages.filter((message: any) => message.role === "user" && !message.hidden).length
   );
   const phaseInfo = getConversationPhase(exchangeCount, maxExchanges);
 
@@ -173,7 +173,7 @@ export function ClientChat({
       let done = false;
 
       const assistantMessageId = Math.random().toString();
-      setMessages((prev) => [
+      setMessages((prev: any) => [
         ...prev,
         { id: assistantMessageId, role: "assistant", content: "" },
       ]);
@@ -183,7 +183,7 @@ export function ClientChat({
         done = doneReading;
         if (value) {
           const chunk = decoder.decode(value, { stream: !done });
-          setMessages((prev) => {
+          setMessages((prev: any) => {
             const mapped = [...prev];
             const lastIdx = mapped.length - 1;
             if (mapped[lastIdx].id === assistantMessageId) {
@@ -372,7 +372,7 @@ If course context is available, use it naturally in the first three exchanges.`,
             <div className="border-b border-[var(--rule)]">
               <button
                 type="button"
-                onClick={() => setOrientationOpen((v) => !v)}
+                onClick={() => setOrientationOpen((v: any) => !v)}
                 aria-expanded={orientationOpen}
                 aria-controls="learner-session-orientation"
                 className="flex w-full items-center justify-between px-4 py-3 text-left md:px-8 hover:bg-[rgba(0,0,0,0.02)] transition-colors"
@@ -451,7 +451,7 @@ If course context is available, use it naturally in the first three exchanges.`,
             </div>
 
             <div className="min-h-0 flex-1">
-              <ChatArea messages={messages.filter((m) => !m.hidden)} isLoading={isLoading} />
+              <ChatArea messages={messages.filter((m: any) => !m.hidden)} isLoading={isLoading} />
             </div>
 
             <div className="border-t border-[var(--rule)] px-4 py-4 pb-6 md:px-8">

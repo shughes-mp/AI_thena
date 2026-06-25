@@ -316,13 +316,13 @@ export async function POST(
     const suggestCount = Math.max(1, Math.min(4, recommendedCount - existingCount));
 
     const readingContent = session.readings
-      .map((reading) => `=== ${reading.filename} ===\n${reading.content}`)
+      .map((reading: any) => `=== ${reading.filename} ===\n${reading.content}`)
       .join("\n\n");
 
     const existingQuestions =
       session.checkpoints.length > 0
         ? `\n\nThe instructor has already written these questions. Do NOT duplicate them:\n${session.checkpoints
-            .map((checkpoint, index) => `${index + 1}. ${checkpoint.prompt}`)
+            .map((checkpoint: any, index: any) => `${index + 1}. ${checkpoint.prompt}`)
             .join("\n")}`
         : "";
 

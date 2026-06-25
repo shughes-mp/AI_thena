@@ -65,7 +65,7 @@ export async function PATCH(
       updateData.orderIndex = Math.max(0, Math.floor(body.orderIndex));
     }
 
-    const updated = await prisma.$transaction(async (tx) => {
+    const updated = await prisma.$transaction(async (tx: any) => {
       const next = await tx.checkpoint.update({
         where: { id: checkpointId },
         data: updateData,

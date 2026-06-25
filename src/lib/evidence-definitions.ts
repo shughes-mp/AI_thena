@@ -46,7 +46,7 @@ export async function syncEvidenceQuestions(
     where: { sessionId },
     orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }],
   });
-  const checkpointIds = checkpoints.map((checkpoint) => checkpoint.id);
+  const checkpointIds = checkpoints.map((checkpoint: any) => checkpoint.id);
 
   await tx.evidenceQuestion.updateMany({
     where: {
@@ -78,7 +78,7 @@ export async function syncEvidenceQuestions(
 }
 
 export async function ensureNormalizedEvidenceDefinitions(sessionId: string) {
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: any) => {
     const session = await tx.session.findUnique({
       where: { id: sessionId },
       select: { learningOutcomes: true },

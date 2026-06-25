@@ -92,7 +92,7 @@ test("every Prisma model is represented in the Turso bootstrap schema", () => {
   );
   const modelNames = Array.from(
     prismaSchema.matchAll(/^model\s+(\w+)\s+\{/gm),
-    (match) => match[1]
+    (match: any) => match[1]
   );
 
   assert.ok(modelNames.length > 0);

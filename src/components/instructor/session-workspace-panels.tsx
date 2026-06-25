@@ -627,8 +627,8 @@ export function ReadingsSection({
             AI_thena uses these sources as its evidence base for learner dialogue. PDF, DOCX, TXT, or Markdown. Up to 10MB.
           </p>
           <div
-            onDrop={(e) => handlers.onDrop(e, "reading")}
-            onDragOver={(e) => handlers.onDragOver(e, "reading")}
+            onDrop={(e: any) => handlers.onDrop(e, "reading")}
+            onDragOver={(e: any) => handlers.onDragOver(e, "reading")}
             onDragLeave={handlers.onDragLeave}
             className={`relative flex min-h-[120px] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-6 py-10 text-center transition-colors ${
               dragActive === "reading"
@@ -654,7 +654,7 @@ export function ReadingsSection({
               type="file"
               accept=".pdf,.docx,.txt,.md"
               className="sr-only"
-              onChange={(e) => handlers.onFileChange(e, "reading")}
+              onChange={(e: any) => handlers.onFileChange(e, "reading")}
             />
           </div>
 
@@ -913,7 +913,7 @@ export function QuestionsSection({
                   key={checkpoint.id}
                   draggable
                   onDragStart={() => actions.onDragStartCheckpoint(checkpoint.id)}
-                  onDragOver={(e) => actions.onDragOverCheckpoint(e, checkpoint.id)}
+                  onDragOver={(e: any) => actions.onDragOverCheckpoint(e, checkpoint.id)}
                   onDrop={() => actions.onDropCheckpoint(checkpoint.id)}
                   onDragEnd={actions.onEndDragCheckpoint}
                   className={`rounded-xl border px-4 py-3 transition-colors ${
@@ -928,7 +928,7 @@ export function QuestionsSection({
                     <div className="space-y-3">
                       <textarea
                         value={editingCheckpointPrompt}
-                        onChange={(e) => setEditingCheckpointPrompt(e.target.value)}
+                        onChange={(e: any) => setEditingCheckpointPrompt(e.target.value)}
                         rows={3}
                         className="minerva-input w-full resize-none text-sm"
                         autoFocus
@@ -990,11 +990,11 @@ export function QuestionsSection({
             <label className="minerva-label">Design your own question below</label>
             <textarea
               value={newCheckpointPrompt}
-              onChange={(e) => setNewCheckpointPrompt(e.target.value)}
+              onChange={(e: any) => setNewCheckpointPrompt(e.target.value)}
               placeholder="e.g. What does Meadows mean by 'system behavior is intrinsic'?"
               rows={3}
               className="minerva-input w-full resize-none text-sm"
-              onKeyDown={(e) => {
+              onKeyDown={(e: any) => {
                 if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                   actions.onCreateCheckpoint();
                 }
@@ -1054,7 +1054,7 @@ export function GoalsSection({
   if (!session) return null;
 
   const updateSession = (updates: Partial<SessionDetails>) => {
-    setSession((prev) => (prev ? { ...prev, ...updates } : prev));
+    setSession((prev: any) => (prev ? { ...prev, ...updates } : prev));
   };
 
   return (
@@ -1131,7 +1131,7 @@ export function GoalsSection({
             <textarea
               id="learningOutcomes"
               value={session.learningOutcomes ?? ""}
-              onChange={(e) => updateSession({ learningOutcomes: e.target.value || null })}
+              onChange={(e: any) => updateSession({ learningOutcomes: e.target.value || null })}
               placeholder={"#system-analysis: Observe and deconstruct systems into constituent parts to explain the characteristics, and relationships among, those parts at multiple levels of analysis"}
               rows={4}
               className="minerva-input w-full resize-none text-sm"
@@ -1201,7 +1201,7 @@ export function TeachingContextSection({
   const isConfigured = !!(session.courseContext || session.learningGoal || session.learningOutcomes);
 
   function updateSession(updates: Partial<SessionDetails>) {
-    setSession((prev) => (prev ? { ...prev, ...updates } : prev));
+    setSession((prev: any) => (prev ? { ...prev, ...updates } : prev));
   }
 
   return (
@@ -1236,7 +1236,7 @@ export function TeachingContextSection({
             <textarea
               id="courseContext"
               value={session.courseContext ?? ""}
-              onChange={(e) => updateSession({ courseContext: e.target.value || null })}
+              onChange={(e: any) => updateSession({ courseContext: e.target.value || null })}
               placeholder="e.g. Week 4 of Systems Thinking. Learners have covered feedback loops and delays."
               rows={3}
               className="minerva-input w-full resize-none text-sm"
@@ -1254,7 +1254,7 @@ export function TeachingContextSection({
             <textarea
               id="learningGoal"
               value={session.learningGoal ?? ""}
-              onChange={(e) => updateSession({ learningGoal: e.target.value || null })}
+              onChange={(e: any) => updateSession({ learningGoal: e.target.value || null })}
               placeholder="e.g. Understand how system structure drives behavior - not external events."
               rows={3}
               className="minerva-input w-full resize-none text-sm"
@@ -1271,7 +1271,7 @@ export function TeachingContextSection({
             <textarea
               id="sessionDescription"
               value={session.description ?? ""}
-              onChange={(e) => updateSession({ description: e.target.value || null })}
+              onChange={(e: any) => updateSession({ description: e.target.value || null })}
               placeholder="e.g. Explain how the author's definition of X conflicts with Y. AI_thena will push you on your reasoning."
               rows={3}
               className="minerva-input w-full resize-none text-sm"
@@ -1282,7 +1282,7 @@ export function TeachingContextSection({
           <div className="border-t border-[var(--rule)] pt-6">
             <button
               type="button"
-              onClick={() => setShowAdvanced((v) => !v)}
+              onClick={() => setShowAdvanced((v: any) => !v)}
               className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--dim-grey)] hover:text-[var(--charcoal)]"
             >
               <svg
@@ -1336,7 +1336,7 @@ export function TeachingContextSection({
                     min={4}
                     max={100}
                     value={session.maxExchanges}
-                    onChange={(e) => updateSession({ maxExchanges: Number(e.target.value) })}
+                    onChange={(e: any) => updateSession({ maxExchanges: Number(e.target.value) })}
                     className="minerva-input w-32 text-sm"
                   />
                 </div>
@@ -1351,7 +1351,7 @@ export function TeachingContextSection({
                       id="opensAt"
                       type="datetime-local"
                       value={session.opensAt ? session.opensAt.slice(0, 16) : ""}
-                      onChange={(e) => updateSession({ opensAt: e.target.value ? new Date(e.target.value).toISOString() : null })}
+                      onChange={(e: any) => updateSession({ opensAt: e.target.value ? new Date(e.target.value).toISOString() : null })}
                       className="minerva-input w-full text-sm"
                     />
                   </div>
@@ -1363,7 +1363,7 @@ export function TeachingContextSection({
                       id="closesAt"
                       type="datetime-local"
                       value={session.closesAt ? session.closesAt.slice(0, 16) : ""}
-                      onChange={(e) => updateSession({ closesAt: e.target.value ? new Date(e.target.value).toISOString() : null })}
+                      onChange={(e: any) => updateSession({ closesAt: e.target.value ? new Date(e.target.value).toISOString() : null })}
                       className="minerva-input w-full text-sm"
                     />
                   </div>
@@ -1393,7 +1393,7 @@ export function TeachingContextSection({
                     {session.prerequisiteMap && (
                       <textarea
                         value={session.prerequisiteMap}
-                        onChange={(e) => updateSession({ prerequisiteMap: e.target.value || null })}
+                        onChange={(e: any) => updateSession({ prerequisiteMap: e.target.value || null })}
                         rows={6}
                         className="minerva-input w-full resize-y font-mono text-xs"
                       />
@@ -1490,8 +1490,8 @@ export function AssessmentsSection({
 
           {/* Drop zone */}
           <div
-            onDrop={(e) => handlers.onDrop(e, "assessment")}
-            onDragOver={(e) => handlers.onDragOver(e, "assessment")}
+            onDrop={(e: any) => handlers.onDrop(e, "assessment")}
+            onDragOver={(e: any) => handlers.onDragOver(e, "assessment")}
             onDragLeave={handlers.onDragLeave}
             className={`relative flex min-h-[120px] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-6 py-10 text-center transition-colors ${
               dragActive === "assessment"
@@ -1517,7 +1517,7 @@ export function AssessmentsSection({
               type="file"
               accept=".pdf,.docx,.txt,.md"
               className="sr-only"
-              onChange={(e) => handlers.onFileChange(e, "assessment")}
+              onChange={(e: any) => handlers.onFileChange(e, "assessment")}
             />
           </div>
 

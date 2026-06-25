@@ -91,8 +91,8 @@ export async function getReportFreshness(
     review?.createdAt,
     recommendation?.updatedAt,
     pivot?.updatedAt,
-    ...readings.map((reading) => reading.uploadedAt),
-    ...assessments.map((assessment) => assessment.uploadedAt),
+    ...readings.map((reading: any) => reading.uploadedAt),
+    ...assessments.map((assessment: any) => assessment.uploadedAt),
     outcome?.updatedAt,
     question?.updatedAt,
   ].filter((value): value is Date => Boolean(value));

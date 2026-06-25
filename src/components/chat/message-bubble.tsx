@@ -37,10 +37,10 @@ export const MessageBubble = memo(function MessageBubble({
             ) : (
               <ReactMarkdown
                 components={{
-                  p: ({ children }) => (
+                  p: ({ children }: any) => (
                     <p className="tutor-paragraph">{children}</p>
                   ),
-                  strong: ({ children }) => (
+                  strong: ({ children }: any) => (
                     <strong className="tutor-question">{children}</strong>
                   ),
                 }}

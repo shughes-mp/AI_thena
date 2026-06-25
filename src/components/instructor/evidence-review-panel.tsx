@@ -68,10 +68,10 @@ export function EvidenceReviewPanel({ sessionId }: EvidenceReviewPanelProps) {
     const questions = new Map<string, string>();
     const learners = new Map<string, string>();
     for (const signal of signals) {
-      signal.learningOutcomes.forEach((outcome) =>
+      signal.learningOutcomes.forEach((outcome: any) =>
         outcomes.set(outcome.id, outcome.label)
       );
-      signal.evidenceQuestions.forEach((question) =>
+      signal.evidenceQuestions.forEach((question: any) =>
         questions.set(question.id, question.prompt)
       );
       if (signal.studentSessionId && signal.learnerName) {
@@ -94,7 +94,7 @@ export function EvidenceReviewPanel({ sessionId }: EvidenceReviewPanelProps) {
     key: Key,
     value: EvidenceReviewFilters[Key]
   ) {
-    setFilters((current) => ({ ...current, [key]: value }));
+    setFilters((current: any) => ({ ...current, [key]: value }));
   }
 
   async function review(signal: EvidenceSignalRecord, action: EvidenceReviewAction) {
@@ -136,8 +136,8 @@ export function EvidenceReviewPanel({ sessionId }: EvidenceReviewPanelProps) {
       if (!response.ok || !data.signal) {
         throw new Error(data.error || "Could not save the review.");
       }
-      setSignals((current) =>
-        current.map((item) => (item.id === signal.id ? data.signal! : item))
+      setSignals((current: any) =>
+        current.map((item: any) => (item.id === signal.id ? data.signal! : item))
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save the review.");
@@ -167,7 +167,7 @@ export function EvidenceReviewPanel({ sessionId }: EvidenceReviewPanelProps) {
             These records predate stable citations and version metadata. They remain readable for compatibility, but cannot be approved as traceable evidence in this workflow.
           </p>
           <div className="mt-5 space-y-3">
-            {legacySignals.map((signal) => (
+            {legacySignals.map((signal: any) => (
               <div key={signal.id} className="rounded-lg border border-[var(--rule)] p-4">
                 <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--dim-grey)]">
                   <span className="rounded-full bg-slate-100 px-2 py-1 font-mono">legacy-unversioned</span>
@@ -196,7 +196,7 @@ export function EvidenceReviewPanel({ sessionId }: EvidenceReviewPanelProps) {
               <input
                 type="search"
                 value={filters.search}
-                onChange={(event) => updateFilter("search", event.target.value)}
+                onChange={(event: any) => updateFilter("search", event.target.value)}
                 className="mt-1.5 w-full border border-[var(--rule)] bg-white px-3 py-2 text-sm font-normal"
                 placeholder="Search evidence"
               />
@@ -314,7 +314,7 @@ export function EvidenceReviewPanel({ sessionId }: EvidenceReviewPanelProps) {
           No evidence signals match these filters.
         </div>
       ) : (
-        visibleSignals.map((signal) => (
+        visibleSignals.map((signal: any) => (
           <article
             key={signal.id}
             id={`signal-${signal.id}`}
@@ -337,7 +337,7 @@ export function EvidenceReviewPanel({ sessionId }: EvidenceReviewPanelProps) {
                   <ReactMarkdown>{signal.claim}</ReactMarkdown>
                 </div>
               </div>
-              <span className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${statusTone[signal.status]}`}>
+              <span className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${statusTone[signal.status as EvidenceSignalStatus]}`}>
                 {formatInstructorStatus(signal.status)}
               </span>
             </div>
@@ -347,7 +347,7 @@ export function EvidenceReviewPanel({ sessionId }: EvidenceReviewPanelProps) {
                 Show evidence
               </summary>
             <div className="mt-4 grid gap-4 lg:grid-cols-2">
-              {signal.citations.map((citation) => (
+              {signal.citations.map((citation: any) => (
                 <div key={citation.id} className="rounded-lg border border-[var(--rule)] p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--teal)]">
                     {citation.citationType === "source_passage" ? "Source evidence" : citation.citationType.replace(/_/g, " ")}
@@ -387,7 +387,7 @@ export function EvidenceReviewPanel({ sessionId }: EvidenceReviewPanelProps) {
               <p className="mt-2">{signal.limitations}</p>
               {signal.qualifications.length > 0 ? (
                 <ul className="mt-3 list-disc space-y-1 pl-5 text-[var(--dim-grey)]">
-                  {signal.qualifications.map((qualification) => (
+                  {signal.qualifications.map((qualification: any) => (
                     <li key={qualification.id}>
                       <span className="font-medium text-[var(--charcoal)]">
                         {qualification.kind.replaceAll("_", " ")}:
@@ -405,13 +405,13 @@ export function EvidenceReviewPanel({ sessionId }: EvidenceReviewPanelProps) {
                 {signal.learningOutcomes.length > 0 && (
                   <p className="text-[var(--charcoal)]">
                     <span className="font-semibold">Learning outcome:</span>{" "}
-                    {signal.learningOutcomes.map((outcome) => outcome.label).join(" · ")}
+                    {signal.learningOutcomes.map((outcome: any) => outcome.label).join(" · ")}
                   </p>
                 )}
                 {signal.evidenceQuestions.length > 0 && (
                   <p className="mt-2 text-[var(--dim-grey)]">
                     <span className="font-semibold text-[var(--charcoal)]">Evidence question:</span>{" "}
-                    {signal.evidenceQuestions.map((question) => question.prompt).join(" · ")}
+                    {signal.evidenceQuestions.map((question: any) => question.prompt).join(" · ")}
                   </p>
                 )}
               </div>
@@ -448,7 +448,7 @@ export function EvidenceReviewPanel({ sessionId }: EvidenceReviewPanelProps) {
               <details className="mt-5 text-sm text-[var(--dim-grey)]">
                 <summary className="cursor-pointer font-medium text-[var(--charcoal)]">Review history ({signal.reviews.length})</summary>
                 <ol className="mt-3 space-y-2">
-                  {signal.reviews.map((item) => (
+                  {signal.reviews.map((item: any) => (
                     <li key={item.id} className="rounded-md bg-[rgba(34,34,34,0.03)] p-3">
                       {item.action.replace(/_/g, " ")} · {item.previousStatus} → {item.newStatus}
                       {(item.rationale || item.contextualNote) && <p className="mt-1">{item.rationale || item.contextualNote}</p>}
@@ -504,7 +504,7 @@ function SelectField({
       {label}
       <select
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={(event: any) => onChange(event.target.value)}
         className="mt-1.5 w-full border border-[var(--rule)] bg-white px-3 py-2 text-sm font-normal"
       >
         {options.map((option) => (

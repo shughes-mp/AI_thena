@@ -65,7 +65,7 @@ function planningResponse(
     session: planningSession,
     checkpoints: session.checkpoints,
     readingCount: session.readings.length,
-    assessmentContents: session.assessments.map((assessment) => assessment.content),
+    assessmentContents: session.assessments.map((assessment: any) => assessment.content),
     pivots,
     participation,
   });

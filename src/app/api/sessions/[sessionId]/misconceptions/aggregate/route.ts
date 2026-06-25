@@ -207,7 +207,7 @@ ${claims.join("\n")}`,
       ],
     });
 
-    const content = response.content.find((item) => item.type === "text");
+    const content = response.content.find((item: any) => item.type === "text");
     if (!content || content.type !== "text") {
       throw new Error("No text content returned.");
     }
@@ -356,7 +356,7 @@ export async function GET(
     ]);
 
     const usableMisconceptions = misconceptions.filter(
-      (record) =>
+      (record: any) =>
         !record.evidenceSignal ||
         (record.evidenceSignal.status !== "rejected" &&
           record.evidenceSignal.status !== "superseded")
@@ -369,7 +369,7 @@ export async function GET(
         avgMisconceptionsPerStudent: 0,
         overallResolutionRate: 0,
         engagementSummary: Object.fromEntries(
-          engagementCounts.map((row) => [row.engagementFlag, row._count])
+          engagementCounts.map((row: any) => [row.engagementFlag, row._count])
         ) as EngagementSummary,
       };
 
@@ -381,12 +381,12 @@ export async function GET(
     }
 
     const overrideByLabel = new Map(
-      overrides.map((override) => [normalizeLabel(override.clusterLabel), override])
+      overrides.map((override: any) => [normalizeLabel(override.clusterLabel), override])
     );
 
     const bins = new Map<string, Bin>();
 
-    usableMisconceptions.forEach((misconception) => {
+    usableMisconceptions.forEach((misconception: any) => {
       const anchor = getAnchorLabel(
         misconception.passageAnchor,
         misconception.topicThread
@@ -412,7 +412,7 @@ export async function GET(
       const semanticGroups = await buildSemanticGroups(bin);
 
       semanticGroups.forEach((group, index) => {
-        const override = overrideByLabel.get(normalizeLabel(group.label)) ?? null;
+        const override = (overrideByLabel.get(normalizeLabel(group.label)) ?? null) as { overrideType: string } | null;
         if (override?.overrideType === "acceptable_interpretation") {
           return;
         }
@@ -525,7 +525,7 @@ export async function GET(
             clusters.length
           : 0,
       engagementSummary: Object.fromEntries(
-        engagementCounts.map((row) => [row.engagementFlag, row._count])
+        engagementCounts.map((row: any) => [row.engagementFlag, row._count])
       ) as EngagementSummary,
     };
 

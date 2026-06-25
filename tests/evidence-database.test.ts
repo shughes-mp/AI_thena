@@ -213,7 +213,7 @@ test("migrated evidence database preserves normalized links and provenance", asy
       assert.equal(loaded.learningOutcomeLinks[0].learningOutcome.id, outcome.id);
       assert.equal(loaded.evidenceQuestionLinks[0].evidenceQuestion.id, question.id);
       assert.deepEqual(
-        loaded.qualifications.map((item) => item.kind).sort(),
+        loaded.qualifications.map((item: any) => item.kind).sort(),
         ["contradictory_evidence", "missing_evidence"]
       );
       await assert.rejects(client.learningOutcome.delete({ where: { id: outcome.id } }));

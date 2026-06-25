@@ -370,10 +370,10 @@ export async function POST(
 
     const transcriptContext = session.studentSessions
       .slice(0, 5)
-      .map((studentSession) => {
+      .map((studentSession: any) => {
         const excerpt = studentSession.messages
           .slice(0, 8)
-          .map((message) => `${message.role.toUpperCase()}: ${message.content}`)
+          .map((message: any) => `${message.role.toUpperCase()}: ${message.content}`)
           .join("\n");
 
         return `Student ${studentSession.studentName} (${studentSession.id})\n${excerpt}`;

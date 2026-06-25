@@ -90,7 +90,7 @@ export async function POST(
         ? body.processLevel
         : "infer";
 
-    const checkpoint = await prisma.$transaction(async (tx) => {
+    const checkpoint = await prisma.$transaction(async (tx: any) => {
       const maxCheckpoint = await tx.checkpoint.findFirst({
         where: { sessionId },
         orderBy: { orderIndex: "desc" },
@@ -157,7 +157,7 @@ export async function DELETE(
       );
     }
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       await tx.evidenceQuestion.updateMany({
         where: { checkpointId },
         data: { active: false, checkpointId: null },

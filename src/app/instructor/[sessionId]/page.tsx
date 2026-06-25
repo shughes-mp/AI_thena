@@ -269,7 +269,7 @@ export default function SessionManagementPage() {
     setDragActive(null);
     const droppedFiles = Array.from(e.dataTransfer.files);
     if (droppedFiles.length > 0) {
-      handleUpload(droppedFiles[0], category);
+      handleUpload(droppedFiles[0] as File, category);
     }
   }
 
@@ -356,7 +356,7 @@ export default function SessionManagementPage() {
         throw new Error(data.error || "Failed to generate prerequisite map.");
       }
       const data = await res.json();
-      setSession((prev) =>
+      setSession((prev: any) =>
         prev
           ? {
               ...prev,
@@ -460,7 +460,7 @@ export default function SessionManagementPage() {
         throw new Error(data?.error || "Failed to add outcome.");
       }
 
-      setSuggestions((prev) => prev.filter((_, suggestionIndex) => suggestionIndex !== index));
+      setSuggestions((prev: any) => prev.filter((_: any, suggestionIndex: any) => suggestionIndex !== index));
       await fetchCheckpoints();
       setToast({ tone: "success", message: "Outcome added." });
     } catch (err) {
@@ -473,7 +473,7 @@ export default function SessionManagementPage() {
   }
 
   function dismissSuggestion(index: number) {
-    setSuggestions((prev) => prev.filter((_, suggestionIndex) => suggestionIndex !== index));
+    setSuggestions((prev: any) => prev.filter((_: any, suggestionIndex: any) => suggestionIndex !== index));
   }
 
   function startEditingCheckpoint(checkpoint: CheckpointRecord) {
@@ -544,8 +544,8 @@ export default function SessionManagementPage() {
   }
 
   async function reorderCheckpoints(fromCheckpointId: string, toCheckpointId: string) {
-    const currentIndex = checkpoints.findIndex((checkpoint) => checkpoint.id === fromCheckpointId);
-    const targetIndex = checkpoints.findIndex((checkpoint) => checkpoint.id === toCheckpointId);
+    const currentIndex = checkpoints.findIndex((checkpoint: any) => checkpoint.id === fromCheckpointId);
+    const targetIndex = checkpoints.findIndex((checkpoint: any) => checkpoint.id === toCheckpointId);
 
     if (
       currentIndex < 0 ||
@@ -673,8 +673,8 @@ export default function SessionManagementPage() {
     }
   }
 
-  const readings = files.filter((f) => f.category === "reading");
-  const assessments = files.filter((f) => f.category === "assessment");
+  const readings = files.filter((f: any) => f.category === "reading");
+  const assessments = files.filter((f: any) => f.category === "assessment");
   const hasLearningOutcome = Boolean(session?.learningOutcomes?.trim());
   const hasReadings = readings.length > 0;
   const hasQuestions = checkpoints.length > 0;
@@ -735,7 +735,7 @@ export default function SessionManagementPage() {
 
         <GoalsSection 
           open={showGoals}
-          onToggle={() => setShowGoals((v) => !v)}
+          onToggle={() => setShowGoals((v: any) => !v)}
           session={session}
           setSession={setSession}
           uiState={{ savingConfig, showSavedState, configSavedAt }}
@@ -746,7 +746,7 @@ export default function SessionManagementPage() {
         <div id="source-materials">
           <ReadingsSection
             open={showReadings}
-            onToggle={() => setShowReadings((value) => !value)}
+            onToggle={() => setShowReadings((value: any) => !value)}
             readings={readings}
             uiState={{
               dragActive,
@@ -768,7 +768,7 @@ export default function SessionManagementPage() {
         <div id="core-questions">
           <QuestionsSection
             open={showQuestions}
-            onToggle={() => setShowQuestions((value) => !value)}
+            onToggle={() => setShowQuestions((value: any) => !value)}
             session={session}
             readingsCount={readings.length}
             checkpoints={checkpoints}
@@ -807,7 +807,7 @@ export default function SessionManagementPage() {
         <section id="preview-share" className="minerva-card overflow-hidden scroll-mt-24">
           <button
             type="button"
-            onClick={() => setShowPreviewShare((value) => !value)}
+            onClick={() => setShowPreviewShare((value: any) => !value)}
             className="flex w-full items-center justify-between px-6 py-6 text-left transition-colors hover:bg-[rgba(34,34,34,0.02)] md:px-8"
             aria-expanded={showPreviewShare}
             aria-controls="preview-share-panel"
@@ -830,7 +830,7 @@ export default function SessionManagementPage() {
               <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${previewChecked ? "text-[var(--teal)]" : previewReady ? "text-[var(--charcoal)]" : "text-[var(--dim-grey)]"}`}>
                 {previewChecked ? "Configured" : previewReady ? "Ready" : "Locked"}
               </span>
-              <ChevronIcon open={showPreviewShare} />
+              <svg className={`h-4 w-4 transition-transform ${showPreviewShare ? "rotate-180" : ""}`} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" /></svg>
             </div>
           </button>
 
@@ -879,7 +879,7 @@ export default function SessionManagementPage() {
         <section className="minerva-card overflow-hidden" aria-labelledby="optional-planning-heading">
           <button
             type="button"
-            onClick={() => setShowOptionalPlanning((value) => !value)}
+            onClick={() => setShowOptionalPlanning((value: any) => !value)}
             className="flex w-full items-center justify-between p-6 text-left md:p-8"
             aria-expanded={showOptionalPlanning}
             aria-controls="optional-planning-panel"
@@ -901,7 +901,7 @@ export default function SessionManagementPage() {
               <div id="teaching-context">
                 <TeachingContextSection
                   open={showConfig}
-                  onToggle={() => setShowConfig((value) => !value)}
+                  onToggle={() => setShowConfig((value: any) => !value)}
                   session={session}
                   setSession={setSession}
                   setShowAdvanced={setShowAdvanced}
@@ -929,7 +929,7 @@ export default function SessionManagementPage() {
               >
                 <button
                   type="button"
-                  onClick={() => setShowSourceUseDetails((value) => !value)}
+                  onClick={() => setShowSourceUseDetails((value: any) => !value)}
                   className="flex w-full items-center justify-between gap-4 p-6 text-left md:p-8"
                   aria-expanded={showSourceUseDetails}
                   aria-controls="source-use-details"
@@ -980,7 +980,7 @@ export default function SessionManagementPage() {
               <div id="protected-assessment-materials">
                 <AssessmentsSection
                   open={showAssessments}
-                  onToggle={() => setShowAssessments((value) => !value)}
+                  onToggle={() => setShowAssessments((value: any) => !value)}
                   assessments={assessments}
                   uiState={{
                     dragActive,
@@ -1006,7 +1006,7 @@ export default function SessionManagementPage() {
           <section className="minerva-card p-6 md:p-8">
             <button
               type="button"
-              onClick={() => setShowDangerZone((value) => !value)}
+              onClick={() => setShowDangerZone((value: any) => !value)}
               className="flex w-full items-center justify-between gap-4 text-left"
               aria-expanded={showDangerZone}
               aria-controls="danger-zone"

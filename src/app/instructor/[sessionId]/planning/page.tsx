@@ -153,7 +153,7 @@ export default function SessionPlanningPage() {
   }, [notice]);
 
   function updatePlan(updates: Partial<PlanningResponse["plan"]>) {
-    setData((current) =>
+    setData((current: any) =>
       current ? { ...current, plan: { ...current.plan, ...updates } } : current
     );
   }
@@ -165,7 +165,7 @@ export default function SessionPlanningPage() {
 
   function updatePivot(index: number, updates: Partial<AnticipatedPivotPoint>) {
     if (!data) return;
-    const pivots = data.plan.pivots.map((pivot, pivotIndex) =>
+    const pivots = data.plan.pivots.map((pivot: any, pivotIndex: any) =>
       pivotIndex === index ? { ...pivot, ...updates } : pivot
     );
     updatePlan({ pivots });
@@ -370,7 +370,7 @@ export default function SessionPlanningPage() {
               <PreviewItem label="Evidence questions">
                 {data.preview.evidenceQuestions.length > 0 ? (
                   <ol className="list-decimal space-y-2 pl-5">
-                    {data.preview.evidenceQuestions.map((question) => (
+                    {data.preview.evidenceQuestions.map((question: any) => (
                       <li key={question.id}>
                         {question.prompt}{" "}
                         <span className="text-xs text-[var(--dim-grey)]">
@@ -408,7 +408,7 @@ export default function SessionPlanningPage() {
               Fix risks before launch
             </h2>
             <div className="mt-6 space-y-3">
-              {data.checks.map((check) => (
+              {data.checks.map((check: any) => (
                 <article key={check.code} className="border border-[var(--rule)] bg-white p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <h3 className="font-semibold text-[var(--charcoal)]">
@@ -462,7 +462,7 @@ export default function SessionPlanningPage() {
                 </span>
                 <textarea
                   value={data.plan.openingQuestion}
-                  onChange={(event) =>
+                  onChange={(event: any) =>
                     updatePlan({ openingQuestion: event.target.value })
                   }
                   disabled={!data.canEdit}
@@ -480,7 +480,7 @@ export default function SessionPlanningPage() {
                 </span>
                 <textarea
                   value={data.plan.taskInstructions}
-                  onChange={(event) =>
+                  onChange={(event: any) =>
                     updatePlan({ taskInstructions: event.target.value })
                   }
                   disabled={!data.canEdit}
@@ -497,7 +497,7 @@ export default function SessionPlanningPage() {
                 </span>
                 <textarea
                   value={data.plan.intendedOutput}
-                  onChange={(event) =>
+                  onChange={(event: any) =>
                     updatePlan({ intendedOutput: event.target.value })
                   }
                   disabled={!data.canEdit}
@@ -561,7 +561,7 @@ export default function SessionPlanningPage() {
           ) : null}
 
           <div className="mt-6 space-y-6">
-            {data.plan.pivots.map((pivot, index) => (
+            {data.plan.pivots.map((pivot: any, index: any) => (
               <article
                 key={pivot.id}
                 className="border-l-4 border-[var(--teal)] bg-[rgba(17,120,144,0.04)] p-5 md:p-6"
@@ -577,7 +577,7 @@ export default function SessionPlanningPage() {
                       onClick={() =>
                         updatePlan({
                           pivots: data.plan.pivots.filter(
-                            (_, itemIndex) => itemIndex !== index
+                            (_: any, itemIndex: any) => itemIndex !== index
                           ),
                         })
                       }
@@ -594,7 +594,7 @@ export default function SessionPlanningPage() {
                       rows={2}
                       disabled={!data.canEdit}
                       value={pivot.likelyWobblePoint}
-                      onChange={(event) =>
+                      onChange={(event: any) =>
                         updatePivot(index, { likelyWobblePoint: event.target.value })
                       }
                       className="minerva-input mt-2 w-full resize-y"
@@ -607,7 +607,7 @@ export default function SessionPlanningPage() {
                       rows={3}
                       disabled={!data.canEdit}
                       value={pivot.watchFor}
-                      onChange={(event) =>
+                      onChange={(event: any) =>
                         updatePivot(index, { watchFor: event.target.value })
                       }
                       className="minerva-input mt-2 w-full resize-y"
@@ -620,7 +620,7 @@ export default function SessionPlanningPage() {
                       rows={3}
                       disabled={!data.canEdit}
                       value={pivot.diagnosisQuestion}
-                      onChange={(event) =>
+                      onChange={(event: any) =>
                         updatePivot(index, { diagnosisQuestion: event.target.value })
                       }
                       className="minerva-input mt-2 w-full resize-y"
@@ -632,7 +632,7 @@ export default function SessionPlanningPage() {
                     <select
                       disabled={!data.canEdit}
                       value={pivot.initialMode}
-                      onChange={(event) =>
+                      onChange={(event: any) =>
                         updatePivot(index, {
                           initialMode: event.target.value as PlannedFacilitationMode,
                         })
@@ -653,7 +653,7 @@ export default function SessionPlanningPage() {
                       rows={3}
                       disabled={!data.canEdit}
                       value={pivot.intendedOutput}
-                      onChange={(event) =>
+                      onChange={(event: any) =>
                         updatePivot(index, { intendedOutput: event.target.value })
                       }
                       className="minerva-input mt-2 w-full resize-y"
@@ -666,7 +666,7 @@ export default function SessionPlanningPage() {
                       rows={3}
                       disabled={!data.canEdit}
                       value={pivot.guidePhrase}
-                      onChange={(event) =>
+                      onChange={(event: any) =>
                         updatePivot(index, { guidePhrase: event.target.value })
                       }
                       className="minerva-input mt-2 w-full resize-y"
@@ -679,7 +679,7 @@ export default function SessionPlanningPage() {
                       rows={3}
                       disabled={!data.canEdit}
                       value={pivot.conductorPhrase}
-                      onChange={(event) =>
+                      onChange={(event: any) =>
                         updatePivot(index, { conductorPhrase: event.target.value })
                       }
                       className="minerva-input mt-2 w-full resize-y"
@@ -692,7 +692,7 @@ export default function SessionPlanningPage() {
                       rows={3}
                       disabled={!data.canEdit}
                       value={pivot.escalationCondition}
-                      onChange={(event) =>
+                      onChange={(event: any) =>
                         updatePivot(index, {
                           escalationCondition: event.target.value,
                         })
@@ -707,7 +707,7 @@ export default function SessionPlanningPage() {
                       rows={3}
                       disabled={!data.canEdit}
                       value={pivot.releaseCondition}
-                      onChange={(event) =>
+                      onChange={(event: any) =>
                         updatePivot(index, { releaseCondition: event.target.value })
                       }
                       className="minerva-input mt-2 w-full resize-y"
@@ -746,7 +746,7 @@ export default function SessionPlanningPage() {
                   rows={3}
                   disabled={!data.canEdit}
                   value={data.plan.participation[field.key]}
-                  onChange={(event) => updateParticipation(field.key, event.target.value)}
+                  onChange={(event: any) => updateParticipation(field.key, event.target.value)}
                   placeholder={field.placeholder}
                   className="minerva-input mt-2 w-full resize-y"
                 />

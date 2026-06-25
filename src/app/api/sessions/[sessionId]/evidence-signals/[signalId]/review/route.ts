@@ -66,7 +66,7 @@ export async function POST(
     }
 
     const previousStateChange = existing.reviews.find(
-      (review) => review.previousStatus !== review.newStatus
+      (review: any) => review.previousStatus !== review.newStatus
     );
     const previousForUndo = previousStateChange?.previousStatus as
       | EvidenceStatus

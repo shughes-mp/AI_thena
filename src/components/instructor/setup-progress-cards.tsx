@@ -3,6 +3,7 @@
 export type SetupStepStatus = "complete" | "attention" | "ready" | "locked";
 
 export interface SetupProgressItem {
+  key?: string | number | null;
   step: number;
   title: string;
   description: string;

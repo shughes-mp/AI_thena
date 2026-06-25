@@ -227,10 +227,10 @@ export default function StudentMonitorPage() {
               students.length > 0 &&
               (() => {
                 const concernCount = students.filter(
-                  (student) => student.hasRecentEngagementConcern
+                  (student: any) => student.hasRecentEngagementConcern
                 ).length;
                 const waitingLong = students.filter(
-                  (student) =>
+                  (student: any) =>
                     student.isWaitingForStudentReply &&
                     (student.secondsSinceLastMessage ?? 0) > 180
                 ).length;
@@ -278,7 +278,7 @@ export default function StudentMonitorPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--rule)]">
-                  {students.map((student) => {
+                  {students.map((student: any) => {
                     const isExpanded = expandedId === student.id;
                     const lastActive = student.lastActiveAt;
 
@@ -317,7 +317,7 @@ export default function StudentMonitorPage() {
                                     Why flagged and what to do
                                   </summary>
                                   <div className="mt-2 space-y-3 border-l-2 border-[var(--rule)] pl-3">
-                                    {student.reviewSignals.map((signal) => (
+                                    {student.reviewSignals.map((signal: any) => (
                                       <div key={`${signal.type}-${signal.relevantExchange}`}>
                                         <p className="font-medium text-[var(--charcoal)]">
                                           {signal.observed}
@@ -407,7 +407,7 @@ export default function StudentMonitorPage() {
                                           Topic evidence
                                         </p>
                                         <div className="mt-2 flex flex-wrap gap-2">
-                                          {expandedDetail.topicMastery.map((topicMastery) => (
+                                          {expandedDetail.topicMastery.map((topicMastery: any) => (
                                             <span
                                               key={topicMastery.id}
                                               className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium ${

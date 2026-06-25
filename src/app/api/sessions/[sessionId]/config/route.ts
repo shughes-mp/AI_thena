@@ -85,7 +85,7 @@ export async function PATCH(
       updateData.sessionPurpose = sessionPurpose;
     }
 
-    const updated = await prisma.$transaction(async (tx) => {
+    const updated = await prisma.$transaction(async (tx: any) => {
       const next = await tx.session.update({
         where: { id: sessionId },
         data: updateData,

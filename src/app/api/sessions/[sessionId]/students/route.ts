@@ -55,9 +55,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ sessionI
     });
 
     return NextResponse.json(
-      studentSessions.map((studentSession) => ({
+      studentSessions.map((studentSession: any) => ({
         ...studentSession,
-        messages: studentSession.messages.map((message, index) => ({
+        messages: studentSession.messages.map((message: any, index: any) => ({
           ...message,
           hidden:
             index === 0 &&

@@ -310,7 +310,7 @@ export async function generateInstructorReport(sessionId: string) {
     if (student.confidenceChecks.length > 0) {
       transcriptData += `Confidence ratings: ${student.confidenceChecks
         .map(
-          (check) =>
+          (check: any) =>
             `[${check.topicThread}: ${check.rating}, probeAsked=${check.probeAsked}, probeResult=${check.probeResult || "pending"}]`
         )
         .join(", ")}\n`;
@@ -318,14 +318,14 @@ export async function generateInstructorReport(sessionId: string) {
 
     if (student.misconceptions.length > 0) {
       transcriptData += "Misconceptions:\n";
-      student.misconceptions.forEach((misconception) => {
+      student.misconceptions.forEach((misconception: any) => {
         transcriptData += `- Topic: ${misconception.topicThread} | Gap: ${misconception.description} | Severity: ${misconception.severity} | Quote: "${misconception.studentMessage}" | Resolved: ${misconception.resolved} | Persistently unresolved: ${misconception.persistentlyUnresolved}\n`;
         totalMisconceptions += 1;
       });
     }
 
     const directAnswers = student.messages.filter(
-      (message) =>
+      (message: any) =>
         message.role === "assistant" &&
         message.mode === "socratic" &&
         (message.attemptNumber ?? 0) >= 3
@@ -336,40 +336,40 @@ export async function generateInstructorReport(sessionId: string) {
     }
 
     const questionTypeCounts = student.messages
-      .filter((message) => message.role === "assistant" && message.questionType)
-      .reduce((acc, message) => {
+      .filter((message: any) => message.role === "assistant" && message.questionType)
+      .reduce((acc: any, message: any) => {
         acc[message.questionType!] = (acc[message.questionType!] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
     const feedbackCounts = student.messages
-      .filter((message) => message.role === "assistant" && message.feedbackType)
-      .reduce((acc, message) => {
+      .filter((message: any) => message.role === "assistant" && message.feedbackType)
+      .reduce((acc: any, message: any) => {
         acc[message.feedbackType!] = (acc[message.feedbackType!] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
 
     transcriptData += `Topics engaged: ${Array.from(
-      new Set(student.messages.map((message) => message.topicThread).filter(Boolean))
+      new Set(student.messages.map((message: any) => message.topicThread).filter(Boolean))
     ).join(", ")}\n`;
     transcriptData += `Question types used: ${JSON.stringify(questionTypeCounts)}\n`;
     transcriptData += `Feedback breakdown: ${JSON.stringify(feedbackCounts)}\n`;
 
     if (student.topicMastery.length > 0) {
       transcriptData += "Topic evidence:\n";
-      student.topicMastery.forEach((mastery) => {
+      student.topicMastery.forEach((mastery: any) => {
         transcriptData += `- ${mastery.topicThread}: ${mastery.status} (criteria: ${mastery.criteriamet}, rung: ${mastery.hintLadderRung})\n`;
       });
     }
 
     if (student.studentCheckpoints.length > 0) {
       transcriptData += "Checkpoint coverage:\n";
-      student.studentCheckpoints.forEach((checkpoint) => {
+      student.studentCheckpoints.forEach((checkpoint: any) => {
         transcriptData += `- ${checkpoint.checkpointId}: ${checkpoint.status} (turnsSpent: ${checkpoint.turnsSpent})\n`;
       });
     }
 
     transcriptData += "Transcript excerpt log:\n";
-    student.messages.forEach((message, index) => {
+    student.messages.forEach((message: any, index: any) => {
       const exchangeNumber =
         message.role === "assistant" ? Math.ceil((index + 1) / 2) : Math.ceil((index + 1) / 2);
       transcriptData += `[Exchange ${exchangeNumber}] ${message.role.toUpperCase()}: ${message.content}\n`;
@@ -402,7 +402,7 @@ export async function generateInstructorReport(sessionId: string) {
 
   if (learningOutcomes.length > 0) {
     const studentSessionMap = new Map(
-      session.studentSessions.map((student) => [student.id, student])
+      session.studentSessions.map((student: any) => [student.id, student])
     );
 
     await prisma.lOAssessment.deleteMany({
@@ -429,7 +429,7 @@ export async function generateInstructorReport(sessionId: string) {
         continue;
       }
 
-      const student = studentSessionMap.get(studentSessionId);
+      const student = studentSessionMap.get(studentSessionId) as any;
       if (!student) continue;
 
       const matchingLearningOutcome = findMatchingLearningOutcome(
@@ -441,13 +441,13 @@ export async function generateInstructorReport(sessionId: string) {
       const processMetrics = {
         hintRungs: Math.max(
           0,
-          ...student.topicMastery.map((item) => item.hintLadderRung)
+          ...student.topicMastery.map((item: any) => item.hintLadderRung)
         ),
         misconceptionCount: student.misconceptions.length,
-        misconceptionsResolved: student.misconceptions.filter((item) => item.resolved)
+        misconceptionsResolved: student.misconceptions.filter((item: any) => item.resolved)
           .length,
         checkpointsAddressed: student.studentCheckpoints.filter(
-          (item) => item.status !== "unseen"
+          (item: any) => item.status !== "unseen"
         ).length,
       };
 

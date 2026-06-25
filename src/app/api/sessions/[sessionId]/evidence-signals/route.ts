@@ -58,7 +58,7 @@ export async function GET(
     return NextResponse.json({
       signals: renderable.map(serializeEvidenceSignal),
       omittedForMissingCitations: signals.length - renderable.length,
-      legacyUnversioned: legacyMisconceptions.map((item) => ({
+      legacyUnversioned: legacyMisconceptions.map((item: any) => ({
         id: item.id,
         learnerName: item.studentSession.studentName,
         claim: item.canonicalClaim || item.studentMessage,

@@ -40,7 +40,7 @@ export async function evaluateMastery(
     }
 
     const hasOpenMisconception = misconceptions.some(
-      (item) => item.studentMessage === student.content && !item.resolved
+      (item: any) => item.studentMessage === student.content && !item.resolved
     );
 
     if (hasOpenMisconception || !isSubstantiveResponse(student.content)) {
@@ -64,14 +64,14 @@ export async function evaluateMastery(
   }
 
   const misconceptionsClear =
-    misconceptions.length > 0 && misconceptions.every((item) => item.resolved);
+    misconceptions.length > 0 && misconceptions.every((item: any) => item.resolved);
   const directAnswerGiven = messages.some(
-    (message) =>
+    (message: any) =>
       message.role === "assistant" &&
       message.mode === "socratic" &&
       (message.attemptNumber ?? 0) >= 3
   );
-  const uncertain = confidenceChecks.some((item) => item.rating === "uncertain");
+  const uncertain = confidenceChecks.some((item: any) => item.rating === "uncertain");
 
   const criteriaMet: string[] = [];
   if (explainPassed) criteriaMet.push("EXPLAIN_PASSED");

@@ -34,6 +34,7 @@ function PivotCard({
   canEdit,
   onUpdated,
 }: {
+  key?: string | number | null;
   pivot: FacilitationRecommendationRecord;
   canEdit: boolean;
   onUpdated: (pivot: FacilitationRecommendationRecord) => void;
@@ -185,7 +186,7 @@ function PivotCard({
               If this recommendation is inappropriate, briefly explain why
               <textarea
                 value={feedback}
-                onChange={(event) => setFeedback(event.target.value)}
+                onChange={(event: any) => setFeedback(event.target.value)}
                 rows={2}
                 maxLength={2000}
                 className="minerva-input mt-2 w-full"
@@ -206,7 +207,7 @@ function PivotCard({
               Choose a different mode
               <select
                 value={selectedMode}
-                onChange={(event) => setSelectedMode(event.target.value as typeof selectedMode)}
+                onChange={(event: any) => setSelectedMode(event.target.value as typeof selectedMode)}
                 className="minerva-input mt-2 w-full"
               >
                 <option value="observer">Observer · step back</option>
@@ -218,7 +219,7 @@ function PivotCard({
               Edit the ready-to-use phrase
               <textarea
                 value={phrase}
-                onChange={(event) => setPhrase(event.target.value)}
+                onChange={(event: any) => setPhrase(event.target.value)}
                 rows={3}
                 maxLength={800}
                 className="minerva-input mt-2 w-full"
@@ -248,7 +249,7 @@ function PivotCard({
                 Move used
                 <textarea
                   value={actionUsed}
-                  onChange={(event) => setActionUsed(event.target.value)}
+                  onChange={(event: any) => setActionUsed(event.target.value)}
                   rows={3}
                   maxLength={1200}
                   className="minerva-input mt-2 w-full"
@@ -258,7 +259,7 @@ function PivotCard({
                 Did it help?
                 <select
                   value={helpfulness}
-                  onChange={(event) => setHelpfulness(event.target.value as typeof helpfulness)}
+                  onChange={(event: any) => setHelpfulness(event.target.value as typeof helpfulness)}
                   className="minerva-input mt-2 w-full"
                 >
                   <option value="not_yet_known">Not yet known</option>
@@ -271,7 +272,7 @@ function PivotCard({
                 Why was this useful or inappropriate?
                 <textarea
                   value={feedback}
-                  onChange={(event) => setFeedback(event.target.value)}
+                  onChange={(event: any) => setFeedback(event.target.value)}
                   rows={3}
                   maxLength={2000}
                   className="minerva-input mt-2 w-full"
@@ -375,7 +376,7 @@ export function FacilitationPivotPanel({
   }
 
   function replacePivot(updated: FacilitationRecommendationRecord) {
-    setPivots((current) => current.map((pivot) => (pivot.id === updated.id ? updated : pivot)));
+    setPivots((current: any) => current.map((pivot: any) => (pivot.id === updated.id ? updated : pivot)));
   }
 
   return (
@@ -416,7 +417,7 @@ export function FacilitationPivotPanel({
         </div>
       ) : (
         <div className="mt-5 space-y-5">
-          {pivots.map((pivot) => (
+          {pivots.map((pivot: any) => (
             <PivotCard key={pivot.id} pivot={pivot} canEdit={canEdit} onUpdated={replacePivot} />
           ))}
         </div>

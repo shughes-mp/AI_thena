@@ -633,7 +633,7 @@ export default function SessionAnalysisPage() {
   const loAssessmentsByStudent = useMemo(() => {
     if (!loAssessments) return {};
     return loAssessments.reduce(
-      (acc, assessment) => {
+      (acc: any, assessment: any) => {
         const studentId = assessment.studentSession.id;
         const studentName = assessment.studentSession.studentName;
         const group = acc[studentId] ?? (acc[studentId] = { studentName, assessments: [] });
@@ -834,7 +834,7 @@ export default function SessionAnalysisPage() {
                     </p>
                   ) : (
                     <div className="space-y-3">
-                      {clusters.slice(0, 5).map((cluster) => (
+                      {clusters.slice(0, 5).map((cluster: any) => (
                         <div
                           key={cluster.id}
                           className="flex flex-col gap-3 rounded-xl border border-[var(--rule)] bg-white p-4 md:flex-row md:items-start md:justify-between"
@@ -961,7 +961,7 @@ export default function SessionAnalysisPage() {
               title="What happened"
               subtitle="Summary of the session and what students demonstrated"
               open={openWhat}
-              onToggle={() => setOpenWhat((v) => !v)}
+              onToggle={() => setOpenWhat((v: any) => !v)}
             />
 
             {/* Report sections (async) — gated on openWhat */}
@@ -1014,7 +1014,7 @@ export default function SessionAnalysisPage() {
               title="What it means"
               subtitle="How ready students are for class and the misconceptions they're carrying in"
               open={openMeans}
-              onToggle={() => setOpenMeans((v) => !v)}
+              onToggle={() => setOpenMeans((v: any) => !v)}
             />
 
             {/* Readiness heatmap + misconceptions + difficulty + LO — gated on openMeans */}
@@ -1049,7 +1049,7 @@ export default function SessionAnalysisPage() {
                   </div>
                 </div>
                 <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {checkpointDifficulty.map((checkpoint) => (
+                  {checkpointDifficulty.map((checkpoint: any) => (
                     <div
                       key={checkpoint.checkpointId}
                       className={`rounded-xl border p-5 ${
@@ -1138,7 +1138,7 @@ export default function SessionAnalysisPage() {
                     No misunderstanding signals have been logged for this session yet.
                   </div>
                 ) : (
-                  topClusters.map((cluster) => (
+                  topClusters.map((cluster: any) => (
                     <div key={cluster.id} className="minerva-card p-6">
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div className="min-w-0 flex-1">
@@ -1238,7 +1238,7 @@ export default function SessionAnalysisPage() {
                           <button
                             type="button"
                             onClick={() =>
-                              setExpandedClusterId((current) =>
+                              setExpandedClusterId((current: any) =>
                                 current === cluster.id ? null : cluster.id
                               )
                             }
@@ -1255,7 +1255,7 @@ export default function SessionAnalysisPage() {
                             Examples in this cluster
                           </p>
                           <ul className="mt-3 space-y-3 text-sm text-[var(--dim-grey)]">
-                            {cluster.records.map((record) => (
+                            {cluster.records.map((record: any) => (
                               <li
                                 key={record.id}
                                 className="rounded-md bg-[rgba(34,34,34,0.03)] px-4 py-3"
@@ -1284,7 +1284,7 @@ export default function SessionAnalysisPage() {
                   <div className="minerva-card p-6">
                     <button
                       type="button"
-                      onClick={() => setShowAllClusters((current) => !current)}
+                      onClick={() => setShowAllClusters((current: any) => !current)}
                       className="minerva-button minerva-button-secondary"
                     >
                       {showAllClusters
@@ -1294,7 +1294,7 @@ export default function SessionAnalysisPage() {
 
                     {showAllClusters && (
                       <div className="mt-5 space-y-3">
-                        {remainingClusters.map((cluster) => (
+                        {remainingClusters.map((cluster: any) => (
                           <div
                             key={cluster.id}
                             className="rounded-lg border border-[var(--rule)] px-4 py-3"
@@ -1328,7 +1328,7 @@ export default function SessionAnalysisPage() {
               title="What to do"
               subtitle="Concrete actions for before and during class, drawn from the analysis above"
               open={openDo}
-              onToggle={() => setOpenDo((v) => !v)}
+              onToggle={() => setOpenDo((v: any) => !v)}
             />
 
             {/* Section 3 content — gated on openDo */}
@@ -1359,7 +1359,7 @@ export default function SessionAnalysisPage() {
                   <input
                     type="checkbox"
                     checked={detailedView}
-                    onChange={(event) => setDetailedView(event.target.checked)}
+                    onChange={(event: any) => setDetailedView(event.target.checked)}
                     className="mr-2"
                   />
                   Detailed view
@@ -1390,7 +1390,7 @@ export default function SessionAnalysisPage() {
               </div>
             ) : (
               <div className="space-y-6">
-                {recommendations.map((recommendation) => (
+                {recommendations.map((recommendation: any) => (
                   <div key={recommendation.id} className="minerva-card p-6">
                     <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                       <div className="min-w-0 flex-1">
@@ -1414,7 +1414,7 @@ export default function SessionAnalysisPage() {
                         Evidence
                       </p>
                       <ul className="mt-3 space-y-2 text-sm text-[var(--charcoal)]">
-                        {recommendation.evidence.map((item, index) => (
+                        {recommendation.evidence.map((item: any, index: any) => (
                           <li key={`${recommendation.id}-evidence-${index}`}>• {item}</li>
                         ))}
                       </ul>
@@ -1434,7 +1434,7 @@ export default function SessionAnalysisPage() {
                                 key={tabId}
                                 type="button"
                                 onClick={() =>
-                                  setExpandedRecommendationId((current) =>
+                                  setExpandedRecommendationId((current: any) =>
                                     current === tabId ? null : tabId
                                   )
                                 }
@@ -1569,7 +1569,7 @@ export default function SessionAnalysisPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--rule)]">
-                      {studentsSummary.map((student) => {
+                      {studentsSummary.map((student: any) => {
                         const isExpanded = expandedStudentId === student.id;
                         const assessments = loAssessmentsByStudent[student.id]?.assessments || [];
 
@@ -1633,12 +1633,12 @@ export default function SessionAnalysisPage() {
                                       </h4>
                                       {assessments.length > 0 ? (
                                         <div className="space-y-4">
-                                          {assessments.map((assessment) => (
+                                          {assessments.map((assessment: any) => (
                                             <LOAssessmentCard
                                               key={assessment.id}
                                               assessment={assessment}
                                               reviewContext={report?.brief?.learningOutcomeEvidence.find(
-                                                (item) =>
+                                                (item: any) =>
                                                   normalizeOutcomeLabel(item.label) ===
                                                   normalizeOutcomeLabel(assessment.learningOutcome)
                                               )}

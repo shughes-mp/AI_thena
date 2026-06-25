@@ -60,7 +60,7 @@ export default function StudentEntryForm({ sessionId, accessCode }: StudentEntry
           id="student-name"
           type="text"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e: any) => setName(e.target.value)}
           placeholder="Enter your first and last name"
           className="minerva-input"
           required

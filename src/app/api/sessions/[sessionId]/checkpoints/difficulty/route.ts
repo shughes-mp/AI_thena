@@ -25,17 +25,17 @@ export async function GET(
       orderBy: { orderIndex: "asc" },
     });
 
-    const difficulty = checkpoints.map((checkpoint) => {
+    const difficulty = checkpoints.map((checkpoint: any) => {
       const total = checkpoint.studentCheckpoints.length;
       const addressed = checkpoint.studentCheckpoints.filter(
-        (studentCheckpoint) => studentCheckpoint.status !== "unseen"
+        (studentCheckpoint: any) => studentCheckpoint.status !== "unseen"
       ).length;
-      const mastered = checkpoint.studentCheckpoints.filter((studentCheckpoint) =>
+      const mastered = checkpoint.studentCheckpoints.filter((studentCheckpoint: any) =>
         ["mastered", "passed", "evidence_sufficient"].includes(
           studentCheckpoint.status
         )
       ).length;
-      const struggling = checkpoint.studentCheckpoints.filter((studentCheckpoint) =>
+      const struggling = checkpoint.studentCheckpoints.filter((studentCheckpoint: any) =>
         ["in_progress", "stuck", "evidence_insufficient", "probing"].includes(
           studentCheckpoint.status
         )
@@ -43,9 +43,9 @@ export async function GET(
       const avgTurns =
         addressed > 0
           ? checkpoint.studentCheckpoints
-              .filter((studentCheckpoint) => studentCheckpoint.status !== "unseen")
+              .filter((studentCheckpoint: any) => studentCheckpoint.status !== "unseen")
               .reduce(
-                (sum, studentCheckpoint) => sum + studentCheckpoint.turnsSpent,
+                (sum: any, studentCheckpoint: any) => sum + studentCheckpoint.turnsSpent,
                 0
               ) / addressed
           : 0;

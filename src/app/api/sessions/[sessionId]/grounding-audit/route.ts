@@ -44,7 +44,7 @@ export async function GET(
       }),
     ]);
 
-    const counts = groundings.reduce<Record<string, number>>((result, item) => {
+    const counts = groundings.reduce<Record<string, number>>((result: any, item: any) => {
       result[item.status] = (result[item.status] ?? 0) + 1;
       return result;
     }, {});
@@ -56,7 +56,7 @@ export async function GET(
         sourceGroundingReady: session.readings.length > 0,
       },
       counts,
-      groundings: groundings.map((item) => ({
+      groundings: groundings.map((item: any) => ({
         id: item.id,
         learnerName: item.studentSession.studentName,
         response: item.message.content,
@@ -65,7 +65,7 @@ export async function GET(
         unsupportedReason: item.unsupportedReason,
         sourceSetVersion: item.sourceSetVersion,
         createdAt: item.createdAt.toISOString(),
-        citations: item.citations.map((citation) => ({
+        citations: item.citations.map((citation: any) => ({
           id: citation.id,
           filename: citation.filename,
           passageId: citation.passageId,
@@ -74,7 +74,7 @@ export async function GET(
           endOffset: citation.endOffset,
         })),
       })),
-      protectionEvents: protectionEvents.map((item) => ({
+      protectionEvents: protectionEvents.map((item: any) => ({
         id: item.id,
         learnerName: item.studentSession.studentName,
         triggerType: item.triggerType,
