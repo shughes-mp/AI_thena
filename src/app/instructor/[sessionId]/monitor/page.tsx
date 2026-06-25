@@ -401,13 +401,13 @@ export default function StudentMonitorPage() {
                                   </div>
                                 ) : expandedDetail?.id === student.id ? (
                                   <>
-                                    {expandedDetail.topicMastery.length > 0 && (
+                                    {expandedDetail!.topicMastery.length > 0 && (
                                       <div className="mb-4 rounded-lg border border-[var(--rule)] bg-[rgba(34,34,34,0.02)] p-4">
                                         <p className="text-xs font-semibold uppercase tracking-widest text-[var(--dim-grey)]">
                                           Topic evidence
                                         </p>
                                         <div className="mt-2 flex flex-wrap gap-2">
-                                          {expandedDetail.topicMastery.map((topicMastery: any) => (
+                                          {expandedDetail!.topicMastery.map((topicMastery: any) => (
                                             <span
                                               key={topicMastery.id}
                                               className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium ${
@@ -428,9 +428,9 @@ export default function StudentMonitorPage() {
                                       </div>
                                     )}
                                     <ExchangeReplay
-                                      messages={expandedDetail.messages}
-                                      misconceptions={expandedDetail.misconceptions}
-                                      confidenceChecks={expandedDetail.confidenceChecks}
+                                      messages={expandedDetail!.messages}
+                                      misconceptions={expandedDetail!.misconceptions}
+                                      confidenceChecks={expandedDetail!.confidenceChecks}
                                     />
                                   </>
                                 ) : (
