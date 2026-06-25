@@ -420,8 +420,8 @@ export default function SessionManagementPage() {
       if (!res.ok) {
         throw new Error(data?.error || "Failed to generate suggestions.");
       }
-      setSuggestions(data?.suggestions ? []);
-      if ((data?.suggestions ? []).length === 0) {
+      setSuggestions(data?.suggestions ?? []);
+      if ((data?.suggestions ?? []).length === 0) {
         setToast({
           tone: "error",
           message: "No suggestions were generated. Try adding more source content.",

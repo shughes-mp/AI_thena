@@ -80,9 +80,9 @@ const PARTICIPATION_FIELDS: Array<{
 ];
 
 const MODE_LABELS: Record<PlannedFacilitationMode, string> = {
-  observer: "Observer · preserve learner control",
-  guide: "Guide · offer one focusing prompt",
-  conductor: "Conductor · use a brief shared reset",
+  observer: "Observer Â· preserve learner control",
+  guide: "Guide Â· offer one focusing prompt",
+  conductor: "Conductor Â· use a brief shared reset",
 };
 
 function CheckBadge({ status }: { status: SessionDesignCheck["status"] }) {
@@ -354,7 +354,7 @@ export default function SessionPlanningPage() {
               <PreviewItem label="Orientation">{data.preview.orientation}</PreviewItem>
               <PreviewItem label="Opening question">
                 <blockquote className="border-l-2 border-[var(--teal)] pl-4 italic">
-                  “{data.preview.openingQuestion}”
+                  â€œ{data.preview.openingQuestion}â€
                 </blockquote>
               </PreviewItem>
               <PreviewItem label="Purpose">
