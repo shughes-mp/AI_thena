@@ -100,9 +100,14 @@ function FileIcon() {
 interface WorkspaceHeaderProps {
   session: SessionDetails;
   subtitle?: string;
+  showWorkspaceItems?: boolean;
 }
 
-export function WorkspaceHeader({ session, subtitle }: WorkspaceHeaderProps) {
+export function WorkspaceHeader({
+  session,
+  subtitle,
+  showWorkspaceItems = true,
+}: WorkspaceHeaderProps) {
   const purposeOption = getSessionPurposeOption(session.sessionPurpose);
 
   return (
@@ -132,7 +137,7 @@ export function WorkspaceHeader({ session, subtitle }: WorkspaceHeaderProps) {
             </p>
           ) : null}
         </div>
-        <InstructorWorkspaceNavigation sessionId={session.id} />
+        <InstructorWorkspaceNavigation sessionId={session.id} showItems={showWorkspaceItems} />
       </div>
     </div>
   );
@@ -386,7 +391,7 @@ export function SessionInsightsCard({
     const completedLearners = liveStatus.filter((l) => l.endedAt);
     const concernCount = activeLearners.filter((l) => l.hasRecentEngagementConcern).length;
     const waitingLong = activeLearners.filter(
-      (l) => l.isWaitingForStudentReply && (l.secondsSinceLastMessage ?? 0) > 180
+      (l) => l.isWaitingForStudentReply && (l.secondsSinceLastMessage ? 0) > 180
     ).length;
     const hasConcerns = concernCount > 0 || waitingLong > 0;
 
@@ -587,6 +592,8 @@ export function ReadingsSection({
   handlers,
 }: ReadingsSectionProps) {
   const { dragActive, uploadingCategory, recentUploadCategory, recentUploadName } = uiState;
+  const statusLabel = readings.length > 0 ? "Configured" : "Needs setup";
+  const statusClass = readings.length > 0 ? "text-[var(--teal)]" : "text-[#906f12]";
 
   return (
     <div id="source-materials" className="minerva-card scroll-mt-24 overflow-hidden">
@@ -606,7 +613,12 @@ export function ReadingsSection({
             <p className="mt-2 text-sm text-[#906f12]">No source materials yet - upload to ground AI_thena</p>
           )}
         </div>
-        <ChevronIcon open={open} />
+        <div className="flex items-center gap-3">
+          <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${statusClass}`}>
+            {statusLabel}
+          </span>
+          <ChevronIcon open={open} />
+        </div>
       </button>
 
       {open && (
@@ -626,7 +638,7 @@ export function ReadingsSection({
             onClick={() => readingInputRef.current?.click()}
           >
             {uploadingCategory === "reading" ? (
-              <LoadingState message="Uploading…" />
+              <LoadingState message="Uploading..." />
             ) : (
               <>
                 <svg className="h-7 w-7 text-[var(--dim-grey)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -648,7 +660,7 @@ export function ReadingsSection({
 
           {/* Recent upload banner */}
           {recentUploadCategory === "reading" && recentUploadName && (
-            <p className="text-xs text-[var(--teal)]">✓ {recentUploadName} uploaded</p>
+            <p className="text-xs text-[var(--teal)]">? {recentUploadName} uploaded</p>
           )}
 
           {/* File list */}
@@ -755,6 +767,8 @@ export function QuestionsSection({
 
   const recommendedCount = Math.max(2, Math.floor((session.maxExchanges - 4) / 4));
   const tooMany = checkpoints.length > recommendedCount + 2;
+  const statusLabel = checkpoints.length > 0 ? "Configured" : "Needs setup";
+  const statusClass = checkpoints.length > 0 ? "text-[var(--teal)]" : "text-[#906f12]";
 
   return (
     <div id="evidence-questions" className="minerva-card scroll-mt-24 overflow-hidden">
@@ -774,7 +788,12 @@ export function QuestionsSection({
             <p className="mt-2 text-sm text-[#906f12]">No questions yet - add 2-4 to guide AI_thena</p>
           )}
         </div>
-        <ChevronIcon open={open} />
+        <div className="flex items-center gap-3">
+          <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${statusClass}`}>
+            {statusLabel}
+          </span>
+          <ChevronIcon open={open} />
+        </div>
       </button>
 
       {open && (
@@ -841,7 +860,7 @@ export function QuestionsSection({
                           </p>
                           <ul className="mt-1 space-y-0.5 text-xs text-[var(--dim-grey)]">
                             {suggestion.expectations.map((e, i) => (
-                              <li key={i}>— {e}</li>
+                              <li key={i}>- {e}</li>
                             ))}
                           </ul>
                         </div>
@@ -853,7 +872,7 @@ export function QuestionsSection({
                           </p>
                           <ul className="mt-1 space-y-0.5 text-xs text-[var(--dim-grey)]">
                             {suggestion.misconceptions.map((m, i) => (
-                              <li key={i}>— {m}</li>
+                              <li key={i}>- {m}</li>
                             ))}
                           </ul>
                         </div>
@@ -1042,27 +1061,30 @@ export function GoalsSection({
     <div id="learning-purpose" className="minerva-card scroll-mt-24 overflow-hidden">
       <button
         onClick={onToggle}
-        className="flex w-full items-center justify-between px-4 py-5 transition-colors hover:bg-[rgba(34,34,34,0.02)] md:px-8"
+        className="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-[rgba(34,34,34,0.02)] md:p-8"
       >
         <div className="flex items-center gap-4">
-          <ChevronIcon open={open} />
-          <h2 className="text-base font-medium text-[var(--charcoal)] tracking-[-0.01em]">
+          <h2 className="font-serif text-[34px] leading-[1] tracking-[-0.03em] text-[var(--charcoal)]">
             Step 1: Task & learning outcomes
           </h2>
         </div>
-        {session.learningOutcomes && session.learningOutcomes.trim().length > 0 ? (
-          <span className="text-[11px] font-semibold text-[var(--teal)] uppercase tracking-[0.06em]">
-            Configured
-          </span>
-        ) : (
-          <span className="text-[11px] font-semibold text-[var(--signal)] uppercase tracking-[0.06em]">
-            Required
-          </span>
-        )}
+        <div className="flex items-center gap-3">
+          {session.learningOutcomes && session.learningOutcomes.trim().length > 0 ? (
+            <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--teal)]">
+              Configured
+            </span>
+          ) : (
+            <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--signal)]">
+              Needs setup
+            </span>
+          )}
+          <ChevronIcon open={open} />
+        </div>
       </button>
 
       {open && (
-        <div className="border-t border-[var(--rule)] bg-white px-4 py-8 md:px-14 md:py-10 space-y-8">
+        <div className="border-t border-[var(--rule)] bg-white px-6 py-8 md:px-8 md:py-10">
+          <div className="space-y-8">
           <div className="space-y-3">
             <label className="minerva-label">Where are you in the learning cycle?</label>
             <p className="text-xs text-[var(--dim-grey)]">
@@ -1132,6 +1154,7 @@ export function GoalsSection({
             {showSavedState && configSavedAt && (
               <p className="text-xs text-[var(--teal)]">Saved at {formatSavedTime(configSavedAt)}</p>
             )}
+          </div>
           </div>
         </div>
       )}
@@ -1478,7 +1501,7 @@ export function AssessmentsSection({
             onClick={() => assessmentInputRef.current?.click()}
           >
             {uploadingCategory === "assessment" ? (
-              <LoadingState message="Uploading…" />
+              <LoadingState message="Uploading..." />
             ) : (
               <>
                 <svg className="h-7 w-7 text-[var(--dim-grey)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1499,7 +1522,7 @@ export function AssessmentsSection({
           </div>
 
           {recentUploadCategory === "assessment" && recentUploadName && (
-            <p className="text-xs text-[var(--teal)]">✓ {recentUploadName} uploaded</p>
+            <p className="text-xs text-[var(--teal)]">? {recentUploadName} uploaded</p>
           )}
 
           {assessments.length > 0 && (
@@ -1528,4 +1551,5 @@ export function AssessmentsSection({
     </div>
   );
 }
+
 

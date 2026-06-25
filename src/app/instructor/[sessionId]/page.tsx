@@ -9,9 +9,9 @@ import {
   AssessmentsSection,
   QuestionsSection,
   ReadingsSection,
+  WorkspaceHeader,
   TeachingContextSection,
   GoalsSection,
-  WorkspaceHeader,
 } from "@/components/instructor/session-workspace-panels";
 import type {
   CheckpointRecord,
@@ -32,65 +32,6 @@ function formatSavedTime(date: Date) {
     minute: "2-digit",
   });
 }
-
-type SetupCardStatus = "complete" | "attention" | "ready" | "locked";
-
-function SetupStepCard({
-  step,
-  title,
-  description,
-  status,
-  onClick,
-}: {
-  step: number;
-  title: string;
-  description: string;
-  status: SetupCardStatus;
-  onClick: () => void;
-}) {
-  const statusCopy = {
-    complete: "Complete",
-    attention: "Needs setup",
-    ready: "Ready",
-    locked: "Locked",
-  } as const;
-
-  const statusStyles = {
-    complete: "border-[rgba(17,120,144,0.28)] bg-[rgba(17,120,144,0.05)]",
-    attention: "border-[rgba(223,47,38,0.2)] bg-white",
-    ready: "border-[rgba(17,120,144,0.18)] bg-white",
-    locked: "border-[var(--rule)] bg-[rgba(34,34,34,0.02)]",
-  } as const;
-
-  const badgeStyles = {
-    complete: "border-[rgba(17,120,144,0.24)] bg-[rgba(17,120,144,0.08)] text-[var(--teal)]",
-    attention: "border-[rgba(223,47,38,0.22)] bg-[rgba(223,47,38,0.08)] text-[var(--signal)]",
-    ready: "border-[var(--rule)] bg-white text-[var(--charcoal)]",
-    locked: "border-[var(--rule)] bg-[rgba(34,34,34,0.02)] text-[var(--dim-grey)]",
-  } as const;
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`block w-full rounded-xl border p-4 text-left transition-colors hover:border-[rgba(17,120,144,0.28)] ${statusStyles[status]}`}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <span
-          className={`inline-flex min-w-[2rem] items-center justify-center rounded-full border px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] ${badgeStyles[status]}`}
-        >
-          {status === "complete" ? "Done" : step}
-        </span>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--dim-grey)]">
-          {statusCopy[status]}
-        </span>
-      </div>
-      <h2 className="mt-4 text-base font-medium tracking-[-0.01em] text-[var(--charcoal)]">{title}</h2>
-      <p className="mt-2 text-sm leading-6 text-[var(--dim-grey)]">{description}</p>
-    </button>
-  );
-}
-
 
 export default function SessionManagementPage() {
   const params = useParams();
@@ -479,8 +420,8 @@ export default function SessionManagementPage() {
       if (!res.ok) {
         throw new Error(data?.error || "Failed to generate suggestions.");
       }
-      setSuggestions(data?.suggestions ?? []);
-      if ((data?.suggestions ?? []).length === 0) {
+      setSuggestions(data?.suggestions ? []);
+      if ((data?.suggestions ? []).length === 0) {
         setToast({
           tone: "error",
           message: "No suggestions were generated. Try adding more source content.",
@@ -783,41 +724,8 @@ export default function SessionManagementPage() {
         <WorkspaceHeader
           session={session}
           subtitle="Set up the learner task, preview the learner experience, and share when ready."
+          showWorkspaceItems={false}
         />
-
-        <section className="minerva-card p-4 md:p-5" aria-labelledby="setup-map-heading">
-          <h2 id="setup-map-heading" className="sr-only">Setup progress</h2>
-          <div className="grid gap-3 lg:grid-cols-4">
-            <SetupStepCard
-              step={1}
-              title="Task"
-              description="Choose the learning-cycle purpose and define the outcomes you want to assess."
-              status={hasLearningOutcome ? "complete" : "attention"}
-              onClick={() => openSetupSection("task")}
-            />
-            <SetupStepCard
-              step={2}
-              title="Materials"
-              description="Upload the reading or source material learners should use as their primary reference."
-              status={hasReadings ? "complete" : "attention"}
-              onClick={() => openSetupSection("materials")}
-            />
-            <SetupStepCard
-              step={3}
-              title="Questions"
-              description="Add one or more core questions so AI_thena knows what evidence to listen for."
-              status={hasQuestions ? "complete" : "attention"}
-              onClick={() => openSetupSection("questions")}
-            />
-            <SetupStepCard
-              step={4}
-              title="Preview & share"
-              description="Check the learner experience, then reveal and copy the learner link when the session is ready."
-              status={!previewReady ? "locked" : previewChecked ? "complete" : "ready"}
-              onClick={() => openSetupSection("preview")}
-            />
-          </div>
-        </section>
 
         {error ? (
           <div className="border border-[rgba(223,47,38,0.24)] bg-[rgba(223,47,38,0.08)] px-4 py-3 text-sm text-[var(--signal)]">
@@ -900,23 +808,29 @@ export default function SessionManagementPage() {
           <button
             type="button"
             onClick={() => setShowPreviewShare((value) => !value)}
-            className="flex w-full items-center justify-between px-4 py-5 transition-colors hover:bg-[rgba(34,34,34,0.02)] md:px-8"
+            className="flex w-full items-center justify-between px-6 py-6 text-left transition-colors hover:bg-[rgba(34,34,34,0.02)] md:px-8"
             aria-expanded={showPreviewShare}
             aria-controls="preview-share-panel"
           >
-            <div className="flex items-center gap-4">
-              <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full border text-[11px] font-semibold ${previewChecked ? "border-[var(--teal)] bg-[var(--teal)] text-white" : "border-[var(--rule)] text-[var(--dim-grey)]"}`}>
-                {previewChecked ? "✓" : "4"}
-              </span>
-              <h2 id="preview-share-heading" className="text-base font-medium tracking-[-0.01em] text-[var(--charcoal)]">
+            <div>
+              <h2 id="preview-share-heading" className="font-serif text-[34px] leading-[1] tracking-[-0.03em] text-[var(--charcoal)]">
                 Step 4: Preview & share
               </h2>
+              {!showPreviewShare ? (
+                <p className="mt-2 text-sm text-[var(--dim-grey)]">
+                  {previewChecked
+                    ? "Learner preview checked and link ready to copy"
+                    : previewReady
+                      ? "Preview the learner flow, then reveal the learner link"
+                      : "Complete Steps 1-3 to unlock preview and sharing"}
+                </p>
+              ) : null}
             </div>
             <div className="flex items-center gap-3">
               <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${previewChecked ? "text-[var(--teal)]" : previewReady ? "text-[var(--charcoal)]" : "text-[var(--dim-grey)]"}`}>
-                {previewChecked ? "Complete" : previewReady ? "Ready" : "Locked"}
+                {previewChecked ? "Configured" : previewReady ? "Ready" : "Locked"}
               </span>
-              <span className={`inline-block transition-transform ${showPreviewShare ? "rotate-180" : ""}`}>⌄</span>
+              <ChevronIcon open={showPreviewShare} />
             </div>
           </button>
 
@@ -933,7 +847,7 @@ export default function SessionManagementPage() {
                   className={`minerva-button ${previewReady ? "" : "pointer-events-none opacity-50"}`}
                   aria-disabled={!previewReady}
                 >
-                  {previewChecked ? "Preview checked - open again" : "Preview learner experience"}
+                  {previewChecked ? "Preview checked — open again" : "Preview learner experience"}
                 </Link>
               </div>
 
@@ -1008,11 +922,15 @@ export default function SessionManagementPage() {
                 />
               </div>
 
-              <section id="source-use-safeguards" className="minerva-card p-6 md:p-8" aria-labelledby="source-use-summary-heading">
+              <section
+                id="source-use-safeguards"
+                className="minerva-card overflow-hidden"
+                aria-labelledby="source-use-summary-heading"
+              >
                 <button
                   type="button"
                   onClick={() => setShowSourceUseDetails((value) => !value)}
-                  className="flex w-full items-start justify-between gap-4 text-left"
+                  className="flex w-full items-center justify-between gap-4 p-6 text-left md:p-8"
                   aria-expanded={showSourceUseDetails}
                   aria-controls="source-use-details"
                 >
@@ -1025,12 +943,19 @@ export default function SessionManagementPage() {
                       Your readings remain the tutor&apos;s primary reference. Broader explanations, examples, and connections are allowed, but they are distinguished from course-reading claims.
                     </p>
                   </div>
-                  <span className="minerva-button minerva-button-secondary shrink-0 text-sm">
-                    {showSourceUseDetails ? "Hide details" : "Show details"}
+                  <span
+                    className={`inline-block shrink-0 text-[var(--dim-grey)] transition-transform ${
+                      showSourceUseDetails ? "rotate-180" : ""
+                    }`}
+                  >
+                    ⌄
                   </span>
                 </button>
                 {showSourceUseDetails ? (
-                  <div id="source-use-details" className="mt-6 grid gap-5 border-t border-[var(--rule)] pt-6 text-sm md:grid-cols-2">
+                  <div
+                    id="source-use-details"
+                    className="grid gap-5 border-t border-[var(--rule)] bg-white px-6 py-6 text-sm md:grid-cols-2 md:px-8"
+                  >
                     <div>
                       <p className="eyebrow eyebrow-teal">Source use</p>
                       <p className="mt-2 leading-6 text-[var(--dim-grey)]">

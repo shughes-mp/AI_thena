@@ -66,8 +66,10 @@ function getActivePhase(key: InstructorWorkspaceNavKey): InstructorWorkspacePhas
 
 export function InstructorWorkspaceNavigation({
   sessionId,
+  showItems = true,
 }: {
   sessionId: string;
+  showItems?: boolean;
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -103,7 +105,7 @@ export function InstructorWorkspaceNavigation({
               aria-selected={selected}
               className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
                 selected
-                  ? "border-[var(--teal)] bg-[var(--teal)] text-white shadow-[0_10px_24px_rgba(17,120,144,0.18)]"
+                  ? "border-[var(--teal)] bg-[var(--teal)] text-white"
                   : "border-[var(--rule)] bg-white text-[var(--dim-grey)] hover:border-[rgba(17,120,144,0.28)] hover:text-[var(--charcoal)]"
               }`}
             >
@@ -113,28 +115,30 @@ export function InstructorWorkspaceNavigation({
         })}
       </div>
 
-      <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-5">
-        {activePhaseConfig.items.map((item) => {
-          const selected = item.key === activeItemKey;
-          return (
-            <Link
-              key={item.key}
-              href={item.href}
-              className={`border p-4 transition-colors ${
-                selected
-                  ? "border-[var(--teal)] bg-[rgba(17,120,144,0.06)]"
-                  : "border-[var(--rule)] bg-white hover:border-[rgba(17,120,144,0.28)]"
-              }`}
-              aria-current={selected ? "page" : undefined}
-            >
-              <p className="text-sm font-semibold text-[var(--charcoal)]">{item.label}</p>
-              <p className="mt-2 text-sm leading-6 text-[var(--dim-grey)]">
-                {item.description}
-              </p>
-            </Link>
-          );
-        })}
-      </div>
+      {showItems ? (
+        <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-5">
+          {activePhaseConfig.items.map((item) => {
+            const selected = item.key === activeItemKey;
+            return (
+              <Link
+                key={item.key}
+                href={item.href}
+                className={`border p-4 transition-colors ${
+                  selected
+                    ? "border-[var(--teal)] bg-[rgba(17,120,144,0.06)]"
+                    : "border-[var(--rule)] bg-white hover:border-[rgba(17,120,144,0.28)]"
+                }`}
+                aria-current={selected ? "page" : undefined}
+              >
+                <p className="text-sm font-semibold text-[var(--charcoal)]">{item.label}</p>
+                <p className="mt-2 text-sm leading-6 text-[var(--dim-grey)]">
+                  {item.description}
+                </p>
+              </Link>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }
