@@ -391,7 +391,7 @@ export function SessionInsightsCard({
     const completedLearners = liveStatus.filter((l) => l.endedAt);
     const concernCount = activeLearners.filter((l) => l.hasRecentEngagementConcern).length;
     const waitingLong = activeLearners.filter(
-      (l) => l.isWaitingForStudentReply && (l.secondsSinceLastMessage ? 0) > 180
+      (l) => l.isWaitingForStudentReply && (l.secondsSinceLastMessage ?? 0) > 180
     ).length;
     const hasConcerns = concernCount > 0 || waitingLong > 0;
 
